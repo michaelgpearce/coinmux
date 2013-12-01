@@ -1,0 +1,6 @@
+https://bitcointalk.org/index.php?topic=279249.0
+http://blog.ezyang.com/2012/07/secure-multiparty-bitcoin-anonymization/
+
+https://github.com/lian/bitcoin-ruby#create-transactions
+
+https://en.bitcoin.it/wiki/Script#Scripts

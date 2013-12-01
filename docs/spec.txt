@@ -1,0 +1,87 @@
+# public insert_key and request_key
+PublishQueue
+{
+  TransactionQueueRequestKey: "RequestKey"
+}
+
+# Readable by anyone, writeable only by creator
+ControlQueue
+{
+  MinOutputs: 3
+  MaxOutputs: 4 # always 1 greater to allow for no change addresses
+  OutputAmount: 2000000 # in satoshi, n^2 or fibonacci, num outputs / 2 (+1 if odd) must be == this amount
+  InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  TransactionList: { RequestKey: "RequestKey" }
+  TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
+  Status: "Open" | "Canceled" | "Complete"
+  UpdatedAt: {
+    Blockheight: 270794
+    Nonce: 2617132268
+  }
+}
+
+# Public insert_key and request_key
+# Every client posts all of their inputs individually
+InputList:
+{
+  PublicKey: "123...abc"
+  TransactionId: "123...abc"
+  InputIndex: 0
+  Amount: 1234 # Satoshi (not necessary and must be verified)
+  Signature: "123...abc" # Signature with (PrivateKey, ControlQueueRequestKey + TransactionId + InputIndex)
+}
+
+# Public insert_key and request_key
+# Every client posts all of their outputs individually
+OutputList:
+{
+  Address: "1abc..."
+  Amount: 1234
+}
+
+# Readable by anyone, writeable only by creator
+# Creator publishes every combination of inputs / outputs that follow rules (min / max outputs, input amount <= output amount)
+# Participant only follows TransactionSignatureList when all rules followed and correctly contains all of his inputs and outputs
+TransactionList:
+{
+  TransactionSignatureList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
+  # script should probably just be default and not present
+  Inputs: [
+    {
+      PublicKey: "123...abc"
+      TransactionId: "123...abc"
+      InputIndex: 0
+      Amount: 1234
+      Signature: "123...abc"
+    },
+    {
+      PublicKey: "789...xyz"
+      TransactionId: "789...xyz"
+      InputIndex: 0
+      Amount: 2345
+      Signature: "789...xyz"
+    }
+  ]
+  Outputs: [
+    {
+      Address: "1abc..."
+      Amount: 1234
+    },
+    {
+      Address: "1xyz..."
+      Amount: 2345
+    }
+  ]
+}
+
+# Public insert_key and request_key
+# Signatures occur in order of inputs.
+# For each of my inputs, create full transaction, sign input, and publish here
+# Creator creates transaction, polls for valid signatures, then sends transaction once received, updating ControlQueue
+TransactionSignatureList:
+{
+  InputIndex: 0
+  ScriptSig: '3046... 04e3...' # this is unique for every transaction
+}
