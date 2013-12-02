@@ -4,3 +4,6 @@ http://blog.ezyang.com/2012/07/secure-multiparty-bitcoin-anonymization/
 https://github.com/lian/bitcoin-ruby#create-transactions
 
 https://en.bitcoin.it/wiki/Script#Scripts
+
+# send enc message to multiple recipients
+http://stackoverflow.com/a/38853
