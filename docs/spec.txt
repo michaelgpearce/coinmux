@@ -1,20 +1,28 @@
 # public insert_key and request_key
-PublishQueue
+# Should i have one list per Amount? Probably yes for speed purposes!
+PublishList
 {
-  TransactionQueueRequestKey: "RequestKey"
+  ControllerInstance: { RequestKey: "RequestKey" }
 }
 
-# Readable by anyone, writeable only by creator
-ControlQueue
+# Readable by anyone, writeable only by controller
+ControllerInstance
 {
-  MinOutputs: 3
-  MaxOutputs: 4 # always 1 greater to allow for no change addresses
-  OutputAmount: 2000000 # in satoshi, n^2 or fibonacci, num outputs / 2 (+1 if odd) must be == this amount
+  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  Amount: 2000000 # in satoshi, n^2
+  MinimumSize: 5 # number of inputs / outputs
   InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  MessageVerificationInstance: { RequestKey: "RequestKey" }
   OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  TransactionList: { RequestKey: "RequestKey" }
+  TransactionInstance: { RequestKey: "RequestKey" }
+  ControlStatusQueue: { RequestKey: "RequestKey" }
+}
+
+# Updated with status information
+ControlStatusQueue
+{
+  Status: "WaitingInputs" | "WaitingOutputs" | "WaitingSignatures" | "WaitingConfirmation" | "Failed" | "Complete"
   TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
-  Status: "Open" | "Canceled" | "Complete"
   UpdatedAt: {
     Blockheight: 270794
     Nonce: 2617132268
@@ -22,14 +30,33 @@ ControlQueue
 }
 
 # Public insert_key and request_key
-# Every client posts all of their inputs individually
+# Every client posts all of their input individually
 InputList:
 {
+  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  Address: "1abc..."
   PublicKey: "123...abc"
-  TransactionId: "123...abc"
-  InputIndex: 0
-  Amount: 1234 # Satoshi (not necessary and must be verified)
-  Signature: "123...abc" # Signature with (PrivateKey, ControlQueueRequestKey + TransactionId + InputIndex)
+  Change: { # should allow null if no change
+    Amount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - ControllerInstance#Amount - InputList#ChangeAmount)
+    Address: "1abc"
+  }
+  Signature: "123...abc" # Signature with (PrivateKey, ControllerInstance#RequestKey) to show ownership of address
+  
+  # Adding proof of work is possibly worse... it can cause the controller to get CPU jammed, so don't do it
+  # Nonce: 123...789 # must be unique for this InputList#Address)
+  # ProofOfWork: "123...abc" # Bcrypt hash of (Address, ControllerInstance#RequestKey, Nonce)
+}
+
+# Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
+# Only accepted inputs are given message verification
+MessageVerificationInstance:
+{
+  IdentifierPublicKey: '123...abc' # AES-256; public key used below; unique from all others
+  EncryptedIdentifier: '123...abc' # a random value encrypted with private key for #IdentifierPublicKey; input with access to the Identifier is verified, but we purposefully cannot identify which input sends a verified message
+  EncryptedIdentifierPrivateKeys: [
+    '123...abc', # private key for MessageVerificationInstance#IdentifierPublicKey encrypted with each InputList#MessagePublicKey that will be in transaction
+    ...
+  ]
 }
 
 # Public insert_key and request_key
@@ -37,13 +64,18 @@ InputList:
 OutputList:
 {
   Address: "1abc..."
-  Amount: 1234
+  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  # This scheme maintains no link between the InputList and the OutputList and ensures that we only add outputs owned by an input.
+  # 1. Decrypt my MessageVerificationInstance#EncryptedIdentifierPrivateKeys to get private key for MessageVerificationInstance#EncryptedIdentifier
+  # 2. Decrypt MessageVerificationInstance#EncryptedIdentifier with private key to get Identifier to allow communication
+  # 3. Encrypt (Identifier + Address) with OutputList#MessagePublicKey to ControllerInstance#MessagePublicKey
+  EncryptedMessageValidation: '123...abc'
 }
 
-# Readable by anyone, writeable only by creator
-# Creator publishes every combination of inputs / outputs that follow rules (min / max outputs, input amount <= output amount)
+# Readable by anyone, writeable only by controller
+# Controller publishes only once a transaction that meets its criteria (number of outputs)
 # Participant only follows TransactionSignatureList when all rules followed and correctly contains all of his inputs and outputs
-TransactionList:
+TransactionInstance:
 {
   TransactionSignatureList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
@@ -66,22 +98,26 @@ TransactionList:
   ]
   Outputs: [
     {
-      Address: "1abc..."
-      Amount: 1234
+      Address: "1abc..." # coin join addresses
+      Amount: 200000000
     },
     {
-      Address: "1xyz..."
+      Address: "1xyz..." # change addresses
       Amount: 2345
-    }
+    },
+    ...
   ]
 }
 
 # Public insert_key and request_key
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
-# Creator creates transaction, polls for valid signatures, then sends transaction once received, updating ControlQueue
+# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatusQueue
 TransactionSignatureList:
 {
   InputIndex: 0
   ScriptSig: '3046... 04e3...' # this is unique for every transaction
+  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  # 3. Encrypt (Identifier + InputIndex + ScriptSig) with TransactionSignatureList#MessagePublicKey to ControllerInstance#MessagePublicKey
+  EncryptedMessageValidation: '123...abc'
 }
