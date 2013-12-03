@@ -1,14 +1,15 @@
 # public insert_key and request_key
 # Should i have one list per Amount? Probably yes for speed purposes!
-PublishList
+CoinJoinList
 {
+  Version: 1
   ControllerInstance: { RequestKey: "RequestKey" }
 }
 
 # Readable by anyone, writeable only by controller
 ControllerInstance
 {
-  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 2000000 # in satoshi, n^2
   MinimumSize: 5 # number of inputs / outputs
   InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
@@ -21,10 +22,10 @@ ControllerInstance
 # Updated with status information
 ControlStatusQueue
 {
-  Status: "WaitingInputs" | "WaitingOutputs" | "WaitingSignatures" | "WaitingConfirmation" | "Failed" | "Complete"
+  Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
   UpdatedAt: {
-    Blockheight: 270794
+    BlockHeight: 270794
     Nonce: 2617132268
   }
 }
@@ -33,13 +34,11 @@ ControlStatusQueue
 # Every client posts all of their input individually
 InputList:
 {
-  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Address: "1abc..."
   PublicKey: "123...abc"
-  Change: { # should allow null if no change
-    Amount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - ControllerInstance#Amount - InputList#ChangeAmount)
-    Address: "1abc"
-  }
+  ChangeAddress: "1abc" # Null if no change
+  ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - ControllerInstance#Amount - InputList#ChangeAmount)
   Signature: "123...abc" # Signature with (PrivateKey, ControllerInstance#RequestKey) to show ownership of address
   
   # Adding proof of work is possibly worse... it can cause the controller to get CPU jammed, so don't do it
@@ -51,7 +50,7 @@ InputList:
 # Only accepted inputs are given message verification
 MessageVerificationInstance:
 {
-  IdentifierPublicKey: '123...abc' # AES-256; public key used below; unique from all others
+  IdentifierPublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); public key used below; unique from all others
   EncryptedIdentifier: '123...abc' # a random value encrypted with private key for #IdentifierPublicKey; input with access to the Identifier is verified, but we purposefully cannot identify which input sends a verified message
   EncryptedIdentifierPrivateKeys: [
     '123...abc', # private key for MessageVerificationInstance#IdentifierPublicKey encrypted with each InputList#MessagePublicKey that will be in transaction
@@ -64,7 +63,7 @@ MessageVerificationInstance:
 OutputList:
 {
   Address: "1abc..."
-  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   # This scheme maintains no link between the InputList and the OutputList and ensures that we only add outputs owned by an input.
   # 1. Decrypt my MessageVerificationInstance#EncryptedIdentifierPrivateKeys to get private key for MessageVerificationInstance#EncryptedIdentifier
   # 2. Decrypt MessageVerificationInstance#EncryptedIdentifier with private key to get Identifier to allow communication
@@ -117,7 +116,7 @@ TransactionSignatureList:
 {
   InputIndex: 0
   ScriptSig: '3046... 04e3...' # this is unique for every transaction
-  MessagePublicKey: '123...abc' # AES-256; unique from other MessagePublicKey
+  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   # 3. Encrypt (Identifier + InputIndex + ScriptSig) with TransactionSignatureList#MessagePublicKey to ControllerInstance#MessagePublicKey
   EncryptedMessageValidation: '123...abc'
 }

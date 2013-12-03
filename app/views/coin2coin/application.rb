@@ -11,7 +11,7 @@ class Coin2Coin::Application
   
   def initialize
     @shell = shell {
-      text "Coin2Coin - Bitcoin Mixer"
+      text "Coin2Coin - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer"
       
       tab_folder {
         tab_item {

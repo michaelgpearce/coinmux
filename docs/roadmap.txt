@@ -1,0 +1,13 @@
+V1.0
+* Creates transactions with no bad actors present
+
+v1.1
+* Require minimum confirmations combined with "Bad address" blacklist for not accepting joins
+* Timestamps current from controller to join transaction
+* Timestamps current from participants to accept inputs
+
+v1.2
+* Automatic retries of failed transactions
+
+v2.0
+* Wallet
