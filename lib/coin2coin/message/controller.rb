@@ -10,10 +10,12 @@ class Coin2Coin::Message::Controller < Coin2Coin::Message::Base
   
   attr_accessor :message_private_key
   
-  def initialize
+  def initialize(params = {:amount => nil, :minimum_size => nil})
+    params.assert_valid_keys(:amount, :minimum_size)
+    
     @message_private_key, self.message_public_key = Coin2Coin::PKI.generate_keypair
-    self.amount = 1 * 100_000_000
-    self.minimum_size = 5
+    self.amount = params[:amount]
+    self.minimum_size = params[:minimum_size]
     self.input_list = Coin2Coin::Message::FreenetAssociation.new
     self.message_verification_instance = Coin2Coin::Message::FreenetAssociation.new(true)
     self.output_list = Coin2Coin::Message::FreenetAssociation.new

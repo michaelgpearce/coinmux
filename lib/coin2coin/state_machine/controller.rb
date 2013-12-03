@@ -1,4 +1,4 @@
-class Coin2Coin::StateMachine
+class Coin2Coin::StateMachine::Controller
   # Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   state_machine :state, :initial => :waiting_for_inputs do
     state :waiting_for_inputs do
@@ -45,6 +45,7 @@ class Coin2Coin::StateMachine
   end
 
   def initialize
+    
     
     super() # NOTE: This *must* be called, otherwise states won't get initialized
   end
