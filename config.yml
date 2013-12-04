@@ -1,15 +1,18 @@
 ---
 development:
+  bitcoin_network: 'testnet'
   coin_joins:
     50000000: {insert_key: '', request_key: ''}
     100000000: {insert_key: '', request_key: ''}
     200000000: {insert_key: '', request_key: ''}
 
 test:
+  bitcoin_network: 'testnet'
   coin_joins:
     <% %w(25000000 50000000 100000000 200000000 400000000).each do |amount| %>
     <%= "'#{amount}': {insert_key: 'insert-coin-join-#{amount}', request_key: 'request-coin-join-#{amount}'}" %>
     <% end %>
 
 production:
+  bitcoin_network: 'mainnet'
   
