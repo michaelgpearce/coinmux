@@ -24,6 +24,7 @@ require 'lib/coin2coin/config'
 
 require 'lib/coin2coin/message/base'
 require 'lib/coin2coin/message/association'
+require 'lib/coin2coin/message/coin_join'
 require 'lib/coin2coin/message/controller'
 require 'lib/coin2coin/message/control_status'
 require 'lib/coin2coin/message/input'
