@@ -22,12 +22,20 @@ describe Coin2Coin::StateMachine::Controller do
     let(:coin_join_request_key) { Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['request_key'] }
     
     subject do
-      controller.minimum_participant_size = minimum_participant_size
-      controller.bitcoin_amount = bitcoin_amount
-      controller.announce_coin_join
+      event = nil
+      controller.announce_coin_join(bitcoin_amount, minimum_participant_size) do |e|
+        event = e
+      end
+      event
     end
     
     context "with valid input" do
+      it "invokes callback with no error" do
+        event = subject
+        
+        expect(event.error).to be_nil
+      end
+      
       it "has status waiting_for_inputs" do
         subject
         

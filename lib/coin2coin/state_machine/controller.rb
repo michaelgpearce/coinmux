@@ -1,5 +1,5 @@
 class Coin2Coin::StateMachine::Controller
-  attr_accessor :controller_message, :coin_join_message, :control_status_message, :bitcoin_amount, :minimum_participant_size
+  attr_accessor :controller_message, :coin_join_message, :control_status_message, :bitcoin_amount, :minimum_participant_size, :announce_coin_join_callback
   
   # Status: "New" | "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   state_machine :state, :initial => :new do
@@ -24,7 +24,7 @@ class Coin2Coin::StateMachine::Controller
     state :complete do
     end
     
-    event :announce_coin_join do
+    event :announce_coin_join_event do
       transition :new => :waiting_for_inputs, :if => :can_announce_coin_join?
     end
 
@@ -34,6 +34,14 @@ class Coin2Coin::StateMachine::Controller
   # Keep empty initialize method here so super call isn't forgotten if logic added!
   def initialize
     super() # NOTE: This *must* be called, otherwise states won't get initialized
+  end
+  
+  def announce_coin_join(bitcoin_amount, minimum_participant_size, &callback)
+    self.bitcoin_amount = bitcoin_amount
+    self.minimum_participant_size = minimum_participant_size
+    self.announce_coin_join_callback = callback
+    
+    announce_coin_join_event
   end
   
   private
@@ -50,17 +58,25 @@ class Coin2Coin::StateMachine::Controller
     
     # insert messages in "reverse" order, control_status -> controller -> coin_join
     Coin2Coin::Freenet.instance.insert(control_status_message_insert_key, control_status_message.to_json) do |event|
-      if event.error.nil?
+      handle_error(event, announce_coin_join_callback) do
         Coin2Coin::Freenet.instance.insert(controller_message_insert_key, controller_message.to_json) do |event|
-          if event.error.nil?
+          handle_error(event, announce_coin_join_callback) do
             Coin2Coin::Freenet.instance.insert(coin_join_message_insert_key, coin_join_message.to_json) do |event|
-              if event.error.nil?
-                # TODO: notify success
+              handle_error(event, announce_coin_join_callback) do
+                announce_coin_join_callback.call(Coin2Coin::StateMachine::Event.new)
               end
             end
           end
         end
       end
+    end
+  end
+  
+  def handle_error(event, callback, &block)
+    if event.error.nil?
+      yield
+    else
+      callback.call(Coin2Coin::StateMachine::Event.new(:error => event.error))
     end
   end
   
