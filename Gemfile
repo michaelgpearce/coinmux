@@ -8,10 +8,11 @@ gem 'glimmer', '0.1.3'
 gem 'activemodel', '4.0.1'
 gem 'state_machine', '1.2.0'
 gem 'hashie', '2.0.5'
-gem 'freenet_hash', '0.0.1', :path => File.join(File.dirname(__FILE__), '..', 'freenet_hash')
+gem 'freenet_hash', '0.0.1'
 
 group :development do
   gem 'rake', '10.1.0'
   gem 'wirble', '0.1.3'
   gem 'rspec', '2.14.1'
+  gem 'warbler', '1.4.0'
 end
