@@ -8,7 +8,7 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   
   attr_accessor :message_private_key
   
-  def initialize(params = {:message_public_key})
+  def initialize(params = {:message_public_key => nil})
     params.assert_valid_keys(:message_identifier, :address)
     
     @message_private_key, self.message_public_key = Coin2Coin::PKI.generate_keypair

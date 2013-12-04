@@ -1,9 +1,8 @@
 require 'singleton'
 
-class Coin2Coin::Bitcoin
-  include Singleton
+class Coin2Coin::Fake::Bitcoin
 
   def current_block_height_and_nonce
-    raise "TODO"
+    [270794, 2617132268]
   end
 end

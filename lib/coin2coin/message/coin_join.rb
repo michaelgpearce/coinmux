@@ -6,6 +6,6 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   
   def initialize
     self.version = VERSION
-    self.controller_instance = Coin2Coin::Message::FreenetAssociation.new(true)
+    self.controller_instance = Coin2Coin::Message::Association.new(true)
   end
 end

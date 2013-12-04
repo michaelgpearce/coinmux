@@ -11,5 +11,7 @@ gem 'hashie', '2.0.5'
 gem 'freenet_hash', '0.0.1', :path => File.join(File.dirname(__FILE__), '..', 'freenet_hash')
 
 group :development do
-  gem 'wirble'
+  gem 'rake', '10.1.0'
+  gem 'wirble', '0.1.3'
+  gem 'rspec', '2.14.1'
 end
