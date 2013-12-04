@@ -29,8 +29,9 @@ require 'lib/coin2coin/message/controller'
 require 'lib/coin2coin/message/control_status'
 require 'lib/coin2coin/message/input'
 
-require 'lib/coin2coin/state_machine/controller'
 require 'lib/coin2coin/state_machine/event'
+require 'lib/coin2coin/state_machine/controller'
+require 'lib/coin2coin/state_machine/participant'
 
 require 'app/models/coin2coin/base'
 require 'app/models/coin2coin/transaction'
