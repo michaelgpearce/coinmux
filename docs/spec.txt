@@ -43,7 +43,7 @@ InputList:
   
   # Adding proof of work is possibly worse... it can cause the controller to get CPU jammed, so don't do it
   # Nonce: 123...789 # must be unique for this InputList#Address)
-  # ProofOfWork: "123...abc" # Bcrypt hash of (Address, ControllerInstance#RequestKey, Nonce)
+  # ProofOfWork: "123...abc" # Scrypt hash of (Address, ControllerInstance#RequestKey, Nonce)
 }
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
