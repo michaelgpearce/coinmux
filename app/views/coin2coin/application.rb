@@ -1,13 +1,22 @@
 require 'swt'
 require 'glimmer'
+require 'singleton'
 
 class Coin2Coin::Application
-  include Glimmer
-
+  include Glimmer, Singleton
+  
   include_package 'org.eclipse.swt'
   include_package 'org.eclipse.swt.widgets'
   include_package 'org.eclipse.swt.layout'
   include_package 'org.eclipse.jface.viewers'
+  
+  def async_exec(&block)
+    @shell.display.async_exec(&block)
+  end
+  
+  def sync_exec(&block)
+    @shell.display.sync_exec(&block)
+  end
   
   def initialize
     @shell = shell {
@@ -117,8 +126,7 @@ class Coin2Coin::Application
       @shell.display.sleep unless @shell.display.readAndDispatch
     end
     @shell.display.dispose
-    
-    # @shell.open
+    @shell = nil
   end
   
   private
