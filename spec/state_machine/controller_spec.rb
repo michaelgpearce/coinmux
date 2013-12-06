@@ -10,30 +10,30 @@ describe Coin2Coin::StateMachine::Controller do
       Coin2Coin::StateMachine::Controller.new
     end
     
-    it "should be in the new state" do
-      expect(subject.state).to eq('new')
+    it "should be in the initialized state" do
+      expect(subject.state).to eq('initialized')
     end
   end
   
-  context "#announce_coin_join" do
+  context "#start" do
     let(:controller) { Coin2Coin::StateMachine::Controller.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:minimum_participant_size) { 5 }
     let(:coin_join_request_key) { Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['request_key'] }
     
     subject do
-      event = nil
-      controller.announce_coin_join(bitcoin_amount, minimum_participant_size) do |e|
-        event = e
+      callback_events = []
+      controller.start(bitcoin_amount, minimum_participant_size) do |e|
+        callback_events << e
       end
-      event
+      callback_events
     end
     
     context "with valid input" do
       it "invokes callback with no error" do
-        event = subject
+        callback_events = subject
         
-        expect(event.error).to be_nil
+        expect(callback_events.collect(&:type)).to eq([:inserting_control_status_message, :inserting_controller_message, :inserting_coin_join_message, :waiting_for_inputs])
       end
       
       it "has status waiting_for_inputs" do
