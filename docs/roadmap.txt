@@ -1,13 +1,25 @@
-V1.0
+v0.1 - Functional Prototype
 * Creates transactions with no bad actors present
+* Works for testnet usage
+
+v0.2 - Functional Prototype
+* Creates transactions with no bad actors present
+* Works for small value mainnet usage for advanced users
+
+v0.3 - Improve deterrence of bad actors
+* Add proof of work for posting inputs:
+  # Nonce: 123...789 # must be unique for this InputList#Address)
+  # ProofOfWork: "123...abc" # Scrypt hash of (Address, CoinJoin#Identifier, Nonce) < CoinJoin#Difficulty
+* Require minimum confirmations for input address
+* Blacklist of "bad addresses" (probably not workable)
+* Works for mainnet usage for advanced users
+
+v0.4 - Embed Freenet (or move to P2P or Bitmessage)
+
+v1.0 - Stable enough and feature rich enough for novice users
+* Installers for OSX, Windows, Linux
 
 v1.1
-* Require minimum confirmations combined with "Bad address" blacklist for not accepting joins
-* Timestamps current from controller to join transaction
-* Timestamps current from participants to accept inputs
-
-v1.2
 * Automatic retries of failed transactions
 
-v2.0
-* Wallet
+v2.0 - Anonymous Wallet
