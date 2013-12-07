@@ -1,4 +1,4 @@
-class Coin2Coin::Message::ControlStatus < Coin2Coin::Message::Base
+class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   property :status
   property :transaction_id
   property :updated_at

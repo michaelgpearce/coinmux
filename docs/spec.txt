@@ -1,14 +1,7 @@
 # public insert_key and request_key
-# Should i have one list per Amount? Probably yes for speed purposes!
 CoinJoinList
 {
   Version: 1
-  ControllerInstance: { RequestKey: "RequestKey" }
-}
-
-# Readable by anyone, writeable only by controller
-ControllerInstance
-{
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 2000000 # in satoshi, n^2
   MinimumSize: 5 # number of inputs / outputs
@@ -16,11 +9,11 @@ ControllerInstance
   MessageVerificationInstance: { RequestKey: "RequestKey" }
   OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   TransactionInstance: { RequestKey: "RequestKey" }
-  ControlStatusQueue: { RequestKey: "RequestKey" }
+  StatusQueue: { RequestKey: "RequestKey" }
 }
 
 # Updated with status information
-ControlStatusQueue
+StatusQueue
 {
   Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain

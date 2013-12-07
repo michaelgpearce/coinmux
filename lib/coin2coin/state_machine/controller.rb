@@ -1,5 +1,5 @@
 class Coin2Coin::StateMachine::Controller
-  attr_accessor :controller_message, :coin_join_message, :control_status_message, :bitcoin_amount, :minimum_participant_size, :callback
+  attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :minimum_participant_size, :callback
   
   # Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   state_machine :state, :initial => :initialized do
@@ -59,23 +59,17 @@ class Coin2Coin::StateMachine::Controller
   end
   
   def do_announce_coin_join
-    self.coin_join_message = Coin2Coin::Message::CoinJoin.new
+    self.coin_join_message = Coin2Coin::Message::CoinJoin.new(:amount => bitcoin_amount, :minimum_size => minimum_participant_size)
     coin_join_message_insert_key = Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['insert_key']
     
-    self.controller_message = Coin2Coin::Message::Controller.new(:amount => bitcoin_amount, :minimum_size => minimum_participant_size)
-    controller_message_insert_key = coin_join_message.controller_instance.read_only_insert_key
-  
-    self.control_status_message = Coin2Coin::Message::ControlStatus.new(:status => 'WaitingForInputs')
-    control_status_message_insert_key = controller_message.control_status_queue.read_only_insert_key
+    self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+    status_message_insert_key = coin_join_message.status_queue.read_only_insert_key
     
-    # insert messages in "reverse" order, control_status -> controller -> coin_join
-    notify(:inserting_control_status_message)
-    insert_message(control_status_message_insert_key, control_status_message) do
-      notify(:inserting_controller_message)
-      insert_message(controller_message_insert_key, controller_message) do
-        notify(:inserting_coin_join_message)
-        insert_message(coin_join_message_insert_key, coin_join_message)
-      end
+    # insert messages in "reverse" order, status -> coin_join
+    notify(:inserting_status_message)
+    insert_message(status_message_insert_key, status_message) do
+      notify(:inserting_coin_join_message)
+      insert_message(coin_join_message_insert_key, coin_join_message)
     end
   end
   

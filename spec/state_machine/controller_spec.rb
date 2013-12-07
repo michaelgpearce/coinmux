@@ -33,7 +33,7 @@ describe Coin2Coin::StateMachine::Controller do
       it "invokes callback with no error" do
         callback_events = subject
         
-        expect(callback_events.collect(&:type)).to eq([:inserting_control_status_message, :inserting_controller_message, :inserting_coin_join_message, :waiting_for_inputs])
+        expect(callback_events.collect(&:type)).to eq([:inserting_status_message, :inserting_coin_join_message, :waiting_for_inputs])
       end
       
       it "has status waiting_for_inputs" do
@@ -48,18 +48,12 @@ describe Coin2Coin::StateMachine::Controller do
         expect(fake_freenet.fetch(coin_join_request_key).last).to eq(controller.coin_join_message.to_json)
       end
 
-      it "inserts controller message" do
+      it "inserts status message" do
         subject
 
-        expect(fake_freenet.fetch(controller.coin_join_message.controller_instance.request_key).last).to eq(controller.controller_message.to_json)
-      end
-
-      it "inserts control status message" do
-        subject
-
-        expect(fake_freenet.fetch(controller.controller_message.control_status_queue.request_key).last).to eq(controller.control_status_message.to_json)
-        expect(controller.control_status_message.status).to eq('WaitingForInputs')
-        expect(controller.control_status_message.transaction_id).to be_nil
+        expect(fake_freenet.fetch(controller.coin_join_message.status_queue.request_key).last).to eq(controller.status_message.to_json)
+        expect(controller.status_message.status).to eq('WaitingForInputs')
+        expect(controller.status_message.transaction_id).to be_nil
       end
     end
   end
