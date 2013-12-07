@@ -6,6 +6,7 @@ CoinJoinList
   Amount: 2000000 # in satoshi, n^2
   MinimumSize: 5 # number of inputs / outputs
   InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  InputAliveList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   MessageVerificationInstance: { RequestKey: "RequestKey" }
   OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   TransactionInstance: { RequestKey: "RequestKey" }
@@ -15,6 +16,7 @@ CoinJoinList
 # Updated with status information
 StatusQueue
 {
+  Identifier: 12345 # Random value used for InputAliveList#EncryptedStatusIdentifier
   Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
   UpdatedAt: {
@@ -29,15 +31,20 @@ InputList:
 {
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey; ensure uniqueness
   Address: "1abc..." # ensure uniqueness
-  PublicKey: "123...abc"
+  PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
   ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - ControllerInstance#Amount - InputList#ChangeAmount)
   Signature: "123...abc" # Signature with (PrivateKey, ControllerInstance#RequestKey) to show ownership of address
-  
-  # Adding proof of work is possibly worse... it can cause the controller to get CPU jammed, so don't do it
-  # Nonce: 123...789 # must be unique for this InputList#Address)
-  # ProofOfWork: "123...abc" # Scrypt hash of (Address, ControllerInstance#RequestKey, Nonce)
 }
+
+# Public insert_key and request_key
+# Participants insert message to indicate they are alive
+InputAliveList:
+{
+  Address: "1abc..."
+  EncryptedStatusIdentifier: "123...abc"
+}
+
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification

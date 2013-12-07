@@ -6,6 +6,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   property :amount
   property :minimum_size
   property :input_list
+  property :input_alive_list
   property :message_verification_instance
   property :output_list
   property :transaction_instance
@@ -21,6 +22,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     self.amount = params[:amount]
     self.minimum_size = params[:minimum_size]
     self.input_list = Coin2Coin::Message::Association.new
+    self.input_alive_list = Coin2Coin::Message::Association.new
     self.message_verification_instance = Coin2Coin::Message::Association.new(true)
     self.output_list = Coin2Coin::Message::Association.new
     self.transaction_instance = Coin2Coin::Message::Association.new(true)
