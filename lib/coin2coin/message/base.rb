@@ -1,9 +1,13 @@
 class Coin2Coin::Message::Base < Hashie::Dash
   include ActiveModel::Model
+
+  attr_accessor :coin_join
   
   class << self
-    def build
-      new
+    def build(coin_join)
+      o = new
+      o.coin_join = coin_join
+      o
     end
 
     def add_properties(*properties)

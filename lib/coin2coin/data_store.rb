@@ -1,6 +1,6 @@
 require 'singleton'
 
-class Coin2Coin::Freenet
+class Coin2Coin::DataStore
   include Singleton
   
   def initialize

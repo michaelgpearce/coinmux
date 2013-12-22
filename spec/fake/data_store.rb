@@ -1,6 +1,6 @@
 require 'singleton'
 
-class Coin2Coin::Fake::Freenet
+class Coin2Coin::Fake::DataStore
   attr_accessor :hash
   
   def initialize
@@ -17,20 +17,20 @@ class Coin2Coin::Fake::Freenet
       array << data
     end
     
-    yield(Coin2Coin::FreenetEvent.new(:data => data))
+    yield(Coin2Coin::DataStoreEvent.new(:data => data))
   end
   
   def fetch_last(request_key, &callback)
-    yield(Coin2Coin::FreenetEvent.new(:data => fetch(request_key).last))
+    yield(Coin2Coin::DataStoreEvent.new(:data => fetch(request_key).last))
   end
   
   def fetch_all(request_key, &callback)
-    yield(Coin2Coin::FreenetEvent.new(:data => fetch(request_key)))
+    yield(Coin2Coin::DataStoreEvent.new(:data => fetch(request_key)))
   end
   
   def fetch_most_recent(request_key, max_items, &callback)
     return [] if max_items <= 0
-    yield(Coin2Coin::FreenetEvent.new(:data => fetch(request_key)))[-1*max_items..-1]
+    yield(Coin2Coin::DataStoreEvent.new(:data => fetch(request_key)))[-1*max_items..-1]
   end
   
   def fetch(request_key)

@@ -15,6 +15,14 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   
   attr_accessor :message_private_key
   
+  class << self
+    def build
+      coin_join = new
+      coin_join.coin_join = coin_join
+      coin_join
+    end
+  end
+
   def initialize(params = {:amount => nil, :minimum_size => nil})
     params.assert_valid_keys(:amount, :minimum_size)
     

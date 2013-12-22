@@ -64,7 +64,7 @@ class Coin2Coin::StateMachine::Controller
   def do_wait_for_inputs
     notify(:waiting_for_inputs)
     
-    Coin2Coin::Application.interval_exec(60) do |interval_id|
+    Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
         self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message)
@@ -73,7 +73,7 @@ class Coin2Coin::StateMachine::Controller
       end
     end
     
-    Coin2Coin::Application.interval_exec(60) do |interval_id|
+    Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
         messages = fetch_all_messages(Coin2Coin::Message::Input, coin_join_message.input_list.request_key)
         self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
@@ -86,18 +86,18 @@ class Coin2Coin::StateMachine::Controller
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
     end
-    Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
     
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
       if state == 'waiting_for_inputs'
         self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message) do
-          Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+          Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
         end
       end
     end
-    Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
   end
   
   def do_announce_coin_join
@@ -123,7 +123,7 @@ class Coin2Coin::StateMachine::Controller
   
   def insert_message(insert_key, message, &block)
     if block_given?
-      Coin2Coin::Freenet.instance.insert(insert_key, message.to_json) do |event|
+      Coin2Coin::DataStore.instance.insert(insert_key, message.to_json) do |event|
         if event.error
           fail
         else
@@ -131,19 +131,19 @@ class Coin2Coin::StateMachine::Controller
         end
       end
     else
-      Coin2Coin::Freenet.instance.insert(insert_key, message.to_json)
+      Coin2Coin::DataStore.instance.insert(insert_key, message.to_json)
     end
   end
   
   def fetch_all_messages(klass, request_key)
-    Coin2Coin::Freenet.instance.fetch_all(request_key).collect do |message_json|
+    Coin2Coin::DataStore.instance.fetch_all(request_key).collect do |message_json|
       klass.from_json(data) if message_json
     end
   end
   
   def notify(type, data = {})
     event = Coin2Coin::StateMachine::Event.new(:type => type)
-    Coin2Coin::Application.sync_exec do
+    Coin2Coin::Application.instance.sync_exec do
       callback.call(event)
     end
   end

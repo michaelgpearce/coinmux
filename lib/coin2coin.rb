@@ -14,12 +14,13 @@ module Coin2Coin
   end
 end
 
+require 'lib/coin2coin/error'
 require 'lib/coin2coin/digest'
 require 'lib/coin2coin/cipher'
 require 'lib/coin2coin/pki'
 require 'lib/coin2coin/bitcoin'
-require 'lib/coin2coin/freenet'
-require 'lib/coin2coin/freenet_event'
+require 'lib/coin2coin/data_store'
+require 'lib/coin2coin/data_store_event'
 require 'lib/coin2coin/config'
 
 require 'lib/coin2coin/message/base'

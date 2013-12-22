@@ -7,18 +7,18 @@ module Coin2Coin
   end
 end
 
-require 'spec/fake/freenet'
+require 'spec/fake/data_store'
 require 'spec/fake/bitcoin'
 
 def fake_all
-  fake_freenet
+  fake_data_store
   fake_bitcoin
 end
 
-def fake_freenet
-  @fake_freenet ||= (
-    freenet = Coin2Coin::Fake::Freenet.new.tap do |freenet|
-      Coin2Coin::Freenet.stub(:instance).and_return(freenet)
+def fake_data_store
+  @fake_data_store ||= (
+    data_store = Coin2Coin::Fake::DataStore.new.tap do |data_store|
+      Coin2Coin::DataStore.stub(:instance).and_return(data_store)
     end
   )
 end

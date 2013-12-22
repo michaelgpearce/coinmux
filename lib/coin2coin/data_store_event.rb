@@ -1,4 +1,4 @@
-class Coin2Coin::FreenetEvent
+class Coin2Coin::DataStoreEvent
   attr_accessor :error, :data
   
   def initialize(params = {})
