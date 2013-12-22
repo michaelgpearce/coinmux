@@ -2,6 +2,8 @@ require 'swt'
 require 'glimmer'
 require 'singleton'
 
+require 'set'
+
 class Coin2Coin::Application
   include Glimmer, Singleton
   
@@ -11,14 +13,45 @@ class Coin2Coin::Application
   include_package 'org.eclipse.jface.viewers'
   
   def async_exec(&block)
-    @shell.display.async_exec(&block)
+    @shell.display.async_exec(&async_block)
   end
   
   def sync_exec(&block)
     @shell.display.sync_exec(&block)
   end
   
+  def future_exec(seconds, &block)
+    Thread.new do
+      sleep(seconds)
+      @shell.display.sync_exec(&block)
+    end
+  end
+  
+  def interval_exec(seconds, &block)
+    interval_id = rand.to_s
+    @intervals << interval_id
+    
+    Thread.new do
+      while @intervals.include?(interval_id)
+        sleep(seconds)
+        if @intervals.include?(interval_id)
+          @shell.display.sync_exec do
+            block.call(interval_id)
+          end
+        end
+      end
+    end
+    
+    interval_id
+  end
+  
+  def clear_interval(interval_id)
+    @intervals.delete(interval_id)
+  end
+  
   def initialize
+    @intervals = Set.new
+    
     @shell = shell {
       text "Coin2Coin - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer"
       

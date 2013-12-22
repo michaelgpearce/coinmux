@@ -5,8 +5,8 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
   attr_accessor :message_identifier, :secret_key
   
   def initialize(input_message_public_keys)
-    @message_identifier = Coin2Coin::Digest.digest(rand.to_s)
-    @secret_key = Coin2Coin::Digest.digest(rand.to_s)
+    @message_identifier = Coin2Coin::Digest.hex_digest(rand.to_s)
+    @secret_key = Coin2Coin::Digest.hex_digest(rand.to_s)
     
     self.encrypted_message_identifier = Coin2Coin::Cipher.encrypt(@secret_key, @message_identifier)
     

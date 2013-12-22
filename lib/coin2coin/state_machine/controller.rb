@@ -6,6 +6,9 @@ class Coin2Coin::StateMachine::Controller
     state :initialized do
     end
     
+    state :announcing_coin_join do
+    end
+    
     state :waiting_for_inputs do
     end
     
@@ -31,10 +34,14 @@ class Coin2Coin::StateMachine::Controller
     after_transition any => :failed, :do => :do_fail
     
     event :start_coin_join do
-      transition :initialized => :waiting_for_inputs, :if => :can_announce_coin_join?
+      transition :initialized => :announcing_coin_join, :if => :can_announce_coin_join?
     end
 
-    before_transition any => :waiting_for_inputs, :do => :do_announce_coin_join
+    after_transition any => :announcing_coin_join, :do => :do_announce_coin_join
+    
+    event :announce_coin_join_completed do
+      transition :announcing_coin_join => :waiting_for_inputs
+    end
     
     after_transition any => :waiting_for_inputs, :do => :do_wait_for_inputs
   end
@@ -56,6 +63,41 @@ class Coin2Coin::StateMachine::Controller
   
   def do_wait_for_inputs
     notify(:waiting_for_inputs)
+    
+    Coin2Coin::Application.interval_exec(60) do |interval_id|
+      if state == 'waiting_for_inputs'
+        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        insert_message(status_message_insert_key, status_message)
+      else
+        Coin2Coin::Application.clear_interval(interval_id)
+      end
+    end
+    
+    Coin2Coin::Application.interval_exec(60) do |interval_id|
+      if state == 'waiting_for_inputs'
+        messages = fetch_all_messages(Coin2Coin::Message::Input, coin_join_message.input_list.request_key)
+        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        insert_message(status_message_insert_key, status_message)
+      else
+        Coin2Coin::Application.clear_interval(interval_id)
+      end
+    end
+    
+    waiting_for_inputs_sleep = 60
+    update_status_proc = Proc.new do
+    end
+    Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+    
+    waiting_for_inputs_sleep = 60
+    update_status_proc = Proc.new do
+      if state == 'waiting_for_inputs'
+        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        insert_message(status_message_insert_key, status_message) do
+          Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+        end
+      end
+    end
+    Coin2Coin::Application.async_exec(waiting_for_inputs_sleep, &update_status_proc)
   end
   
   def do_announce_coin_join
@@ -65,11 +107,13 @@ class Coin2Coin::StateMachine::Controller
     self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
     status_message_insert_key = coin_join_message.status_queue.read_only_insert_key
     
-    # insert messages in "reverse" order, status -> coin_join
+    # insert messages in "reverse" order, control_status -> coin_join
     notify(:inserting_status_message)
     insert_message(status_message_insert_key, status_message) do
       notify(:inserting_coin_join_message)
-      insert_message(coin_join_message_insert_key, coin_join_message)
+      insert_message(coin_join_message_insert_key, coin_join_message) do
+        announce_coin_join_completed
+      end
     end
   end
   
@@ -78,17 +122,30 @@ class Coin2Coin::StateMachine::Controller
   end
   
   def insert_message(insert_key, message, &block)
-    Coin2Coin::Freenet.instance.insert(insert_key, message.to_json) do |event|
-      if event.error
-        fail
-      else
-        yield if block_given?
+    if block_given?
+      Coin2Coin::Freenet.instance.insert(insert_key, message.to_json) do |event|
+        if event.error
+          fail
+        else
+          yield
+        end
       end
+    else
+      Coin2Coin::Freenet.instance.insert(insert_key, message.to_json)
+    end
+  end
+  
+  def fetch_all_messages(klass, request_key)
+    Coin2Coin::Freenet.instance.fetch_all(request_key).collect do |message_json|
+      klass.from_json(data) if message_json
     end
   end
   
   def notify(type, data = {})
-    callback.call(Coin2Coin::StateMachine::Event.new(:type => type))
+    event = Coin2Coin::StateMachine::Event.new(:type => type)
+    Coin2Coin::Application.sync_exec do
+      callback.call(event)
+    end
   end
   
   def can_announce_coin_join?(*args)

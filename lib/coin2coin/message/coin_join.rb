@@ -2,6 +2,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   VERSION = 1
   
   property :version
+  property :identifier
   property :message_public_key
   property :amount
   property :minimum_size
@@ -18,6 +19,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     params.assert_valid_keys(:amount, :minimum_size)
     
     self.version = VERSION
+    self.identifier = Coin2Coin::Digest.random_identifier
     @message_private_key, self.message_public_key = Coin2Coin::PKI.generate_keypair
     self.amount = params[:amount]
     self.minimum_size = params[:minimum_size]

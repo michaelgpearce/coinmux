@@ -17,4 +17,5 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-*.jar
+.DS_Store
+coin2coin.jar

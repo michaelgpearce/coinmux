@@ -2,6 +2,7 @@
 CoinJoinList
 {
   Version: 1
+  Identifier: 12345 # Random value used for InputList#Signature
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 2000000 # in satoshi, n^2
   MinimumSize: 5 # number of inputs / outputs
@@ -34,7 +35,7 @@ InputList:
   PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
   ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - ControllerInstance#Amount - InputList#ChangeAmount)
-  Signature: "123...abc" # Signature with (PrivateKey, ControllerInstance#RequestKey) to show ownership of address
+  Signature: "123...abc" # Signature with (PrivateKey, CoinJoinList#Identifier) to show ownership of address
 }
 
 # Public insert_key and request_key

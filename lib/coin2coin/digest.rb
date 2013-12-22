@@ -13,5 +13,13 @@ class Coin2Coin::Digest
       message = ([message_identifier] + params).join(':')
       digest(message)
     end
+    
+    def hex_digest(message)
+      digest(message).unpack('H*').first
+    end
+    
+    def random_identifier
+      hex_digest(rand.to_s)
+    end
   end
 end

@@ -1,6 +1,6 @@
 ---
 development:
-  bitcoin_network: 'testnet'
+  bitcoin_network: 'testnet3'
   coin_joins:
     50000000: {insert_key: '', request_key: ''}
     100000000: {insert_key: '', request_key: ''}
