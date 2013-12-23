@@ -18,10 +18,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
       hash = JSON.parse(json) rescue nil
       return nil unless hash.is_a?(Hash)
 
-      return nil unless self.properties.collect(&:to_s).sort == self.properties
+      return nil unless self.properties.collect(&:to_s).sort == hash.keys.sort
 
       message = self.new
-      hash.each do |key, value|
+      hash.merge(attributes).each do |key, value|
         message.send("#{key}=", value)
       end
 

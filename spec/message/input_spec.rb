@@ -74,5 +74,33 @@ describe Coin2Coin::Message::Input do
       expect(input.valid?).to be_true
     end
   end
+
+  describe "from_json" do
+    let(:input) { Coin2Coin::Message::Input.build(coin_join, private_key_hex, change_address, change_amount) }
+    let(:json) do
+      {
+        message_public_key: input.message_public_key,
+        address: input.address,
+        public_key: input.public_key,
+        change_address: input.change_address,
+        change_amount: input.change_amount,
+        signature: input.signature
+      }.to_json
+    end
+
+    subject do
+      Coin2Coin::Message::Input.from_json(json, :coin_join => coin_join)
+    end
+
+    it "creates a valid input" do
+      expect(subject).to_not be_nil
+      expect(subject.valid?).to be_true
+      expect(subject.message_public_key).to eq(input.message_public_key)
+      expect(subject.address).to eq(input.address)
+      expect(subject.public_key).to eq(input.public_key)
+      expect(subject.change_address).to eq(input.change_address)
+      expect(subject.change_amount).to eq(input.change_amount)
+    end
+  end
   
 end
