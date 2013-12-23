@@ -3,6 +3,8 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
   attr_accessor :coin_join
   
+  validates :coin_join, :presence => true
+
   class << self
     def build(coin_join)
       o = new

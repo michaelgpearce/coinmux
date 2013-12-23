@@ -5,7 +5,7 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   
   attr_accessor :message_private_key, :private_key
   
-  # validates :message_public_key, :address, :public_key, :signature, :presence => true
+  validates :message_public_key, :address, :public_key, :signature, :presence => true
   validate :address_matches_public_key
   validate :signature_correct
   validate :change_address_valid, :if => :change_address
