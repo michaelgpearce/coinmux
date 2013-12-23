@@ -11,7 +11,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   property :message_verification_instance
   property :output_list
   property :transaction_instance
-  property :status_queue
+  property :status_updatable_instance
   
   attr_accessor :message_private_key
   
@@ -36,6 +36,6 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     self.message_verification_instance = Coin2Coin::Message::Association.new(true)
     self.output_list = Coin2Coin::Message::Association.new
     self.transaction_instance = Coin2Coin::Message::Association.new(true)
-    self.status_queue = Coin2Coin::Message::Association.new(true)
+    self.status_updatable_instance = Coin2Coin::Message::Association.new(true)
   end
 end

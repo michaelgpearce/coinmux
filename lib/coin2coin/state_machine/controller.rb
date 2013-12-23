@@ -105,7 +105,7 @@ class Coin2Coin::StateMachine::Controller
     coin_join_message_insert_key = Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['insert_key']
     
     self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
-    status_message_insert_key = coin_join_message.status_queue.read_only_insert_key
+    status_message_insert_key = coin_join_message.status_updatable_instance.read_only_insert_key
     
     # insert messages in "reverse" order, control_status -> coin_join
     notify(:inserting_status_message)

@@ -11,11 +11,11 @@ CoinJoinList
   MessageVerificationInstance: { RequestKey: "RequestKey" }
   OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   TransactionInstance: { RequestKey: "RequestKey" }
-  StatusQueue: { RequestKey: "RequestKey" }
+  StatusUpdatableInstance: { RequestKey: "RequestKey" }
 }
 
 # Updated with status information
-StatusQueue
+StatusUpdatableInstance
 {
   Identifier: 12345 # Random value used for InputAliveList#EncryptedStatusIdentifier
   Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
@@ -111,7 +111,7 @@ TransactionInstance:
 # Public insert_key and request_key
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
-# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatusQueue
+# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatusUpdatableInstance
 TransactionSignatureList:
 {
   InputIndex: 0
