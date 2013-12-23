@@ -5,7 +5,7 @@ class Coin2Coin::PKI
     def generate_keypair
       pki = OpenSSL::PKey::RSA.new(2048)
       private_key = pki.to_s
-      public_key = pki.public_key
+      public_key = pki.public_key.to_s
 
       [private_key, public_key]
     end
