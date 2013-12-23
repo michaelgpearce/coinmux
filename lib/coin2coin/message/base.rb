@@ -4,6 +4,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
   attr_accessor :coin_join
   
   validates :coin_join, :presence => true
+  validate :coin_join_valid, :if => :coin_join
 
   class << self
     def build(coin_join)
@@ -31,5 +32,13 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
       message
     end
+  end
+
+  private
+
+  def coin_join_valid
+    return if coin_join == self
+
+    errors[:coin_join] << "is not valid" unless coin_join.valid?
   end
 end
