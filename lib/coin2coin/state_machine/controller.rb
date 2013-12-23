@@ -86,18 +86,18 @@ class Coin2Coin::StateMachine::Controller
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
     end
-    Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
     
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
       if state == 'waiting_for_inputs'
         self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message) do
-          Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+          Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
         end
       end
     end
-    Coin2Coin::Application.instance.async_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
   end
   
   def do_announce_coin_join

@@ -12,18 +12,18 @@ class Coin2Coin::Application
   include_package 'org.eclipse.swt.layout'
   include_package 'org.eclipse.jface.viewers'
   
-  def async_exec(&block)
-    @shell.display.async_exec(&async_block)
-  end
-  
   def sync_exec(&block)
     @shell.display.sync_exec(&block)
   end
   
-  def future_exec(seconds, &block)
-    Thread.new do
-      sleep(seconds)
-      @shell.display.sync_exec(&block)
+  def future_exec(seconds = 0, &block)
+    if seconds == 0
+      @shell.display.async_exec(&async_block)
+    else
+      Thread.new do
+        sleep(seconds)
+        @shell.display.sync_exec(&block)
+      end
     end
   end
   

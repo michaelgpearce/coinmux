@@ -1,5 +1,3 @@
-require 'singleton'
-
 class Coin2Coin::Fake::DataStore
   attr_accessor :hash
   

@@ -7,17 +7,27 @@ module Coin2Coin
   end
 end
 
+require 'spec/fake/application'
 require 'spec/fake/data_store'
 require 'spec/fake/bitcoin'
 
 def fake_all
+  fake_application
   fake_data_store
   fake_bitcoin
 end
 
+def fake_application
+  @fake_application ||= (
+    Coin2Coin::Fake::Application.new.tap do |application|
+      Coin2Coin::Application.stub(:instance).and_return(application)
+    end
+  )
+end
+
 def fake_data_store
   @fake_data_store ||= (
-    data_store = Coin2Coin::Fake::DataStore.new.tap do |data_store|
+    Coin2Coin::Fake::DataStore.new.tap do |data_store|
       Coin2Coin::DataStore.stub(:instance).and_return(data_store)
     end
   )
