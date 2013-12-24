@@ -2,8 +2,17 @@ https://bitcointalk.org/index.php?topic=279249.0
 http://blog.ezyang.com/2012/07/secure-multiparty-bitcoin-anonymization/
 
 https://github.com/lian/bitcoin-ruby#create-transactions
+https://code.google.com/p/bitcoinj/wiki/WorkingWithTransactions
+https://code.google.com/p/bitcoinj/wiki/HowThingsFitTogether
 
 https://en.bitcoin.it/wiki/Script#Scripts
 
 # send enc message to multiple recipients
 http://stackoverflow.com/a/38853
+
+# Testnet
+http://test.webbtc.com/address/mjcSuqvGTuq8Ys82juwa69eAb4Z69VaqEE
+https://www.bitaddress.org/bitaddress.org-v2.6.5-SHA1-fa763c2bbc97e1b37bc6d3945647aed869ec8c18.html?testnet=true
+
+# Address balance from transactions
+https://github.com/spesmilo/electrum/blob/master/lib/wallet.py#L1023
