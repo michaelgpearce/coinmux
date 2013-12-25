@@ -38,7 +38,7 @@ describe Coin2Coin::Message::Input do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:public_key]).to eq(["is not correct for address #{address}"])
+          expect(input.errors[:public_key]).to include("is not correct for address #{address}")
         end
       end
     end
@@ -49,7 +49,7 @@ describe Coin2Coin::Message::Input do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:signature]).to eq(["is not correct for address #{address}"])
+          expect(input.errors[:signature]).to include("is not correct for address #{address}")
         end
       end
     end
@@ -60,7 +60,7 @@ describe Coin2Coin::Message::Input do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:change_address]).to eq(["is not a valid address"])
+          expect(input.errors[:change_address]).to include("is not a valid address")
         end
       end
     end

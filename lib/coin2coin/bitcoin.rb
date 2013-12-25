@@ -65,6 +65,15 @@ class Coin2Coin::Bitcoin
   end
   def_no_raise_method(:verify_address, false)
   
+  def block_exists?(block_height, nonce)
+    raise "TODO"
+  end
+
+  # nil returned if transaction not found, 0 returned if in transaction pool, 1+ if accepted into blockchain
+  def transaction_confirmations(transaction_id)
+    raise "TODO"
+  end
+
   private
 
   def build_ec_key(private_key_hex)

@@ -1,7 +1,8 @@
 class Coin2Coin::StateMachine::Controller
   attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :minimum_participant_size, :callback
   
-  # Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
+  STATUSES = %w(WaitingForInputs WaitingForOutputs WaitingForSignatures WaitingForConfirmation Failed Complete)
+  
   state_machine :state, :initial => :initialized do
     state :initialized do
     end

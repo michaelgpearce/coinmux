@@ -25,7 +25,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
       message = self.new
       hash.merge(attributes).each do |key, value|
-        message.send("#{key}=", value)
+        message.send("#{key}=", value.is_a?(Hash) ? value.symbolize_keys : value)
       end
 
       return nil unless message.valid?

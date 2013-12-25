@@ -7,6 +7,11 @@ require 'state_machine'
 require 'hashie'
 require 'freenet_hash'
 
+
+class Hash
+  include Hashie::Extensions::KeyConversion
+end
+
 module Coin2Coin
   module Message
   end
