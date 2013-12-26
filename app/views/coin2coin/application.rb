@@ -69,7 +69,7 @@ class Coin2Coin::Application
   end
   
   def current_coin_join
-    @current_coin_join ||= Coin2Coin::CoinJoin.new
+    @current_coin_join ||= Coin2Coin::CoinJoin.build
   end
   
   def home_tab_item

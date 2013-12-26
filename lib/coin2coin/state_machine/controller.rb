@@ -67,7 +67,7 @@ class Coin2Coin::StateMachine::Controller
     
     Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
-        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message)
       else
         Coin2Coin::Application.clear_interval(interval_id)
@@ -77,7 +77,7 @@ class Coin2Coin::StateMachine::Controller
     Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
         messages = fetch_all_messages(Coin2Coin::Message::Input, coin_join_message.input_list.request_key)
-        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message)
       else
         Coin2Coin::Application.clear_interval(interval_id)
@@ -92,7 +92,7 @@ class Coin2Coin::StateMachine::Controller
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
       if state == 'waiting_for_inputs'
-        self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
+        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_insert_key, status_message) do
           Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
         end
@@ -102,11 +102,11 @@ class Coin2Coin::StateMachine::Controller
   end
   
   def do_announce_coin_join
-    self.coin_join_message = Coin2Coin::Message::CoinJoin.new(:amount => bitcoin_amount, :minimum_size => minimum_participant_size)
+    self.coin_join_message = Coin2Coin::Message::CoinJoin.build(bitcoin_amount, minimum_participant_size)
     coin_join_message_insert_key = Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['insert_key']
     
-    self.status_message = Coin2Coin::Message::Status.new(:status => 'WaitingForInputs')
-    status_message_insert_key = coin_join_message.status_updatable_instance.read_only_insert_key
+    self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
+    status_message_insert_key = coin_join_message.status_variable.read_only_insert_key
     
     # insert messages in "reverse" order, control_status -> coin_join
     notify(:inserting_status_message)

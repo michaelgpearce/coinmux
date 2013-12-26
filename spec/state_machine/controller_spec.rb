@@ -51,7 +51,7 @@ describe Coin2Coin::StateMachine::Controller do
       it "inserts status message" do
         subject
 
-        expect(fake_data_store.fetch(controller.coin_join_message.status_updatable_instance.request_key).last).to eq(controller.status_message.to_json)
+        expect(fake_data_store.fetch(controller.coin_join_message.status_variable.request_key).last).to eq(controller.status_message.to_json)
         expect(controller.status_message.status).to eq('WaitingForInputs')
         expect(controller.status_message.transaction_id).to be_nil
       end

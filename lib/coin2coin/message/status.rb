@@ -13,7 +13,7 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   validate :updated_at_valid
 
   class << self
-    def build(coin_join, status, transaction_id)
+    def build(coin_join, status, transaction_id = nil)
       message = super(coin_join)
       message.status = status
       message.transaction_id = transaction_id

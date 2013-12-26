@@ -10,6 +10,10 @@ require 'freenet_hash'
 
 class Hash
   include Hashie::Extensions::KeyConversion
+
+  def assert_required_keys!(*keys)
+    raise "There are invalid keys #{self.keys}, expected #{keys}" if self.keys.sort != keys.sort
+  end
 end
 
 module Coin2Coin
