@@ -37,6 +37,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
     end
 
     def from_json(json, attributes = {})
+      return nil if json.nil?
+
+      return nil if json.bytesize > 5_000 # not sure the best number for this, but all our messages should be small
+
       hash = JSON.parse(json) rescue nil
       return nil unless hash.is_a?(Hash)
 
