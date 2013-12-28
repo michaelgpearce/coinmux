@@ -103,7 +103,7 @@ class Coin2Coin::StateMachine::Controller
   
   def do_announce_coin_join
     self.coin_join_message = Coin2Coin::Message::CoinJoin.build(bitcoin_amount, minimum_participant_size)
-    coin_join_message_insert_key = Coin2Coin::Config.instance['coin_joins'][bitcoin_amount.to_s]['insert_key']
+    coin_join_message_insert_key = Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).insert_key
     
     self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
     status_message_insert_key = coin_join_message.status_variable.read_only_insert_key

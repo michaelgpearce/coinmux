@@ -6,7 +6,7 @@ class Coin2Coin::Config < Hashie::Dash
   include Singleton
 
   property :bitcoin_network
-  property :coin_joins
+  property :coin_join_uri
   
   def initialize
     config_path = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config.yml'))
