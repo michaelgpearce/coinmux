@@ -14,7 +14,7 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   class << self
     def build(coin_join, private_key_hex, change_address = nil, change_amount = nil)
       input = super(coin_join)
-      input.message_private_key, input.message_public_key = Coin2Coin::PKI.generate_keypair
+      input.message_private_key, input.message_public_key = Coin2Coin::PKI.instance.generate_keypair
 
       input.private_key = private_key_hex
       input.public_key = Coin2Coin::Bitcoin.instance.public_key_for_private_key!(private_key_hex)

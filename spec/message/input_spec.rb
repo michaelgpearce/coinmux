@@ -70,8 +70,17 @@ describe Coin2Coin::Message::Input do
     subject { Coin2Coin::Message::Input.build(coin_join, private_key_hex) }
 
     it "builds valid input" do
-      input = subject
-      expect(input.valid?).to be_true
+      expect(subject.valid?).to be_true
+    end
+
+    it "has private_key" do
+      expect(subject.private_key).to eq(private_key_hex)
+    end
+
+    it "has message_private_key and message_public_key for encrypting and decrypting" do
+      message = "a random message #{rand}"
+      encrypted_message = Coin2Coin::PKI.instance.private_encrypt(subject.message_private_key, message)
+      expect(Coin2Coin::PKI.instance.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
     end
   end
 

@@ -12,7 +12,7 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
     
     # only selected inputs will get the secret to decrypt the identifier
     self.encrypted_secret_keys = input_message_public_keys.inject({}) do |acc, input_message_public_key|
-      acc[input_message_public_key] = Coin2Coin::PKI.public_encrypt(input_message_public_key, @secret_key)
+      acc[input_message_public_key] = Coin2Coin::PKI.instance.public_encrypt(input_message_public_key, @secret_key)
       acc
     end
   end

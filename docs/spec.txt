@@ -5,7 +5,7 @@ CoinJoinList:
   Identifier: 12345 # Random value used for InputList#Signature
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 2000000 # in satoshi, n^2
-  MinimumSize: 5 # number of inputs / outputs
+  MinimumParticipants: 5 # number of inputs / outputs
   InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   #InputAliveList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   MessageVerificationFixed: { RequestKey: "RequestKey" }
