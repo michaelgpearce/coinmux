@@ -98,7 +98,7 @@ describe Coin2Coin::Message::Input do
     end
 
     subject do
-      Coin2Coin::Message::Input.from_json(json, :coin_join => coin_join)
+      Coin2Coin::Message::Input.from_json(json, coin_join)
     end
 
     it "creates a valid input" do

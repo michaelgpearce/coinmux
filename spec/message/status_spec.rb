@@ -42,7 +42,6 @@ describe Coin2Coin::Message::Status do
             let(:status) { test_status }
 
             it "is valid" do
-              subject
               expect(subject).to be_true
             end
           end
@@ -53,7 +52,6 @@ describe Coin2Coin::Message::Status do
             let(:status) { test_status }
 
             it "is invalid" do
-              subject
               expect(subject).to be_false
               expect(message.errors[:transaction_id]).to include("must not be present for status #{test_status}")
             end
@@ -69,7 +67,6 @@ describe Coin2Coin::Message::Status do
             let(:status) { test_status }
 
             it "is invalid" do
-              subject
               expect(subject).to be_false
               expect(message.errors[:transaction_id]).to include("must be present for status #{test_status}")
             end
@@ -81,7 +78,6 @@ describe Coin2Coin::Message::Status do
             let(:status) { test_status }
 
             it "is valid" do
-              subject
               expect(subject).to be_true
             end
           end
@@ -95,7 +91,6 @@ describe Coin2Coin::Message::Status do
 
         context "with confirmed transaction" do
           it "is valid" do
-            subject
             expect(subject).to be_true
           end
         end
@@ -104,7 +99,6 @@ describe Coin2Coin::Message::Status do
           let(:transaction_id) { nil }
 
           it "is invalid" do
-            subject
             expect(subject).to be_false
             expect(message.errors[:transaction_id]).to include("is not confirmed")
           end
@@ -117,7 +111,6 @@ describe Coin2Coin::Message::Status do
         let(:status) { 'InvalidStatus' }
 
         it "is invalid" do
-          subject
           expect(subject).to be_false
           expect(message.errors[:status]).to include("is not a valid status")
         end
@@ -129,7 +122,6 @@ describe Coin2Coin::Message::Status do
         let(:updated_at) { nil }
 
         it "is invalid" do
-          subject
           expect(subject).to be_false
           expect(message.errors[:updated_at]).to include("must be a hash")
         end
@@ -139,7 +131,6 @@ describe Coin2Coin::Message::Status do
         let(:updated_at) { { :block_height => current_block_height + 1, :nonce => current_nonce } }
 
         it "is invalid" do
-          subject
           expect(subject).to be_false
           expect(message.errors[:updated_at]).to include("is not a valid block")
         end
@@ -149,7 +140,6 @@ describe Coin2Coin::Message::Status do
         let(:updated_at) { { :block_height => current_block_height, :nonce => "wrong nonce" } }
 
         it "is invalid" do
-          subject
           expect(subject).to be_false
           expect(message.errors[:updated_at]).to include("is not a valid block")
         end
@@ -178,7 +168,7 @@ describe Coin2Coin::Message::Status do
     end
 
     subject do
-      Coin2Coin::Message::Status.from_json(json, :coin_join => coin_join)
+      Coin2Coin::Message::Status.from_json(json, coin_join)
     end
 
     it "creates a valid input" do
