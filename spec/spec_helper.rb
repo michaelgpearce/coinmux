@@ -10,6 +10,9 @@ end
 require 'spec/fake/application'
 require 'spec/fake/data_store'
 require 'spec/fake/bitcoin'
+require 'factory_girl'
+
+FactoryGirl.find_definitions
 
 def fake_all
   fake_application

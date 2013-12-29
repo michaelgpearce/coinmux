@@ -16,3 +16,7 @@ group :development do
   gem 'rspec', '2.14.1'
   gem 'warbler', '1.4.0'
 end
+
+group :development, :test do
+  gem 'factory_girl', '4.3.0'
+end

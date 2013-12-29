@@ -6,7 +6,7 @@ class Coin2Coin::Cipher
 
   def encrypt(secret_key, clear_text)
     cipher = build_cipher(:encrypt)
-    cipher.key = Coin2Coin::Digest.digest(secret_key)
+    cipher.key = Coin2Coin::Digest.instance.digest(secret_key)
     cipher.iv = iv = cipher.random_iv # 16 bytes
     
     encrypted = cipher.update(clear_text)
@@ -16,7 +16,7 @@ class Coin2Coin::Cipher
 
   def decrypt(secret_key, encrypted_text)
     cipher = build_cipher(:decrypt)
-    cipher.key = Coin2Coin::Digest.digest(secret_key)
+    cipher.key = Coin2Coin::Digest.instance.digest(secret_key)
     cipher.iv = encrypted_text[0...16] # first 16 bytes are IV
     encrypted_text = encrypted_text[16..-1]
 

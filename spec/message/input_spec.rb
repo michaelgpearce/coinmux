@@ -2,31 +2,27 @@ require 'spec_helper'
 require 'base64'
 
 describe Coin2Coin::Message::Input do
-  let(:input_identifier) { "this is a message" }
-  let(:address) { "mh9nRF1ZSqLJB3hbUjPLmfDHdnGUURdYdK" }
-  let(:private_key_hex) { "585C660C887913E5F40B8E34D99C62766443F9D043B1DE1DFDCC94E386BC6DF6" }
-  let(:public_key_hex) { "04FD30E98AF97627082F169B524E4646D31F900C9CAB13743140567C0CAE4B3F303AE48426DD157AEA58DCC239BB8FB19193FB856C312592D8296B02C0EA54E03C" }
-  let(:signature_base_64) { "HIZQbBLAGJLhSZ310FCQMAo9l1X2ysxyt0kXkf6KcBN3znl2iClC6V9wz9Nkn6mMDUaq4kRlgYQDUUlsm29Bl0o=" }
-  let(:change_address) { "mi4J2qXAVTwonMhaWGX63eKnjZcFM9Gy8Q" }
-  let(:change_amount) { 100000 }
-  let(:coin_join) do
-    Coin2Coin::Message::CoinJoin.build.tap do |coin_join|
-      coin_join.identifier = input_identifier
-    end
-  end
+  let(:default_message) { FactoryGirl.build(:input_message) }
+  let(:input_identifier) { default_message.input_identifier }
+  let(:address) { default_message.address }
+  let(:private_key) { default_message.private_key }
+  let(:public_key) { default_message.public_key }
+  let(:signature) { default_message.signature }
+  let(:change_address) { default_message.change_address }
+  let(:change_amount) { default_message.change_amount }
+  let(:coin_join) { default_message.coin_join }
   
   describe "validations" do
-    let(:input) do
-      Coin2Coin::Message::Input.build(coin_join, private_key_hex, change_address, change_amount).tap do |input|
-        input.address = address
-        input.private_key = private_key_hex
-        input.public_key = public_key_hex
-        input.signature = signature_base_64
-        input.change_address = change_address
-      end
+    let(:message) do
+      FactoryGirl.build(:input_message,
+        address: address,
+        private_key: private_key,
+        public_key: public_key,
+        signature: signature,
+        change_address: change_address)
     end
 
-    subject { input.valid? }
+    subject { message.valid? }
 
     it "is valid with default data" do
       expect(subject).to be_true
@@ -34,22 +30,22 @@ describe Coin2Coin::Message::Input do
 
     describe "address_matches_public_key" do
       context "with public key not matching address" do
-        let(:public_key_hex) { "00FD30E98AF97627082F169B524E4646D31F900C9CAB13743140567C0CAE4B3F303AE48426DD157AEA58DCC239BB8FB19193FB856C312592D8296B02C0EA54E03C" }
+        let(:public_key) { "00FD30E98AF97627082F169B524E4646D31F900C9CAB13743140567C0CAE4B3F303AE48426DD157AEA58DCC239BB8FB19193FB856C312592D8296B02C0EA54E03C" }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:public_key]).to include("is not correct for address #{address}")
+          expect(message.errors[:public_key]).to include("is not correct for address #{address}")
         end
       end
     end
 
     describe "signature_correct" do
       context "with invalid signature" do
-        let(:signature_base_64) { Base64.encode64('invalid').strip }
+        let(:signature) { Base64.encode64('invalid').strip }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:signature]).to include("is not correct for address #{address}")
+          expect(message.errors[:signature]).to include("is not correct for address #{address}")
         end
       end
     end
@@ -60,21 +56,21 @@ describe Coin2Coin::Message::Input do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(input.errors[:change_address]).to include("is not a valid address")
+          expect(message.errors[:change_address]).to include("is not a valid address")
         end
       end
     end
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::Input.build(coin_join, private_key_hex) }
+    subject { Coin2Coin::Message::Input.build(coin_join, private_key) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true
     end
 
     it "has private_key" do
-      expect(subject.private_key).to eq(private_key_hex)
+      expect(subject.private_key).to eq(private_key)
     end
 
     it "has message_private_key and message_public_key for encrypting and decrypting" do
@@ -85,15 +81,15 @@ describe Coin2Coin::Message::Input do
   end
 
   describe "from_json" do
-    let(:input) { Coin2Coin::Message::Input.build(coin_join, private_key_hex, change_address, change_amount) }
+    let(:message) { default_message }
     let(:json) do
       {
-        message_public_key: input.message_public_key,
-        address: input.address,
-        public_key: input.public_key,
-        change_address: input.change_address,
-        change_amount: input.change_amount,
-        signature: input.signature
+        message_public_key: message.message_public_key,
+        address: message.address,
+        public_key: message.public_key,
+        change_address: message.change_address,
+        change_amount: message.change_amount,
+        signature: message.signature
       }.to_json
     end
 
@@ -104,11 +100,11 @@ describe Coin2Coin::Message::Input do
     it "creates a valid input" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
-      expect(subject.message_public_key).to eq(input.message_public_key)
-      expect(subject.address).to eq(input.address)
-      expect(subject.public_key).to eq(input.public_key)
-      expect(subject.change_address).to eq(input.change_address)
-      expect(subject.change_amount).to eq(input.change_amount)
+      expect(subject.message_public_key).to eq(message.message_public_key)
+      expect(subject.address).to eq(message.address)
+      expect(subject.public_key).to eq(message.public_key)
+      expect(subject.change_address).to eq(message.change_address)
+      expect(subject.change_amount).to eq(message.change_amount)
     end
   end
   

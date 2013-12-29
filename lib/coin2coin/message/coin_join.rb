@@ -22,7 +22,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
       message = super(nil)
 
       message.version = VERSION
-      message.identifier = Coin2Coin::Digest.random_identifier
+      message.identifier = Coin2Coin::Digest.instance.random_identifier
       message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
       message.amount = amount
       message.minimum_participants = minimum_participants

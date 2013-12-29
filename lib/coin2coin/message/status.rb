@@ -17,7 +17,7 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
       message = super(coin_join)
       message.status = status
       message.transaction_id = transaction_id
-      message.identifier = Coin2Coin::Digest.random_identifier
+      message.identifier = Coin2Coin::Digest.instance.random_identifier
 
       block_height, nonce = Coin2Coin::Bitcoin.instance.current_block_height_and_nonce
       message.updated_at = {

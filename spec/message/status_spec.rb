@@ -10,22 +10,22 @@ describe Coin2Coin::Message::Status do
     end
   end
 
-  let(:identifier) { "valid_identifier:#{rand}" }
-  let(:status) { "Complete" }
-  let(:transaction_id) { "valid_transaction_id:#{rand}" }
-  let(:current_block_height) { Coin2Coin::Bitcoin.instance.current_block_height_and_nonce.first }
-  let(:current_nonce) { Coin2Coin::Bitcoin.instance.current_block_height_and_nonce.last }
-  let(:updated_at) { { :block_height => current_block_height, :nonce => current_nonce } }
-  let(:coin_join) { Coin2Coin::Message::CoinJoin.build }
-  
+  let(:default_message) { FactoryGirl.build(:status_message) }
+  let(:identifier) { default_message.identifier }
+  let(:status) { default_message.status }
+  let(:transaction_id) { default_message.transaction_id }
+  let(:current_block_height) { default_message.updated_at[:block_height] }
+  let(:current_nonce) { default_message.updated_at[:nonce] }
+  let(:updated_at) { default_message.updated_at }
+  let(:coin_join) { default_message.coin_join }
+
   describe "validations" do
     let(:message) do
-      Coin2Coin::Message::Status.build(coin_join, status, transaction_id).tap do |message|
-        message.identifier = identifier
-        message.status = status
-        message.transaction_id = transaction_id
-        message.updated_at = updated_at
-      end
+      FactoryGirl.build(:status_message,
+        identifier: identifier,
+        status: status,
+        transaction_id: transaction_id,
+        updated_at: updated_at)
     end
 
     subject { message.valid? }
@@ -157,7 +157,7 @@ describe Coin2Coin::Message::Status do
   end
 
   describe "from_json" do
-    let(:message) { Coin2Coin::Message::Status.build(coin_join, status, transaction_id) }
+    let(:message) { default_message }
     let(:json) do
       {
         identifier: message.identifier,
