@@ -11,6 +11,7 @@ require 'spec/fake/application'
 require 'spec/fake/data_store'
 require 'spec/fake/bitcoin'
 require 'factory_girl'
+require 'pry'
 
 FactoryGirl.find_definitions
 

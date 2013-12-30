@@ -19,4 +19,5 @@ end
 
 group :development, :test do
   gem 'factory_girl', '4.3.0'
+  gem 'pry', '0.9.12.4'
 end
