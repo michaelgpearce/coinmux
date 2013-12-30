@@ -11,13 +11,13 @@ FactoryGirl.define do
     amount Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN
     minimum_participants 5
 
-    input_list { Coin2Coin::Message::Association.new(false) }
-    inputs { [] }
-    output_list { Coin2Coin::Message::Association.new(false) }
-    outputs { [] }
-    message_verification_fixed { Coin2Coin::Message::Association.new(true) }
-    transaction_fixed { Coin2Coin::Message::Association.new(true) }
-    status_variable { Coin2Coin::Message::Association.new(true) }
+    after(:build) do |coin_join|
+      coin_join.inputs = Coin2Coin::Message::Association.build(coin_join, 'input', :list, false)
+      coin_join.outputs = Coin2Coin::Message::Association.build(coin_join, 'output', :list, false)
+      coin_join.message_verification = Coin2Coin::Message::Association.build(coin_join, 'message_verification', :fixed, true)
+      coin_join.transaction = Coin2Coin::Message::Association.build(coin_join, 'transaction', :fixed, true)
+      coin_join.status = Coin2Coin::Message::Association.build(coin_join, 'status', :variable, true)
+    end
   end
 
   factory :input_message, :class => Coin2Coin::Message::Input do

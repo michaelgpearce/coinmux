@@ -1,5 +1,5 @@
 # public insert_key and request_key
-CoinJoinList:
+CoinJoins:
 {
   Version: 1
   Identifier: 12345 # Random value used for InputList#Signature
@@ -8,14 +8,15 @@ CoinJoinList:
   MinimumParticipants: 5 # number of inputs / outputs
   InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   #InputAliveList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  MessageVerificationFixed: { RequestKey: "RequestKey" }
+  MessageVerificationFixed: { InsertKey: null, RequestKey: "RequestKey" }
   OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  TransactionFixed: { RequestKey: "RequestKey" }
-  StatusVariable: { RequestKey: "RequestKey" }
+  TransactionFixed: { InsertKey: null, RequestKey: "RequestKey" }
+  StatusVariable: { InsertKey: null, RequestKey: "RequestKey" }
 }
 
 # Updated with status information
-StatusVariable:
+# Updatable
+Status:
 {
   Identifier: 12345 # Random value used for InputAliveList#EncryptedStatusIdentifier
   Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
@@ -28,7 +29,7 @@ StatusVariable:
 
 # Public insert_key and request_key
 # Every client posts all of their input individually
-InputList:
+Inputs:
 {
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey; ensure uniqueness
   Address: "1abc..." # ensure uniqueness
@@ -40,7 +41,7 @@ InputList:
 
 # Public insert_key and request_key
 # Participants insert message to indicate they are alive
-#InputAliveList:
+#InputAlives:
 #{
 #  Address: "1abc..."
 #  EncryptedStatusIdentifier: "123...abc"
@@ -50,7 +51,8 @@ InputList:
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification
 # Identifier is only encrypted once and shared to ensure that Controller cannot link inputs to outputs by giving each input a different identifier
-MessageVerificationFixed:
+# Write-Once
+MessageVerification:
 {
   EncryptedMessageIdentifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
   EncryptedSecretKeys: {
@@ -61,7 +63,7 @@ MessageVerificationFixed:
 
 # Public insert_key and request_key
 # Every client posts all of their outputs individually
-OutputList:
+Outputs:
 {
   Address: "1abc..."
   # This scheme maintains no link between the InputList and the OutputList and ensures that we only add outputs owned by an input.
@@ -74,7 +76,8 @@ OutputList:
 # Readable by anyone, writeable only by controller
 # Controller publishes only once a transaction that meets its criteria (number of outputs)
 # Participant only follows TransactionSignatureList when all rules followed and correctly contains all of his inputs and outputs
-TransactionFixed:
+# Write-Once
+Transaction:
 {
   TransactionSignatureList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
@@ -112,7 +115,7 @@ TransactionFixed:
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
 # Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatusVariable
-TransactionSignatureList:
+TransactionSignatures:
 {
   InputIndex: 0
   ScriptSig: '3046... 04e3...' # this is unique for every transaction

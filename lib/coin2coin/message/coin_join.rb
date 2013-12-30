@@ -3,11 +3,11 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   SATOSHIS_PER_BITCOIN = 100_000_000
   
   add_properties :version, :identifier, :message_public_key, :amount, :minimum_participants
-  add_list_association :inputs, :read_only => false
-  add_list_association :outputs, :read_only => false
-  add_fixed_association :message_verification, :read_only => true
-  add_fixed_association :transaction, :read_only => true
-  add_variable_association :status, :read_only => true
+  add_association :inputs, :list, :read_only => false
+  add_association :outputs, :list, :read_only => false
+  add_association :message_verification, :fixed, :read_only => true
+  add_association :transaction, :fixed, :read_only => true
+  add_association :status, :variable, :read_only => true
   
   attr_accessor :message_private_key
   

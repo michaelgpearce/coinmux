@@ -94,55 +94,51 @@ describe Coin2Coin::Message::CoinJoin do
 
     context "inputs" do
       it "is a read-write list association" do
-        expect(message.inputs).to eq([])
-        expect(message.input_list.read_only_insert_key).to be_nil
-        expect(message.input_list.insert_key).to_not be_nil
-        expect(message.input_list.request_key).to_not be_nil
+        expect(message.inputs.value).to eq([])
+        expect(message.inputs.type).to eq(:list)
+        expect(message.inputs.read_only_insert_key).to be_nil
+        expect(message.inputs.insert_key).to_not be_nil
+        expect(message.inputs.request_key).to_not be_nil
       end
     end
 
     context "outputs" do
       it "is a read-write list association" do
-        expect(message.outputs).to eq([])
-        expect(message.output_list.read_only_insert_key).to be_nil
-        expect(message.output_list.insert_key).to_not be_nil
-        expect(message.output_list.request_key).to_not be_nil
-      end
-    end
-
-    context "outputs" do
-      it "is a read-write list association" do
-        expect(message.outputs).to eq([])
-        expect(message.output_list.read_only_insert_key).to be_nil
-        expect(message.output_list.insert_key).to_not be_nil
-        expect(message.output_list.request_key).to_not be_nil
+        expect(message.outputs.value).to eq([])
+        expect(message.outputs.type).to eq(:list)
+        expect(message.outputs.read_only_insert_key).to be_nil
+        expect(message.outputs.insert_key).to_not be_nil
+        expect(message.outputs.request_key).to_not be_nil
       end
     end
 
     context "message_verification" do
       it "is a read-only fixed association" do
-        expect(message.message_verification).to eq(nil)
-        expect(message.message_verification_fixed.read_only_insert_key).to_not be_nil
-        expect(message.message_verification_fixed.insert_key).to be_nil
-        expect(message.message_verification_fixed.request_key).to_not be_nil
+        expect(message.message_verification.value).to eq(nil)
+        expect(message.message_verification.type).to eq(:fixed)
+        expect(message.message_verification.read_only_insert_key).to_not be_nil
+        expect(message.message_verification.insert_key).to be_nil
+        expect(message.message_verification.request_key).to_not be_nil
       end
     end
 
     context "transaction" do
       it "is a read-only fixed association" do
-        expect(message.transaction).to eq(nil)
-        expect(message.transaction_fixed.read_only_insert_key).to_not be_nil
-        expect(message.transaction_fixed.insert_key).to be_nil
-        expect(message.transaction_fixed.request_key).to_not be_nil
+        expect(message.transaction.value).to eq(nil)
+        expect(message.transaction.type).to eq(:fixed)
+        expect(message.transaction.read_only_insert_key).to_not be_nil
+        expect(message.transaction.insert_key).to be_nil
+        expect(message.transaction.request_key).to_not be_nil
       end
     end
 
     context "status" do
       it "is a read-only variable association" do
-        expect(message.status).to eq(nil)
-        expect(message.status_variable.read_only_insert_key).to_not be_nil
-        expect(message.status_variable.insert_key).to be_nil
-        expect(message.status_variable.request_key).to_not be_nil
+        expect(message.status.value).to eq(nil)
+        expect(message.status.type).to eq(:variable)
+        expect(message.status.read_only_insert_key).to_not be_nil
+        expect(message.status.insert_key).to be_nil
+        expect(message.status.request_key).to_not be_nil
       end
     end
   end
@@ -165,11 +161,11 @@ describe Coin2Coin::Message::CoinJoin do
         message_public_key: message.message_public_key,
         amount: message.amount,
         minimum_participants: message.minimum_participants,
-        input_list: { insert_key: message.input_list.insert_key, request_key: message.input_list.request_key },
-        message_verification_fixed: { request_key: message.message_verification_fixed.request_key },
-        output_list: { insert_key: message.output_list.insert_key, request_key: message.output_list.request_key },
-        transaction_fixed: { request_key: message.transaction_fixed.request_key },
-        status_variable: { request_key: message.status_variable.request_key }
+        inputs: { insert_key: message.inputs.insert_key, request_key: message.inputs.request_key },
+        message_verification: { insert_key: nil, request_key: message.message_verification.request_key },
+        outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
+        transaction: { insert_key: nil, request_key: message.transaction.request_key },
+        status: { insert_key: nil, request_key: message.status.request_key }
       }.to_json
     end
 
@@ -185,21 +181,21 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject.message_public_key).to eq(message.message_public_key)
       expect(subject.amount).to eq(message.amount)
       expect(subject.minimum_participants).to eq(message.minimum_participants)
-      expect(subject.input_list.insert_key).to eq(message.input_list.insert_key)
-      expect(subject.input_list.request_key).to eq(message.input_list.request_key)
-      expect(subject.inputs).to eq([])
-      expect(subject.message_verification_fixed.insert_key).to be_nil
-      expect(subject.message_verification_fixed.request_key).to eq(message.message_verification_fixed.request_key)
-      expect(subject.message_verification).to be_nil
-      expect(subject.output_list.insert_key).to eq(message.output_list.insert_key)
-      expect(subject.output_list.request_key).to eq(message.output_list.request_key)
-      expect(subject.outputs).to eq([])
-      expect(subject.transaction_fixed.insert_key).to be_nil
-      expect(subject.transaction_fixed.request_key).to eq(message.transaction_fixed.request_key)
-      expect(subject.transaction).to be_nil
-      expect(subject.status_variable.insert_key).to be_nil
-      expect(subject.status_variable.request_key).to eq(message.status_variable.request_key)
-      expect(subject.status).to be_nil
+      expect(subject.inputs.insert_key).to eq(message.inputs.insert_key)
+      expect(subject.inputs.request_key).to eq(message.inputs.request_key)
+      expect(subject.inputs.value).to eq([])
+      expect(subject.message_verification.insert_key).to be_nil
+      expect(subject.message_verification.request_key).to eq(message.message_verification.request_key)
+      expect(subject.message_verification.value).to be_nil
+      expect(subject.outputs.insert_key).to eq(message.outputs.insert_key)
+      expect(subject.outputs.request_key).to eq(message.outputs.request_key)
+      expect(subject.outputs.value).to eq([])
+      expect(subject.transaction.insert_key).to be_nil
+      expect(subject.transaction.request_key).to eq(message.transaction.request_key)
+      expect(subject.transaction.value).to be_nil
+      expect(subject.status.insert_key).to be_nil
+      expect(subject.status.request_key).to eq(message.status.request_key)
+      expect(subject.status.value).to be_nil
     end
   end
   

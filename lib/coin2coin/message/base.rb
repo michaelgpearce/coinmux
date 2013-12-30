@@ -9,13 +9,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
   class << self
     def build(coin_join = nil)
-      message = new
-      message.coin_join = coin_join
-      message.created_with_build = true
+      message = build_without_associations(coin_join)
 
-      associations.each do |(type, name), options|
-        message.send("#{association_property(type, name)}=", Coin2Coin::Message::Association.new(options[:read_only]))
-        message.send("#{name}=", options[:default_value_builder].call)
+      associations.each do |name, config|
+        message.send("#{name}=", Coin2Coin::Message::Association.build(coin_join, name, config[:type], config[:read_only]))
       end
 
       message
@@ -23,18 +20,6 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
     def add_properties(*properties)
       properties.each { |prop| property(prop) }
-    end
-
-    def add_list_association(property, options)
-      add_association(:list, property, lambda { Array.new }, options)
-    end
-
-    def add_fixed_association(property, options)
-      add_association(:fixed, property, lambda { nil }, options)
-    end
-
-    def add_variable_association(property, options)
-      add_association(:variable, property, lambda { nil }, options)
     end
 
     def from_json(json, coin_join = nil)
@@ -45,18 +30,21 @@ class Coin2Coin::Message::Base < Hashie::Dash
       hash = JSON.parse(json) rescue nil
       return nil unless hash.is_a?(Hash)
 
+      from_hash(hash, coin_join)
+    end
+
+    def from_hash(hash, coin_join = nil)
       return nil unless self.properties.collect(&:to_s).sort == hash.keys.sort
 
       message = self.new
       message.coin_join = coin_join
       hash.each do |property_name, value|
         property = property_name.to_sym
-        if (type_and_name = association_property_map[property])
-          if value.is_a?(Hash)
-            config = associations[type_and_name]
-            message.send("#{property}=", build_association(value, config[:read_only]))
-            message.send("#{type_and_name.last}=", config[:default_value_builder].call)
-          end
+        if associations[property]
+          association = association_from_hash(coin_join, property, value)
+          return nil if association.nil?
+
+          message.send("#{property}=", association)
         else
           message.send("#{property}=", value.is_a?(Hash) ? value.symbolize_keys : value)
         end
@@ -67,42 +55,36 @@ class Coin2Coin::Message::Base < Hashie::Dash
       message
     end
 
-    private
-
-    def build_association(hash, read_only)
-      association = Coin2Coin::Message::Association.new(read_only)
-      association.request_key = hash['request_key']
-      if !read_only
-        association.insert_key = hash['insert_key']
-      end
-
-      association
-    end
-
-    def add_association(type, name, default_value_builder, options)
+    def add_association(name, type, options)
       options.assert_required_keys!(:read_only)
       raise ArgumentError, "Invalid association type: #{type}" unless ASSOCIATION_TYPES.include?(type)
 
-      attr_accessor name
-
-      association_property = association_property(type, name)
-      property(association_property)
-      associations[[type, name]] = options.merge(:default_value_builder => default_value_builder)
-      association_property_map[association_property] = [type, name]
+      property(name)
+      associations[name] = options.merge(:type => type)
     end
 
-    def association_property_map
-      @association_property_map ||= {}
+    protected
+
+    def build_without_associations(coin_join)
+      message = new
+      message.coin_join = coin_join
+      message.created_with_build = true
+
+      message
+    end
+
+    private
+
+    def association_from_hash(coin_join, property, hash)
+      return nil unless hash.is_a?(Hash)
+
+      config = associations[property]
+
+      Coin2Coin::Message::Association.from_hash(hash, coin_join, property, config[:type], config[:read_only])
     end
 
     def associations
       @associations ||= {}
-    end
-
-    def association_property(type, name)
-      property_name = type.to_s == 'list' ? name.to_s.gsub(/e?s$/, '') : name
-      
-      :"#{property_name}_#{type}"
     end
   end
 
