@@ -3,7 +3,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
 
-  attr_accessor :coin_join
+  attr_accessor :coin_join, :created_with_build
 
   validate :coin_join_valid, :if => :coin_join
 
@@ -11,6 +11,8 @@ class Coin2Coin::Message::Base < Hashie::Dash
     def build(coin_join = nil)
       message = new
       message.coin_join = coin_join
+      message.created_with_build = true
+
       associations.each do |(type, name), options|
         message.send("#{association_property(type, name)}=", Coin2Coin::Message::Association.new(options[:read_only]))
         message.send("#{name}=", options[:default_value_builder].call)
@@ -102,6 +104,14 @@ class Coin2Coin::Message::Base < Hashie::Dash
       
       :"#{property_name}_#{type}"
     end
+  end
+
+  def initialize
+    self.created_with_build = false
+  end
+
+  def created_with_build?
+    !!created_with_build
   end
 
   private
