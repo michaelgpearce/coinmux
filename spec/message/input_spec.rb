@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'base64'
 
 describe Coin2Coin::Message::Input do
-  let(:default_message) { FactoryGirl.build(:input_message) }
+  let(:default_message) { build(:input_message) }
   let(:input_identifier) { default_message.input_identifier }
   let(:address) { default_message.address }
   let(:private_key) { default_message.private_key }
@@ -14,7 +14,7 @@ describe Coin2Coin::Message::Input do
   
   describe "validations" do
     let(:message) do
-      FactoryGirl.build(:input_message,
+      build(:input_message,
         address: address,
         private_key: private_key,
         public_key: public_key,

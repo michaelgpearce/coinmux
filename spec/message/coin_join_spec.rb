@@ -10,7 +10,7 @@ describe Coin2Coin::Message::CoinJoin do
   let(:version) { Coin2Coin::Message::CoinJoin::VERSION }
   
   describe "validations" do
-    let(:message) { FactoryGirl.build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
 
     subject { message.valid? }
 
@@ -90,7 +90,7 @@ describe Coin2Coin::Message::CoinJoin do
   end
 
   describe "associations" do
-    let(:message) { FactoryGirl.build(:coin_join_message) }
+    let(:message) { build(:coin_join_message) }
 
     context "inputs" do
       it "is a read-write list association" do
@@ -153,7 +153,7 @@ describe Coin2Coin::Message::CoinJoin do
   end
 
   describe "from_json" do
-    let(:message) { FactoryGirl.build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
     let(:json) do
       {
         version: message.version,

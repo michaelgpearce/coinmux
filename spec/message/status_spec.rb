@@ -10,7 +10,7 @@ describe Coin2Coin::Message::Status do
     end
   end
 
-  let(:default_message) { FactoryGirl.build(:status_message) }
+  let(:default_message) { build(:status_message) }
   let(:identifier) { default_message.identifier }
   let(:status) { default_message.status }
   let(:transaction_id) { default_message.transaction_id }
@@ -21,7 +21,7 @@ describe Coin2Coin::Message::Status do
 
   describe "validations" do
     let(:message) do
-      FactoryGirl.build(:status_message,
+      build(:status_message,
         identifier: identifier,
         status: status,
         transaction_id: transaction_id,
