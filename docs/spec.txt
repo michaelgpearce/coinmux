@@ -2,23 +2,22 @@
 CoinJoins:
 {
   Version: 1
-  Identifier: 12345 # Random value used for InputList#Signature
+  Identifier: 12345 # Random value used for Inputs#Signature
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 200000000 # in satoshi, n^2
   MinimumParticipants: 5 # number of inputs / outputs
-  InputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  #InputAliveList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  MessageVerificationFixed: { InsertKey: null, RequestKey: "RequestKey" }
-  OutputList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  TransactionFixed: { InsertKey: null, RequestKey: "RequestKey" }
-  StatusVariable: { InsertKey: null, RequestKey: "RequestKey" }
+  Inputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  MessageVerification: { InsertKey: null, RequestKey: "RequestKey" }
+  Outputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  Transaction: { InsertKey: null, RequestKey: "RequestKey" }
+  TransactionSignatures: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
+  Status: { InsertKey: null, RequestKey: "RequestKey" }
 }
 
 # Updated with status information
 # Updatable
 Status:
 {
-  Identifier: 12345 # Random value used for InputAliveList#EncryptedStatusIdentifier
   Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
   TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
   UpdatedAt: {
@@ -35,18 +34,9 @@ Inputs:
   Address: "1abc..." # ensure uniqueness
   PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
-  ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@InputList#Address - CoinJoinList#Amount - InputList#ChangeAmount)
-  Signature: "123...abc" # Signature with (PrivateKey, CoinJoinList#Identifier) to show ownership of address
+  ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@Inputs#Address - CoinJoins#Amount - Inputs#ChangeAmount)
+  Signature: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
 }
-
-# Public insert_key and request_key
-# Participants insert message to indicate they are alive
-#InputAlives:
-#{
-#  Address: "1abc..."
-#  EncryptedStatusIdentifier: "123...abc"
-#}
-
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification
@@ -56,7 +46,7 @@ MessageVerification:
 {
   EncryptedMessageIdentifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
   EncryptedSecretKeys: {
-    'Inputs#Addess': '123...abc', # secret key for #EncryptedMessageIdentifier encrypted PKI for each InputList#MessagePublicKey that will be in transaction
+    'Inputs#Addess': '123...abc', # secret key for #EncryptedMessageIdentifier encrypted PKI for each Inputs#MessagePublicKey that will be in transaction
     ...
   }
 }
@@ -66,20 +56,19 @@ MessageVerification:
 Outputs:
 {
   Address: "1abc..."
-  # This scheme maintains no link between the InputList and the OutputList and ensures that we only add outputs owned by an input.
-  # 1. Decrypt my MessageVerificationFixed#EncryptedIdentifierPrivateKeys to get private key for MessageVerificationFixed#EncryptedIdentifier
-  # 2. Decrypt MessageVerificationFixed#EncryptedIdentifier with private key to get Identifier to allow signing
-  # 3. Hash (Identifier + Address) with OutputList#MessagePublicKey to CoinJoinList#MessagePublicKey
+  # This scheme maintains no link between the Inputs and the Outputs and ensures that we only add outputs owned by an input.
+  # 1. Decrypt my MessageVerification#EncryptedIdentifierPrivateKeys to get private key for MessageVerification#EncryptedIdentifier
+  # 2. Decrypt MessageVerification#EncryptedIdentifier with private key to get Identifier to allow signing
+  # 3. Hash (Identifier + Address) with Outputs#MessagePublicKey to CoinJoins#MessagePublicKey
   MessageVerification: '123...abc'
 }
 
 # Readable by anyone, writeable only by controller
 # Controller publishes only once a transaction that meets its criteria (number of outputs)
-# Participant only follows TransactionSignatureList when all rules followed and correctly contains all of his inputs and outputs
+# Participant only follows TransactionSignatures when all rules followed and correctly contains all of his inputs and outputs
 # Write-Once
 Transaction:
 {
-  TransactionSignatureList: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
   # script should probably just be default and not present
   Inputs: [
@@ -114,12 +103,12 @@ Transaction:
 # Public insert_key and request_key
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
-# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatusVariable
+# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatus
 TransactionSignatures:
 {
   InputIndex: 0
   ScriptSig: '3046... 04e3...' # this is unique for every transaction
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
-  # 3. Signature (Identifier + InputIndex + ScriptSig) with TransactionSignatureList#MessagePublicKey to CoinJoinList#MessagePublicKey
+  # 3. Signature (Identifier + InputIndex + ScriptSig) with TransactionSignatures#MessagePublicKey to CoinJoins#MessagePublicKey
   MessageVerification: '123...abc'
 }
