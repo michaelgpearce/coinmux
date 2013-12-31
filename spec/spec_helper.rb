@@ -43,8 +43,31 @@ def fake_bitcoin
   end
 end
 
+module Helpers
+  # Keep these cached for performance reasons
+  def self.create_bitcoin_info(index)
+    @bitcoin_infos ||= []
+    raise "Invalid index: #{index}" unless index <= @bitcoin_infos.size
+
+    if (bitcoin_info = @bitcoin_infos[index]).nil?
+      bitcoin_info = {}
+      bitcoin_info[:private_key] = "%064x" % (index + 1)
+      bitcoin_info[:public_key] = Coin2Coin::Bitcoin.instance.public_key_for_private_key!(bitcoin_info[:private_key])
+      bitcoin_info[:address] = Coin2Coin::Bitcoin.instance.address_for_public_key!(bitcoin_info[:public_key])
+      bitcoin_info[:identifier] = "valid-identifier-#{index + 1}"
+      bitcoin_info[:signature] = Coin2Coin::Bitcoin.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
+
+      @bitcoin_infos << bitcoin_info
+    end
+
+    bitcoin_info
+  end
+end
+
+
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
+  config.include Helpers
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus

@@ -19,12 +19,14 @@ describe Coin2Coin::Message::Input do
         private_key: private_key,
         public_key: public_key,
         signature: signature,
-        change_address: change_address)
+        change_address: change_address,
+        coin_join: coin_join)
     end
 
     subject { message.valid? }
 
     it "is valid with default data" do
+      subject
       expect(subject).to be_true
     end
 

@@ -20,22 +20,29 @@ FactoryGirl.define do
     end
   end
 
+  factory :coin_join_message_with_inputs, :parent => :coin_join_message do
+    after(:build) do |coin_join|
+      coin_join.inputs.insert(FactoryGirl.build(:input_message, :coin_join => coin_join))
+      coin_join.inputs.insert(FactoryGirl.build(:input_message, :coin_join => coin_join))
+    end
+  end
+
   factory :input_message, :class => Coin2Coin::Message::Input do
     ignore do
-      input_identifier "this is a message"
+      sequence(:bitcoin_info) { |n| Helpers.create_bitcoin_info(n - 1) }
       message_keys { Coin2Coin::PKI.instance.generate_keypair }
     end
 
-    address "mh9nRF1ZSqLJB3hbUjPLmfDHdnGUURdYdK"
-    private_key "585C660C887913E5F40B8E34D99C62766443F9D043B1DE1DFDCC94E386BC6DF6"
-    public_key "04FD30E98AF97627082F169B524E4646D31F900C9CAB13743140567C0CAE4B3F303AE48426DD157AEA58DCC239BB8FB19193FB856C312592D8296B02C0EA54E03C"
-    signature "HIZQbBLAGJLhSZ310FCQMAo9l1X2ysxyt0kXkf6KcBN3znl2iClC6V9wz9Nkn6mMDUaq4kRlgYQDUUlsm29Bl0o="
+    address { bitcoin_info[:address] }
+    private_key { bitcoin_info[:private_key] }
+    public_key { bitcoin_info[:public_key] }
+    signature { bitcoin_info[:signature] }
     change_address "mi4J2qXAVTwonMhaWGX63eKnjZcFM9Gy8Q"
     change_amount 100000
     message_private_key { message_keys.first }
     message_public_key { message_keys.last }
 
-    association :coin_join, factory: :coin_join_message, strategy: :build, identifier: "this is a message"
+    coin_join { association :coin_join_message, strategy: :build, identifier: bitcoin_info[:identifier] }
   end
 
   factory :status_message, :class => Coin2Coin::Message::Status do
@@ -49,6 +56,18 @@ FactoryGirl.define do
     updated_at { { :block_height => current_block_height_and_nonce.first, :nonce => current_block_height_and_nonce.last } }
 
     association :coin_join, factory: :coin_join_message, strategy: :build
+  end
+
+  factory :message_verification_message, :class => Coin2Coin::Message::MessageVerification do
+    message_identifier { Coin2Coin::Digest.instance.random_identifier }
+    secret_key { Coin2Coin::Digest.instance.random_identifier }
+    encrypted_message_identifier { Coin2Coin::Cipher.instance.encrypt(secret_key, message_identifier) }
+
+    coin_join { association :coin_join_message_with_inputs, strategy: :build }
+
+    after(:build) do |message_verification|
+      message_verification.encrypted_secret_keys = message_verification.build_encrypted_secret_keys
+    end
   end
 end
 

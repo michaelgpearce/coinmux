@@ -56,7 +56,7 @@ MessageVerification:
 {
   EncryptedMessageIdentifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
   EncryptedSecretKeys: {
-    '#MessagePublicKey': '123...abc', # secret key for #EncryptedMessageIdentifier encrypted PKI for each InputList#MessagePublicKey that will be in transaction
+    'Inputs#Addess': '123...abc', # secret key for #EncryptedMessageIdentifier encrypted PKI for each InputList#MessagePublicKey that will be in transaction
     ...
   }
 }

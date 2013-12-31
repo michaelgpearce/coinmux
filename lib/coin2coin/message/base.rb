@@ -88,8 +88,12 @@ class Coin2Coin::Message::Base < Hashie::Dash
     end
   end
 
-  def initialize
+  def initialize(attributes = {})
     self.created_with_build = false
+
+    attributes.each do |key, value|
+      send("#{key}=", value)
+    end
   end
 
   def created_with_build?

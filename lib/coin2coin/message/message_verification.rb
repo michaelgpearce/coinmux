@@ -1,19 +1,71 @@
+require 'base64'
+
 class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
   property :encrypted_message_identifier
   property :encrypted_secret_keys
   
   attr_accessor :message_identifier, :secret_key
   
-  def initialize(input_message_public_keys)
-    @message_identifier = Coin2Coin::Digest.hex_digest(rand.to_s)
-    @secret_key = Coin2Coin::Digest.hex_digest(rand.to_s)
-    
-    self.encrypted_message_identifier = Coin2Coin::Cipher.encrypt(@secret_key, @message_identifier)
-    
+  validates :encrypted_message_identifier, :encrypted_secret_keys, :presence => true
+  validates :message_identifier, :secret_key, :presence => true, :if => :created_with_build?
+  validates :message_identifier, :secret_key, :absence => true, :unless => :created_with_build?
+  validate :ensure_has_addresses_for_all_encrypted_secret_keys, :unless => :created_with_build?
+  validate :ensure_owned_input_can_decrypt_message_identifier, :unless => :created_with_build?
+
+  class << self
+    def build(coin_join)
+      message = super(coin_join)
+
+      message.message_identifier = Coin2Coin::Digest.instance.random_identifier
+      message.secret_key = Coin2Coin::Digest.instance.random_identifier
+      
+      message.encrypted_message_identifier = Base64.encode64(Coin2Coin::Cipher.instance.encrypt(message.secret_key, message.message_identifier)).strip
+      
+      message.encrypted_secret_keys = message.build_encrypted_secret_keys
+
+      message
+    end
+  end
+
+  def build_encrypted_secret_keys
     # only selected inputs will get the secret to decrypt the identifier
-    self.encrypted_secret_keys = input_message_public_keys.inject({}) do |acc, input_message_public_key|
-      acc[input_message_public_key] = Coin2Coin::PKI.instance.public_encrypt(input_message_public_key, @secret_key)
+    coin_join.inputs.value.inject({}) do |acc, input|
+      encrypted_secret_key = Coin2Coin::PKI.instance.public_encrypt(input.message_public_key, secret_key)
+      acc[input.address.to_sym] = Base64.encode64(encrypted_secret_key)
+
       acc
     end
+  end
+
+  # raise ArgumentError if unable to decrypt
+  def get_secret_key_for_address!(address)
+    input = coin_join.inputs.value.detect { |input| input.address.to_s == address.to_s }
+    raise "Invalid state: no input!" if input.nil?
+
+    encoded_encrypted_secret_key = encrypted_secret_keys[address.to_sym]
+    raise ArgumentError, "not found for address #{address}" if encoded_encrypted_secret_key.nil?
+
+    encrypted_secret_key = (Base64.decode64(encoded_encrypted_secret_key) rescue nil) || ""
+    secret_key = Coin2Coin::PKI.instance.private_decrypt(input.message_private_key, encrypted_secret_key) rescue nil
+    raise ArgumentError, "cannot be decrypted" if secret_key.nil?
+
+    secret_key
+  end
+
+  private
+
+  def ensure_owned_input_can_decrypt_message_identifier
+    input = coin_join.inputs.value.detect(&:message_private_key)
+    raise "Invalid state: no input!" if input.nil?
+
+    get_secret_key_for_address!(input.address)
+  rescue ArgumentError => e
+    errors[:encrypted_secret_keys] << e.message
+  end
+
+  def ensure_has_addresses_for_all_encrypted_secret_keys
+    (errors[:encrypted_secret_keys] << "is not a Hash" and return) unless encrypted_secret_keys.is_a?(Hash)
+
+    errors[:encrypted_secret_keys] << "contains address not an input" if (encrypted_secret_keys.keys.collect(&:to_s) - coin_join.inputs.value.collect(&:address)).size != 0
   end
 end

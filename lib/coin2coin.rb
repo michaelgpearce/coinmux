@@ -38,6 +38,7 @@ require 'lib/coin2coin/message/association'
 require 'lib/coin2coin/message/coin_join'
 require 'lib/coin2coin/message/status'
 require 'lib/coin2coin/message/input'
+require 'lib/coin2coin/message/message_verification'
 
 require 'lib/coin2coin/state_machine/event'
 require 'lib/coin2coin/state_machine/controller'
