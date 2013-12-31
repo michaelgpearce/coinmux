@@ -1,12 +1,11 @@
 class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   STATUSES_REQUIRING_TRANSACTION_ID = %w(WaitingForConfirmation Complete)
 
-  property :identifier
   property :status
   property :transaction_id
   property :updated_at
   
-  validates :status, :identifier, :updated_at, :presence => true
+  validates :status, :updated_at, :presence => true
   validate :transaction_id_presence
   validate :transaction_confirmed, :if => :is_complete?
   validate :status_valid
@@ -17,7 +16,6 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
       message = super(coin_join)
       message.status = status
       message.transaction_id = transaction_id
-      message.identifier = Coin2Coin::Digest.instance.random_identifier
 
       block_height, nonce = Coin2Coin::Bitcoin.instance.current_block_height_and_nonce
       message.updated_at = {

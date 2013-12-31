@@ -50,7 +50,6 @@ FactoryGirl.define do
       current_block_height_and_nonce { Coin2Coin::Bitcoin.instance.current_block_height_and_nonce }
     end
 
-    identifier { "valid_identifier:#{rand}" }
     status "Complete"
     transaction_id { "valid_transaction_id:#{rand}" }
     updated_at { { :block_height => current_block_height_and_nonce.first, :nonce => current_block_height_and_nonce.last } }

@@ -11,7 +11,6 @@ describe Coin2Coin::Message::Status do
   end
 
   let(:default_message) { build(:status_message) }
-  let(:identifier) { default_message.identifier }
   let(:status) { default_message.status }
   let(:transaction_id) { default_message.transaction_id }
   let(:current_block_height) { default_message.updated_at[:block_height] }
@@ -22,7 +21,6 @@ describe Coin2Coin::Message::Status do
   describe "validations" do
     let(:message) do
       build(:status_message,
-        identifier: identifier,
         status: status,
         transaction_id: transaction_id,
         updated_at: updated_at)
@@ -160,7 +158,6 @@ describe Coin2Coin::Message::Status do
     let(:message) { default_message }
     let(:json) do
       {
-        identifier: message.identifier,
         status: message.status,
         transaction_id: message.transaction_id,
         updated_at: message.updated_at
@@ -174,7 +171,6 @@ describe Coin2Coin::Message::Status do
     it "creates a valid input" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
-      expect(subject.identifier).to eq(message.identifier)
       expect(subject.status).to eq(message.status)
       expect(subject.transaction_id).to eq(message.transaction_id)
       expect(subject.updated_at).to eq(message.updated_at)
