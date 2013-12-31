@@ -7,6 +7,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   add_association :outputs, :list, :read_only => false
   add_association :message_verification, :fixed, :read_only => true
   add_association :transaction, :fixed, :read_only => true
+  add_association :transaction_signatures, :list, :read_only => false
   add_association :status, :variable, :read_only => true
   
   attr_accessor :message_private_key

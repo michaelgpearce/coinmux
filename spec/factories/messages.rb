@@ -16,6 +16,7 @@ FactoryGirl.define do
       coin_join.outputs = Coin2Coin::Message::Association.build(coin_join, 'output', :list, false)
       coin_join.message_verification = Coin2Coin::Message::Association.build(coin_join, 'message_verification', :fixed, true)
       coin_join.transaction = Coin2Coin::Message::Association.build(coin_join, 'transaction', :fixed, true)
+      coin_join.transaction_signatures = Coin2Coin::Message::Association.build(coin_join, 'transaction_signature', :list, false)
       coin_join.status = Coin2Coin::Message::Association.build(coin_join, 'status', :variable, true)
     end
   end

@@ -132,6 +132,16 @@ describe Coin2Coin::Message::CoinJoin do
       end
     end
 
+    context "transaction_signatures" do
+      it "is a read-write list association" do
+        expect(message.transaction_signatures.value).to eq([])
+        expect(message.transaction_signatures.type).to eq(:list)
+        expect(message.transaction_signatures.read_only_insert_key).to be_nil
+        expect(message.transaction_signatures.insert_key).to_not be_nil
+        expect(message.transaction_signatures.request_key).to_not be_nil
+      end
+    end
+
     context "status" do
       it "is a read-only variable association" do
         expect(message.status.value).to eq(nil)
@@ -165,6 +175,8 @@ describe Coin2Coin::Message::CoinJoin do
         message_verification: { insert_key: nil, request_key: message.message_verification.request_key },
         outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
         transaction: { insert_key: nil, request_key: message.transaction.request_key },
+        transaction_signatures: { insert_key: message.transaction_signatures.insert_key, request_key: message.transaction_signatures.request_key },
+        outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
         status: { insert_key: nil, request_key: message.status.request_key }
       }.to_json
     end
@@ -193,6 +205,9 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject.transaction.insert_key).to be_nil
       expect(subject.transaction.request_key).to eq(message.transaction.request_key)
       expect(subject.transaction.value).to be_nil
+      expect(subject.transaction_signatures.insert_key).to eq(message.transaction_signatures.insert_key)
+      expect(subject.transaction_signatures.request_key).to eq(message.transaction_signatures.request_key)
+      expect(subject.transaction_signatures.value).to eq([])
       expect(subject.status.insert_key).to be_nil
       expect(subject.status.request_key).to eq(message.status.request_key)
       expect(subject.status.value).to be_nil
