@@ -1,5 +1,5 @@
 class Coin2Coin::StateMachine::Controller
-  attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :minimum_participant_size, :callback
+  attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :participant_count, :callback
   
   STATUSES = %w(WaitingForInputs WaitingForOutputs WaitingForSignatures WaitingForConfirmation Failed Complete)
   
@@ -52,9 +52,9 @@ class Coin2Coin::StateMachine::Controller
     super() # NOTE: This *must* be called, otherwise states won't get initialized
   end
   
-  def start(bitcoin_amount, minimum_participant_size, &callback)
+  def start(bitcoin_amount, participant_count, &callback)
     self.bitcoin_amount = bitcoin_amount
-    self.minimum_participant_size = minimum_participant_size
+    self.participant_count = participant_count
     self.callback = callback
     
     start_coin_join
@@ -102,7 +102,7 @@ class Coin2Coin::StateMachine::Controller
   end
   
   def do_announce_coin_join
-    self.coin_join_message = Coin2Coin::Message::CoinJoin.build(bitcoin_amount, minimum_participant_size)
+    self.coin_join_message = Coin2Coin::Message::CoinJoin.build(bitcoin_amount, participant_count)
     coin_join_message_insert_key = Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).insert_key
     
     self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
@@ -150,6 +150,6 @@ class Coin2Coin::StateMachine::Controller
   end
   
   def can_announce_coin_join?(*args)
-    bitcoin_amount > 0 && minimum_participant_size.to_i >= 1
+    bitcoin_amount > 0 && participant_count.to_i >= 1
   end
 end

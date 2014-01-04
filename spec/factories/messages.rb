@@ -9,7 +9,7 @@ FactoryGirl.define do
     message_private_key { message_keys.first }
     message_public_key { message_keys.last }
     amount Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN
-    minimum_participants 5
+    participants 5
 
     after(:build) do |coin_join|
       coin_join.inputs = Coin2Coin::Message::Association.build(coin_join, 'input', :list, false)

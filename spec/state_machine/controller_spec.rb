@@ -18,12 +18,12 @@ describe Coin2Coin::StateMachine::Controller do
   context "#start" do
     let(:controller) { Coin2Coin::StateMachine::Controller.new }
     let(:bitcoin_amount) { 100_000_000 }
-    let(:minimum_participant_size) { 5 }
+    let(:participant_count) { 5 }
     let(:coin_join_request_key) { Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).request_key }
     
     subject do
       callback_events = []
-      controller.start(bitcoin_amount, minimum_participant_size) do |e|
+      controller.start(bitcoin_amount, participant_count) do |e|
         callback_events << e
       end
       callback_events

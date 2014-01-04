@@ -2,7 +2,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   VERSION = 1
   SATOSHIS_PER_BITCOIN = 100_000_000
   
-  add_properties :version, :identifier, :message_public_key, :amount, :minimum_participants
+  add_properties :version, :identifier, :message_public_key, :amount, :participants
   add_association :inputs, :list, :read_only => false
   add_association :outputs, :list, :read_only => false
   add_association :message_verification, :fixed, :read_only => true
@@ -13,20 +13,20 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   attr_accessor :message_private_key
   
   validates :coin_join, :presence => false
-  validates :version, :identifier, :message_public_key, :amount, :minimum_participants, :presence => true
-  validate :minimum_participants_numericality, :if => :minimum_participants
+  validates :version, :identifier, :message_public_key, :amount, :participants, :presence => true
+  validate :participants_numericality, :if => :participants
   validate :version_matches, :if => :version
   validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
-    def build(amount = SATOSHIS_PER_BITCOIN, minimum_participants = 5)
+    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5)
       message = super(nil)
 
       message.version = VERSION
       message.identifier = Coin2Coin::Digest.instance.random_identifier
       message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
       message.amount = amount
-      message.minimum_participants = minimum_participants
+      message.participants = participants
 
       message
     end
@@ -38,9 +38,9 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     (errors[:version] << "must be #{VERSION}" and return) unless version.to_s == VERSION.to_s
   end
 
-  def minimum_participants_numericality
-    (errors[:minimum_participants] << "is not an integer" and return) unless minimum_participants.to_s.to_i == minimum_participants
-    (errors[:minimum_participants] << "must be at least 2" and return) unless minimum_participants > 1
+  def participants_numericality
+    (errors[:participants] << "is not an integer" and return) unless participants.to_s.to_i == participants
+    (errors[:participants] << "must be at least 2" and return) unless participants > 1
   end
 
   def amount_is_base_2_bitcoin
