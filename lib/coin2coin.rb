@@ -12,7 +12,7 @@ require 'digest/sha2'
 require 'swt'
 require 'glimmer'
 require 'set'
-Dir[File.join(File.dirname(__FILE__), '*.jar')].each { |filename| require filename }
+Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 
 class Hash
   include Hashie::Extensions::KeyConversion
