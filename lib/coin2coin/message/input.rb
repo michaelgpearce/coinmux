@@ -11,14 +11,14 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   
   class << self
     def build(coin_join, private_key_hex, change_address = nil)
-      input = super(coin_join)
-      input.message_private_key, input.message_public_key = Coin2Coin::PKI.instance.generate_keypair
+      message = super(coin_join)
+      message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
 
-      input.private_key = private_key_hex
-      input.address = Coin2Coin::BitcoinCrypto.instance.address_for_private_key!(private_key_hex)
-      input.signature = Coin2Coin::BitcoinCrypto.instance.sign_message!(coin_join.identifier, private_key_hex)
+      message.private_key = private_key_hex
+      message.address = Coin2Coin::BitcoinCrypto.instance.address_for_private_key!(private_key_hex)
+      message.signature = Coin2Coin::BitcoinCrypto.instance.sign_message!(coin_join.identifier, private_key_hex)
 
-      input
+      message
     end
   end
   
