@@ -39,6 +39,14 @@ describe Coin2Coin::BitcoinCrypto do
     end
   end
 
+  describe "address_for_private_key!" do
+    subject { Coin2Coin::BitcoinCrypto.instance.address_for_private_key!(private_key_hex) }
+
+    it "returns the address" do
+      expect(subject).to eq(address)
+    end
+  end
+
   describe "verify_address!" do
     subject { Coin2Coin::BitcoinCrypto.instance.verify_address!(address) }
 

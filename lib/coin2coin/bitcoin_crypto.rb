@@ -49,6 +49,11 @@ class Coin2Coin::BitcoinCrypto
   end
   def_no_raise_method(:address_for_public_key, nil)
   
+  def address_for_private_key!(private_key_hex)
+    address_for_public_key!(public_key_for_private_key!(private_key_hex))
+  end
+  def_no_raise_method(:address_for_private_key, nil)
+  
   def verify_address!(address)
     Address.new(network_params, address)
     true
