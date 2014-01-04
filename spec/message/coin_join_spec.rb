@@ -7,10 +7,11 @@ describe Coin2Coin::Message::CoinJoin do
 
   let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN }
   let(:participants) { 2 }
+  let(:participant_transaction_fee) { Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE / 2 }
   let(:version) { Coin2Coin::Message::CoinJoin::VERSION }
   
   describe "validations" do
-    let(:message) { build(:coin_join_message, amount: amount, participants: participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, participants: participants, participant_transaction_fee: participant_transaction_fee, version: version) }
 
     subject { message.valid? }
 
@@ -35,6 +36,35 @@ describe Coin2Coin::Message::CoinJoin do
         it "is invalid" do
           expect(subject).to be_false
           expect(message.errors[:participants]).to include("must be at least 2")
+        end
+      end
+    end
+
+    describe "participant_transaction_fee_numericality" do
+      context "with non numeric value" do
+        let(:participant_transaction_fee) { "non-numeric" }
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:participant_transaction_fee]).to include("is not an integer")
+        end
+      end
+
+      context "with less than 0" do
+        let(:participant_transaction_fee) { -1 }
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:participant_transaction_fee]).to include("may not be a negative amount")
+        end
+      end
+
+      context "with greater than DEFAULT_TRANSACTION_FEE" do
+        let(:participant_transaction_fee) { Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE + 1 }
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:participant_transaction_fee]).to include("may not be greater than #{Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE}")
         end
       end
     end
@@ -163,7 +193,7 @@ describe Coin2Coin::Message::CoinJoin do
   end
 
   describe "from_json" do
-    let(:message) { build(:coin_join_message, amount: amount, participants: participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, participants: participants, participant_transaction_fee: participant_transaction_fee, version: version) }
     let(:json) do
       {
         version: message.version,
@@ -171,6 +201,7 @@ describe Coin2Coin::Message::CoinJoin do
         message_public_key: message.message_public_key,
         amount: message.amount,
         participants: message.participants,
+        participant_transaction_fee: message.participant_transaction_fee,
         inputs: { insert_key: message.inputs.insert_key, request_key: message.inputs.request_key },
         message_verification: { insert_key: nil, request_key: message.message_verification.request_key },
         outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
@@ -193,6 +224,7 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject.message_public_key).to eq(message.message_public_key)
       expect(subject.amount).to eq(message.amount)
       expect(subject.participants).to eq(message.participants)
+      expect(subject.participant_transaction_fee).to eq(message.participant_transaction_fee)
       expect(subject.inputs.insert_key).to eq(message.inputs.insert_key)
       expect(subject.inputs.request_key).to eq(message.inputs.request_key)
       expect(subject.inputs.value).to eq([])

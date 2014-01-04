@@ -10,6 +10,7 @@ FactoryGirl.define do
     message_public_key { message_keys.last }
     amount Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN
     participants 5
+    participant_transaction_fee { (Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE / 5).to_i }
 
     after(:build) do |coin_join|
       coin_join.inputs = Coin2Coin::Message::Association.build(coin_join, 'input', :list, false)
@@ -39,7 +40,6 @@ FactoryGirl.define do
     public_key { bitcoin_info[:public_key] }
     signature { bitcoin_info[:signature] }
     change_address "mi4J2qXAVTwonMhaWGX63eKnjZcFM9Gy8Q"
-    change_amount 100000
     message_private_key { message_keys.first }
     message_public_key { message_keys.last }
 

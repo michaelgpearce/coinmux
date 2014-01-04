@@ -13,7 +13,6 @@ describe Coin2Coin::Message::Input do
   let(:public_key) { default_message.public_key }
   let(:signature) { default_message.signature }
   let(:change_address) { default_message.change_address }
-  let(:change_amount) { default_message.change_amount }
   let(:coin_join) { default_message.coin_join }
   
   describe "validations" do
@@ -94,7 +93,6 @@ describe Coin2Coin::Message::Input do
         address: message.address,
         public_key: message.public_key,
         change_address: message.change_address,
-        change_amount: message.change_amount,
         signature: message.signature
       }.to_json
     end
@@ -110,7 +108,6 @@ describe Coin2Coin::Message::Input do
       expect(subject.address).to eq(message.address)
       expect(subject.public_key).to eq(message.public_key)
       expect(subject.change_address).to eq(message.change_address)
-      expect(subject.change_amount).to eq(message.change_amount)
     end
   end
   

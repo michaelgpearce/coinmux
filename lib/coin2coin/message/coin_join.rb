@@ -1,8 +1,9 @@
 class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   VERSION = 1
   SATOSHIS_PER_BITCOIN = 100_000_000
+  DEFAULT_TRANSACTION_FEE = (0.0005 * SATOSHIS_PER_BITCOIN).to_i
   
-  add_properties :version, :identifier, :message_public_key, :amount, :participants
+  add_properties :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee
   add_association :inputs, :list, :read_only => false
   add_association :outputs, :list, :read_only => false
   add_association :message_verification, :fixed, :read_only => true
@@ -13,13 +14,14 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   attr_accessor :message_private_key
   
   validates :coin_join, :presence => false
-  validates :version, :identifier, :message_public_key, :amount, :participants, :presence => true
+  validates :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee, :presence => true
   validate :participants_numericality, :if => :participants
+  validate :participant_transaction_fee_numericality, :if => :participant_transaction_fee
   validate :version_matches, :if => :version
   validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
-    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5)
+    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5, participant_transaction_fee = (DEFAULT_TRANSACTION_FEE / participants).to_i)
       message = super(nil)
 
       message.version = VERSION
@@ -27,6 +29,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
       message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
       message.amount = amount
       message.participants = participants
+      message.participant_transaction_fee = participant_transaction_fee
 
       message
     end
@@ -41,6 +44,12 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   def participants_numericality
     (errors[:participants] << "is not an integer" and return) unless participants.to_s.to_i == participants
     (errors[:participants] << "must be at least 2" and return) unless participants > 1
+  end
+
+  def participant_transaction_fee_numericality
+    (errors[:participant_transaction_fee] << "is not an integer" and return) unless participant_transaction_fee.to_s.to_i == participant_transaction_fee
+    (errors[:participant_transaction_fee] << "may not be a negative amount" and return) if participant_transaction_fee < 0
+    (errors[:participant_transaction_fee] << "may not be greater than #{DEFAULT_TRANSACTION_FEE}" and return) if participant_transaction_fee > DEFAULT_TRANSACTION_FEE
   end
 
   def amount_is_base_2_bitcoin

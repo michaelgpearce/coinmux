@@ -4,8 +4,9 @@ CoinJoins:
   Version: 1
   Identifier: 12345 # Random value used for Inputs#Verification
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
-  Amount: 200000000 # in satoshi, n^2
   Participants: 5 # number of inputs / outputs
+  Amount: 200000000 # in satoshi, n^2
+  ParticipantTransactionFee: 10000 # each participant must pay this fee (for now 0.0005 / num participants)
   Inputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   MessageVerification: { InsertKey: null, RequestKey: "RequestKey" }
   Outputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
@@ -34,7 +35,6 @@ Inputs:
   Address: "1abc..." # ensure uniqueness
   PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
-  ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@Inputs#Address - CoinJoins#Amount - Inputs#ChangeAmount)
   Verification: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
 }
 
