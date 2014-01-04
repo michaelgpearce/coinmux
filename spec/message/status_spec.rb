@@ -7,8 +7,8 @@ describe Coin2Coin::Message::Status do
 
   before do
     if !transaction_id.nil?
-      Coin2Coin::Bitcoin.instance.test_add_transaction_id_to_pool(transaction_id)
-      Coin2Coin::Bitcoin.instance.test_confirm_block
+      Coin2Coin::BitcoinNetwork.instance.test_add_transaction_id_to_pool(transaction_id)
+      Coin2Coin::BitcoinNetwork.instance.test_confirm_block
     end
   end
 

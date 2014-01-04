@@ -1,9 +1,3 @@
-require 'swt'
-require 'glimmer'
-require 'singleton'
-
-require 'set'
-
 class Coin2Coin::Application
   include Glimmer, Singleton
   

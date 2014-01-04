@@ -1,6 +1,3 @@
-require 'digest/sha2'
-require 'singleton'
-
 class Coin2Coin::Digest
   include Singleton
   

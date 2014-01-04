@@ -1,6 +1,5 @@
 require 'yaml'
 require 'erb'
-require 'singleton'
 
 class Coin2Coin::Config < Hashie::Dash
   include Singleton

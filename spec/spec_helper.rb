@@ -9,7 +9,7 @@ end
 
 require 'spec/fake/application'
 require 'spec/fake/data_store'
-require 'spec/fake/bitcoin'
+require 'spec/fake/bitcoin_network'
 require 'factory_girl'
 require 'pry'
 
@@ -18,12 +18,12 @@ FactoryGirl.find_definitions
 def fake_all
   fake_application
   fake_data_store
-  fake_bitcoin
+  fake_bitcoin_network
 end
 
 def fake_all_network_connections
   fake_data_store
-  fake_bitcoin
+  fake_bitcoin_network
 end
 
 def fake_application
@@ -42,9 +42,9 @@ def fake_data_store
   )
 end
 
-def fake_bitcoin
-  @fake_bitcoin ||= Coin2Coin::Fake::Bitcoin.new.tap do |bitcoin|
-    Coin2Coin::Bitcoin.stub(:instance).and_return(bitcoin)
+def fake_bitcoin_network
+  @fake_bitcoin_network ||= Coin2Coin::Fake::BitcoinNetwork.new.tap do |bitcoin_network|
+    Coin2Coin::BitcoinNetwork.stub(:instance).and_return(bitcoin_network)
   end
 end
 
@@ -57,10 +57,10 @@ module Helpers
     if (bitcoin_info = @bitcoin_infos[index]).nil?
       bitcoin_info = {}
       bitcoin_info[:private_key] = "%064x" % (index + 1)
-      bitcoin_info[:public_key] = Coin2Coin::Bitcoin.instance.public_key_for_private_key!(bitcoin_info[:private_key])
-      bitcoin_info[:address] = Coin2Coin::Bitcoin.instance.address_for_public_key!(bitcoin_info[:public_key])
+      bitcoin_info[:public_key] = Coin2Coin::BitcoinCrypto.instance.public_key_for_private_key!(bitcoin_info[:private_key])
+      bitcoin_info[:address] = Coin2Coin::BitcoinCrypto.instance.address_for_public_key!(bitcoin_info[:public_key])
       bitcoin_info[:identifier] = "valid-identifier-#{index + 1}"
-      bitcoin_info[:signature] = Coin2Coin::Bitcoin.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
+      bitcoin_info[:signature] = Coin2Coin::BitcoinCrypto.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
 
       @bitcoin_infos << bitcoin_info
     end

@@ -1,10 +1,6 @@
-%w(bitcoinj-0.11-SNAPSHOT.jar guava-15.0.jar sc-light-jdk15on-1.47.0.3.jar scprov-jdk15on-1.47.0.2.jar slf4j-api-1.7.5.jar slf4j-nop-1.7.5.jar).each do |f|
-  require File.join(File.dirname(__FILE__), '..', f)
-end
-require 'singleton'
+class Coin2Coin::BitcoinCrypto
+  include Singleton, Coin2Coin::BitcoinUtil
 
-class Coin2Coin::Bitcoin
-  include Singleton
   import 'java.math.BigInteger'
   import 'java.security.SignatureException'
   import 'com.google.bitcoin.core.ECKey'
@@ -25,10 +21,6 @@ class Coin2Coin::Bitcoin
     end
   end
 
-  def current_block_height_and_nonce
-    raise "TODO"
-  end
-  
   def verify_message!(message, signature_base_64, address)
     address == ECKey.signedMessageToKey(message, signature_base_64).toAddress(network_params).to_s
   rescue => e
@@ -65,22 +57,9 @@ class Coin2Coin::Bitcoin
   end
   def_no_raise_method(:verify_address, false)
   
-  def block_exists?(block_height, nonce)
-    raise "TODO"
-  end
-
-  # nil returned if transaction not found, 0 returned if in transaction pool, 1+ if accepted into blockchain
-  def transaction_confirmations(transaction_id)
-    raise "TODO"
-  end
-
   private
 
   def build_ec_key(private_key_hex)
     ECKey.new(BigInteger.new(private_key_hex, 16))
-  end
-
-  def network_params
-    Coin2Coin::Config.instance.bitcoin_network == 'mainnet' ? NetworkParameters.prodNet() : NetworkParameters.testNet3()
   end
 end

@@ -6,7 +6,13 @@ require 'json'
 require 'state_machine'
 require 'hashie'
 require 'freenet_hash'
-
+require 'singleton'
+require 'openssl'
+require 'digest/sha2'
+require 'swt'
+require 'glimmer'
+require 'set'
+Dir[File.join(File.dirname(__FILE__), '*.jar')].each { |filename| require filename }
 
 class Hash
   include Hashie::Extensions::KeyConversion
@@ -29,7 +35,9 @@ require 'lib/coin2coin/error'
 require 'lib/coin2coin/digest'
 require 'lib/coin2coin/cipher'
 require 'lib/coin2coin/pki'
-require 'lib/coin2coin/bitcoin'
+require 'lib/coin2coin/bitcoin_util'
+require 'lib/coin2coin/bitcoin_crypto'
+require 'lib/coin2coin/bitcoin_network'
 require 'lib/coin2coin/data_store'
 require 'lib/coin2coin/data_store_event'
 require 'lib/coin2coin/config'

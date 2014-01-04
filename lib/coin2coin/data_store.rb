@@ -1,5 +1,3 @@
-require 'singleton'
-
 class Coin2Coin::DataStore
   include Singleton
   

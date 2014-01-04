@@ -1,6 +1,3 @@
-require 'openssl'
-require 'singleton'
-
 class Coin2Coin::Cipher
   include Singleton
 

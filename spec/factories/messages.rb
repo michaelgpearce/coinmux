@@ -48,7 +48,7 @@ FactoryGirl.define do
 
   factory :status_message, :class => Coin2Coin::Message::Status do
     ignore do
-      current_block_height_and_nonce { Coin2Coin::Bitcoin.instance.current_block_height_and_nonce }
+      current_block_height_and_nonce { Coin2Coin::BitcoinNetwork.instance.current_block_height_and_nonce }
     end
 
     status "Complete"
