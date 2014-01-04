@@ -7,6 +7,7 @@ gem 'glimmer', '0.1.3'
 gem 'activemodel', '4.0.1'
 gem 'activesupport', '4.0.1'
 gem 'state_machine', '1.2.0'
+gem 'bitcoin-ruby', '0.0.2'
 gem 'hashie', '2.0.5'
 gem 'freenet_hash', :path => '../freenet_hash' #'0.0.1'
 

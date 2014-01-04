@@ -1,4 +1,4 @@
-%w(bitcoinj-0.8.jar guava-15.0.jar sc-light-jdk15on-1.47.0.3.jar scprov-jdk15on-1.47.0.2.jar slf4j-api-1.7.5.jar slf4j-nop-1.7.5.jar).each do |f|
+%w(bitcoinj-0.11-SNAPSHOT.jar guava-15.0.jar sc-light-jdk15on-1.47.0.3.jar scprov-jdk15on-1.47.0.2.jar slf4j-api-1.7.5.jar slf4j-nop-1.7.5.jar).each do |f|
   require File.join(File.dirname(__FILE__), '..', f)
 end
 require 'singleton'

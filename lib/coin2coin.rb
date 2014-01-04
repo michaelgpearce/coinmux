@@ -23,6 +23,7 @@ module Coin2Coin
   end
 end
 
+require 'lib/coin2coin/version'
 require 'lib/coin2coin/coin_join_uri'
 require 'lib/coin2coin/error'
 require 'lib/coin2coin/digest'

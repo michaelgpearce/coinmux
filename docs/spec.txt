@@ -2,10 +2,10 @@
 CoinJoins:
 {
   Version: 1
-  Identifier: 12345 # Random value used for Inputs#Signature
+  Identifier: 12345 # Random value used for Inputs#Verification
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   Amount: 200000000 # in satoshi, n^2
-  MinimumParticipants: 5 # number of inputs / outputs
+  Participants: 5 # number of inputs / outputs
   Inputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
   MessageVerification: { InsertKey: null, RequestKey: "RequestKey" }
   Outputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
@@ -35,7 +35,7 @@ Inputs:
   PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
   ChangeAmount: 1234 # Satoshi (Transaction fee = Coins@Inputs#Address - CoinJoins#Amount - Inputs#ChangeAmount)
-  Signature: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
+  Verification: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
 }
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
@@ -71,20 +71,21 @@ Transaction:
 {
   # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
   # script should probably just be default and not present
+  TransactionHash: '1b5...bf5'
   Inputs: [
     {
-      PublicKey: "123...abc"
+      # PublicKey: "123...abc"
       TransactionId: "123...abc"
-      InputIndex: 0
+      # OutputIndex: 0
       Amount: 1234
-      Signature: "123...abc"
+      # Verification: "123...abc"
     },
     {
-      PublicKey: "789...xyz"
+      # PublicKey: "789...xyz"
       TransactionId: "789...xyz"
-      InputIndex: 0
+      # OutputIndex: 0
       Amount: 2345
-      Signature: "789...xyz"
+      # Verification: "789...xyz"
     }
   ]
   Outputs: [
@@ -106,7 +107,7 @@ Transaction:
 # Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatus
 TransactionSignatures:
 {
-  InputIndex: 0
+  TransactionInputIndex: 0
   ScriptSig: '3046... 04e3...' # this is unique for every transaction
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
   # 3. Signature (Identifier + InputIndex + ScriptSig) with TransactionSignatures#MessagePublicKey to CoinJoins#MessagePublicKey
