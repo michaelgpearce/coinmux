@@ -21,6 +21,11 @@ def fake_all
   fake_bitcoin
 end
 
+def fake_all_network_connections
+  fake_data_store
+  fake_bitcoin
+end
+
 def fake_application
   @fake_application ||= (
     Coin2Coin::Fake::Application.new.tap do |application|

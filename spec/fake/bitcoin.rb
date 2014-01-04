@@ -1,4 +1,8 @@
-class Coin2Coin::Fake::Bitcoin
+class Coin2Coin::Fake::Bitcoin < Coin2Coin::Bitcoin
+  def self.new
+    super
+  end
+
   def initialize
     @blocks = []
     @transaction_pool = []

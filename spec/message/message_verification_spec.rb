@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Coin2Coin::Message::MessageVerification do
   before do
-    fake_data_store
+    fake_all_network_connections
   end
 
   let(:coin_join) { build(:coin_join_message_with_inputs) }

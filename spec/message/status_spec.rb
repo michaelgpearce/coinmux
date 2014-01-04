@@ -2,8 +2,10 @@ require 'spec_helper'
 
 describe Coin2Coin::Message::Status do
   before do
-    fake_bitcoin
+    fake_all_network_connections
+  end
 
+  before do
     if !transaction_id.nil?
       Coin2Coin::Bitcoin.instance.test_add_transaction_id_to_pool(transaction_id)
       Coin2Coin::Bitcoin.instance.test_confirm_block

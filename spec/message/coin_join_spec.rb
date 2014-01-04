@@ -2,15 +2,15 @@ require 'spec_helper'
 
 describe Coin2Coin::Message::CoinJoin do
   before do
-    fake_bitcoin
+    fake_all_network_connections
   end
 
   let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN }
-  let(:minimum_participants) { 2 }
+  let(:participants) { 2 }
   let(:version) { Coin2Coin::Message::CoinJoin::VERSION }
   
   describe "validations" do
-    let(:message) { build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, participants: participants, version: version) }
 
     subject { message.valid? }
 
@@ -19,22 +19,22 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject).to be_true
     end
 
-    describe "minimum_participants_numericality" do
+    describe "participants_numericality" do
       context "with non numeric value" do
-        let(:minimum_participants) { "non-numeric" }
+        let(:participants) { "non-numeric" }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:minimum_participants]).to include("is not an integer")
+          expect(message.errors[:participants]).to include("is not an integer")
         end
       end
 
       context "with less than 2" do
-        let(:minimum_participants) { 1 }
+        let(:participants) { 1 }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:minimum_participants]).to include("must be at least 2")
+          expect(message.errors[:participants]).to include("must be at least 2")
         end
       end
     end
@@ -154,7 +154,7 @@ describe Coin2Coin::Message::CoinJoin do
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::CoinJoin.build(amount, minimum_participants) }
+    subject { Coin2Coin::Message::CoinJoin.build(amount, participants) }
 
     it "builds valid input" do
       input = subject
@@ -163,14 +163,14 @@ describe Coin2Coin::Message::CoinJoin do
   end
 
   describe "from_json" do
-    let(:message) { build(:coin_join_message, amount: amount, minimum_participants: minimum_participants, version: version) }
+    let(:message) { build(:coin_join_message, amount: amount, participants: participants, version: version) }
     let(:json) do
       {
         version: message.version,
         identifier: message.identifier,
         message_public_key: message.message_public_key,
         amount: message.amount,
-        minimum_participants: message.minimum_participants,
+        participants: message.participants,
         inputs: { insert_key: message.inputs.insert_key, request_key: message.inputs.request_key },
         message_verification: { insert_key: nil, request_key: message.message_verification.request_key },
         outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
@@ -192,7 +192,7 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject.identifier).to eq(message.identifier)
       expect(subject.message_public_key).to eq(message.message_public_key)
       expect(subject.amount).to eq(message.amount)
-      expect(subject.minimum_participants).to eq(message.minimum_participants)
+      expect(subject.participants).to eq(message.participants)
       expect(subject.inputs.insert_key).to eq(message.inputs.insert_key)
       expect(subject.inputs.request_key).to eq(message.inputs.request_key)
       expect(subject.inputs.value).to eq([])

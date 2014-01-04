@@ -2,6 +2,10 @@ require 'spec_helper'
 require 'base64'
 
 describe Coin2Coin::Message::Input do
+  before do
+    fake_all_network_connections
+  end
+
   let(:default_message) { build(:input_message) }
   let(:input_identifier) { default_message.input_identifier }
   let(:address) { default_message.address }
