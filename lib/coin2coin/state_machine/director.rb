@@ -1,4 +1,4 @@
-class Coin2Coin::StateMachine::Controller
+class Coin2Coin::StateMachine::Director
   attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :participant_count, :callback
   
   STATUSES = %w(WaitingForInputs WaitingForOutputs WaitingForSignatures WaitingForConfirmation Failed Complete)
@@ -108,7 +108,7 @@ class Coin2Coin::StateMachine::Controller
     self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
     status_message_insert_key = coin_join_message.status.read_only_insert_key
     
-    # insert messages in "reverse" order, control_status -> coin_join
+    # insert messages in "reverse" order, status -> coin_join
     notify(:inserting_status_message)
     insert_message(status_message_insert_key, status_message) do
       notify(:inserting_coin_join_message)

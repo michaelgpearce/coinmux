@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Coin2Coin::StateMachine::Controller do
+describe Coin2Coin::StateMachine::Director do
   before do
     fake_all
   end
   
   context "#initialize" do
     subject do
-      Coin2Coin::StateMachine::Controller.new
+      Coin2Coin::StateMachine::Director.new
     end
     
     it "should be in the initialized state" do
@@ -16,14 +16,14 @@ describe Coin2Coin::StateMachine::Controller do
   end
   
   context "#start" do
-    let(:controller) { Coin2Coin::StateMachine::Controller.new }
+    let(:director) { Coin2Coin::StateMachine::Director.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:participant_count) { 5 }
     let(:coin_join_request_key) { Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).request_key }
     
     subject do
       callback_events = []
-      controller.start(bitcoin_amount, participant_count) do |e|
+      director.start(bitcoin_amount, participant_count) do |e|
         callback_events << e
       end
       callback_events
@@ -39,21 +39,21 @@ describe Coin2Coin::StateMachine::Controller do
       it "has status waiting_for_inputs" do
         subject
         
-        expect(controller.state).to eq('waiting_for_inputs')
+        expect(director.state).to eq('waiting_for_inputs')
       end
       
       it "inserts coin join message" do
         subject
 
-        expect(fake_data_store.fetch(coin_join_request_key).last).to eq(controller.coin_join_message.to_json)
+        expect(fake_data_store.fetch(coin_join_request_key).last).to eq(director.coin_join_message.to_json)
       end
 
       it "inserts status message" do
         subject
 
-        expect(fake_data_store.fetch(controller.coin_join_message.status.request_key).last).to eq(controller.status_message.to_json)
-        expect(controller.status_message.status).to eq('WaitingForInputs')
-        expect(controller.status_message.transaction_id).to be_nil
+        expect(fake_data_store.fetch(director.coin_join_message.status.request_key).last).to eq(director.status_message.to_json)
+        expect(director.status_message.status).to eq('WaitingForInputs')
+        expect(director.status_message.transaction_id).to be_nil
       end
     end
   end

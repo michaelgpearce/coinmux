@@ -40,7 +40,7 @@ Inputs:
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification
-# Identifier is only encrypted once and shared to ensure that Controller cannot link inputs to outputs by giving each input a different identifier
+# Identifier is only encrypted once and shared to ensure that Director cannot link inputs to outputs by giving each input a different identifier
 # Write-Once
 MessageVerification:
 {
@@ -63,8 +63,8 @@ Outputs:
   MessageVerification: '123...abc'
 }
 
-# Readable by anyone, writeable only by controller
-# Controller publishes only once a transaction that meets its criteria (number of outputs)
+# Readable by anyone, writeable only by director
+# Director publishes only once a transaction that meets its criteria (number of outputs)
 # Participant only follows TransactionSignatures when all rules followed and correctly contains all of his inputs and outputs
 # Write-Once
 Transaction:
@@ -104,7 +104,7 @@ Transaction:
 # Public insert_key and request_key
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
-# Controller creates transaction, polls for valid signatures, then sends transaction once received and validated, updating ControlStatus
+# Director creates transaction, polls for valid signatures, then sends transaction once received and validated, updating Status
 TransactionSignatures:
 {
   TransactionInputIndex: 0

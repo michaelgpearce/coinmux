@@ -50,7 +50,7 @@ require 'lib/coin2coin/message/input'
 require 'lib/coin2coin/message/message_verification'
 
 require 'lib/coin2coin/state_machine/event'
-require 'lib/coin2coin/state_machine/controller'
+require 'lib/coin2coin/state_machine/director'
 require 'lib/coin2coin/state_machine/participant'
 
 require 'app/models/coin2coin/base'

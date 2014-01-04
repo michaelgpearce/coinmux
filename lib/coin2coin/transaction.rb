@@ -164,7 +164,7 @@ def sign_transaction_input(transaction, input_index, private_key)
   tx_input.getScriptSig()
 end
 
-# Controller gets #participants addresses
+# Director gets #participants addresses
 # Create an unsigned transaction: For each address, get all unspent transactions for input addresses and add outputs for each output
 
 # Participant builds same transaction and verifies transaction hash and that all of my inputs and outputs are present
@@ -186,7 +186,7 @@ end
 
 
 unsigned_tx = build_unsigned_transaction
-puts "--- CONTROLLER UNSIGNED TX HASH: #{unsigned_tx.getHash()}"
+puts "--- DIRECTOR UNSIGNED TX HASH: #{unsigned_tx.getHash()}"
 
 
 tx_input_script_signatures = []
@@ -219,7 +219,7 @@ signed_tx = build_unsigned_transaction.tap do |transaction|
   end
 end
 
-puts "--- CONTROLLER SIGNED TX HASH: #{signed_tx.getHash()}"
+puts "--- DIRECTOR SIGNED TX HASH: #{signed_tx.getHash()}"
 
 
 peer_group = PeerGroup.new(network_params)

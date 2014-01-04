@@ -46,7 +46,7 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   end
 
   def status_valid
-    errors[:status] << "is not a valid status" unless Coin2Coin::StateMachine::Controller::STATUSES.include?(status)
+    errors[:status] << "is not a valid status" unless Coin2Coin::StateMachine::Director::STATUSES.include?(status)
   end
 
   def updated_at_valid

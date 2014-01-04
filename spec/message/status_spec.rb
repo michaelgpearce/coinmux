@@ -47,7 +47,7 @@ describe Coin2Coin::Message::Status do
           end
         end
 
-        (Coin2Coin::StateMachine::Controller::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coin2Coin::StateMachine::Director::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -73,7 +73,7 @@ describe Coin2Coin::Message::Status do
           end
         end
 
-        (Coin2Coin::StateMachine::Controller::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coin2Coin::StateMachine::Director::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
