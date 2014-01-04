@@ -33,7 +33,6 @@ Inputs:
 {
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey; ensure uniqueness
   Address: "1abc..." # ensure uniqueness
-  PublicKey: "123...abc" # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
   Verification: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
 }

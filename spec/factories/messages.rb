@@ -37,7 +37,6 @@ FactoryGirl.define do
 
     address { bitcoin_info[:address] }
     private_key { bitcoin_info[:private_key] }
-    public_key { bitcoin_info[:public_key] }
     signature { bitcoin_info[:signature] }
     change_address "mi4J2qXAVTwonMhaWGX63eKnjZcFM9Gy8Q"
     message_private_key { message_keys.first }
