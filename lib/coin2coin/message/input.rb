@@ -1,5 +1,3 @@
-require 'json'
-
 class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   add_properties :message_public_key, :address, :change_address, :signature
   
