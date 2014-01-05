@@ -12,13 +12,13 @@ describe Coin2Coin::Message::Status do
     end
   end
 
-  let(:default_message) { build(:status_message) }
-  let(:status) { default_message.status }
-  let(:transaction_id) { default_message.transaction_id }
-  let(:current_block_height) { default_message.updated_at[:block_height] }
-  let(:current_nonce) { default_message.updated_at[:nonce] }
-  let(:updated_at) { default_message.updated_at }
-  let(:coin_join) { default_message.coin_join }
+  let(:template_message) { build(:status_message) }
+  let(:status) { template_message.status }
+  let(:transaction_id) { template_message.transaction_id }
+  let(:current_block_height) { template_message.updated_at[:block_height] }
+  let(:current_nonce) { template_message.updated_at[:nonce] }
+  let(:updated_at) { template_message.updated_at }
+  let(:coin_join) { template_message.coin_join }
 
   describe "validations" do
     let(:message) do
@@ -157,7 +157,7 @@ describe Coin2Coin::Message::Status do
   end
 
   describe "from_json" do
-    let(:message) { default_message }
+    let(:message) { template_message }
     let(:json) do
       {
         status: message.status,

@@ -6,9 +6,9 @@ describe Coin2Coin::Message::MessageVerification do
   end
 
   let(:coin_join) { build(:coin_join_message, :with_inputs) }
-  let(:default_message) { Coin2Coin::Message::MessageVerification.build(coin_join) }
-  let(:encrypted_message_identifier) { default_message.encrypted_message_identifier }
-  let(:encrypted_secret_keys) { default_message.encrypted_secret_keys }
+  let(:template_message) { Coin2Coin::Message::MessageVerification.build(coin_join) }
+  let(:encrypted_message_identifier) { template_message.encrypted_message_identifier }
+  let(:encrypted_secret_keys) { template_message.encrypted_secret_keys }
   let(:message) do
     Coin2Coin::Message::MessageVerification.new(
       coin_join: coin_join,
@@ -54,7 +54,7 @@ describe Coin2Coin::Message::MessageVerification do
   end
 
   describe "get_secret_key_for_address!" do
-    let(:message) { default_message }
+    let(:message) { template_message }
     let(:input) { coin_join.inputs.value.first }
     let(:address) { input.address }
     subject { message.get_secret_key_for_address!(address) }

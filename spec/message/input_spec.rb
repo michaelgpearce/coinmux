@@ -5,13 +5,13 @@ describe Coin2Coin::Message::Input do
     fake_all_network_connections
   end
 
-  let(:default_message) { build(:input_message) }
-  let(:input_identifier) { default_message.input_identifier }
-  let(:address) { default_message.address }
-  let(:private_key) { default_message.private_key }
-  let(:signature) { default_message.signature }
-  let(:change_address) { default_message.change_address }
-  let(:coin_join) { default_message.coin_join }
+  let(:template_message) { build(:input_message) }
+  let(:input_identifier) { template_message.input_identifier }
+  let(:address) { template_message.address }
+  let(:private_key) { template_message.private_key }
+  let(:signature) { template_message.signature }
+  let(:change_address) { template_message.change_address }
+  let(:coin_join) { template_message.coin_join }
   
   describe "validations" do
     let(:message) do
@@ -72,7 +72,7 @@ describe Coin2Coin::Message::Input do
   end
 
   describe "from_json" do
-    let(:message) { default_message }
+    let(:message) { template_message }
     let(:json) do
       {
         message_public_key: message.message_public_key,
