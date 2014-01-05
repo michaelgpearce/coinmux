@@ -11,6 +11,7 @@ require 'openssl'
 require 'digest/sha2'
 require 'swt'
 require 'glimmer'
+require 'base64'
 require 'set'
 Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 
@@ -48,6 +49,7 @@ require 'lib/coin2coin/message/coin_join'
 require 'lib/coin2coin/message/status'
 require 'lib/coin2coin/message/input'
 require 'lib/coin2coin/message/message_verification'
+require 'lib/coin2coin/message/output'
 
 require 'lib/coin2coin/state_machine/event'
 require 'lib/coin2coin/state_machine/director'

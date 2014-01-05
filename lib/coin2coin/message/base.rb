@@ -96,6 +96,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
     end
   end
 
+  def director?
+    coin_join.director?
+  end
+
   def created_with_build?
     !!created_with_build
   end

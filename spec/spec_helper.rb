@@ -7,6 +7,7 @@ module Coin2Coin
   end
 end
 
+require 'rspec'
 require 'spec/fake/application'
 require 'spec/fake/data_store'
 require 'spec/fake/bitcoin_network'
@@ -14,6 +15,10 @@ require 'factory_girl'
 require 'pry'
 
 FactoryGirl.find_definitions
+
+# allow loading in console
+require 'rspec/mocks'
+RSpec::Mocks::setup(Object.new)
 
 def fake_all
   fake_application
@@ -48,31 +53,29 @@ def fake_bitcoin_network
   end
 end
 
-module Helpers
-  # Keep these cached for performance reasons
-  def self.create_bitcoin_info(index)
-    @bitcoin_infos ||= []
-    raise "Invalid index: #{index}" unless index <= @bitcoin_infos.size
+module Helper
+  @@bitcoin_infos = []
+  @@bitcoin_info_index = 0
 
-    if (bitcoin_info = @bitcoin_infos[index]).nil?
+  def self.next_bitcoin_info
+    if (bitcoin_info = @@bitcoin_infos[@@bitcoin_info_index]).nil?
       bitcoin_info = {}
-      bitcoin_info[:private_key] = "%064x" % (index + 1)
+      bitcoin_info[:private_key] = "%064x" % (@@bitcoin_info_index + 1)
       bitcoin_info[:public_key] = Coin2Coin::BitcoinCrypto.instance.public_key_for_private_key!(bitcoin_info[:private_key])
       bitcoin_info[:address] = Coin2Coin::BitcoinCrypto.instance.address_for_public_key!(bitcoin_info[:public_key])
-      bitcoin_info[:identifier] = "valid-identifier-#{index + 1}"
+      bitcoin_info[:identifier] = "valid-identifier-#{@@bitcoin_info_index + 1}"
       bitcoin_info[:signature] = Coin2Coin::BitcoinCrypto.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
 
-      @bitcoin_infos << bitcoin_info
+      @@bitcoin_infos << bitcoin_info
     end
 
+    @@bitcoin_info_index += 1
     bitcoin_info
   end
 end
 
-
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
-  config.include Helpers
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
@@ -82,4 +85,8 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+
+  config.before do
+    Helper.class_variable_set(:@@bitcoin_info_index, 0) # start over reading bitcoin infos for each spec
+  end
 end

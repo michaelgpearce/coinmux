@@ -35,6 +35,32 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     end
   end
 
+  def build_message_verification(*keys)
+    return nil unless input = inputs.value.detect(&:created_with_build?)
+    return nil if message_verification.value.nil?
+    encoded_secret_message_key = message_verification.value.encrypted_secret_keys[input.address.to_sym]
+    encrypted_secret_message_key = Base64.decode64(encoded_secret_message_key)
+    message_private_key = input.message_private_key
+
+    return nil unless secret_message_key = Coin2Coin::PKI.instance.private_decrypt(message_private_key, encrypted_secret_message_key)
+
+    return nil unless message_identifier = Coin2Coin::Cipher.instance.decrypt(
+      secret_message_key,
+      Base64.decode64(message_verification.value.encrypted_message_identifier))
+
+    Coin2Coin::Digest.instance.hex_message_digest(message_identifier, *keys)
+  end
+
+  def message_verification_valid?(message_verification, *keys)
+    raise ArgumentError, "Only director can check message verification validity" unless director?
+
+    message_verification == Coin2Coin::Digest.instance.hex_message_digest(self.message_verification.value.message_identifier, *keys)
+  end
+
+  def director?
+    coin_join.nil?
+  end
+
   private
 
   def version_matches

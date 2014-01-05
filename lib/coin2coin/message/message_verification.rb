@@ -1,5 +1,3 @@
-require 'base64'
-
 class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
   property :encrypted_message_identifier
   property :encrypted_secret_keys

@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'base64'
 
 describe Coin2Coin::Message::Input do
   before do

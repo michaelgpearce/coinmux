@@ -39,7 +39,7 @@ Inputs:
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification
-# Identifier is only encrypted once and shared to ensure that Director cannot link inputs to outputs by giving each input a different identifier
+# MessageIdentifier is encrypted by a shared key to ensure that Director cannot link inputs to outputs by giving each input a different identifier. This shared key is encrypted uniquely for each Input using its Inputs#MessagePublicKey
 # Write-Once
 MessageVerification:
 {
@@ -52,13 +52,17 @@ MessageVerification:
 
 # Public insert_key and request_key
 # Every client posts all of their outputs individually
+# This scheme maintains no link between the Inputs and the Outputs and ensures that we only add outputs owned by an input.
+#
+# MessageVerification is created by the following:
+# 1. Decrypt my MessageVerification#EncryptedSecretKeys for my Inputs#Address using private key of Inputs#MessagePublicKey to get secret key for MessageVerification#EncryptedMessageIdentifier.
+# 2. Decrypt MessageVerification#EncryptedMessageIdentifier with secret key to get MessageVerification#MessageIdentifier used for Outputs#MessageVerification.
+# 3. Ouputs#MessageVerifcation is the SHA256 Hash of ("${MessageVerification#MessageIdentifier}:output:${Outputs#Address}") to show knowledge of MessageVerification#MessageIdentifier.
+#
+# Note: it is possible for a participant to create multiple Outputs with different addresses and the Outputs will have a valid MessageVerification since all Participants share the same MessageIdentifier. This will cause the Director to create a transaction that not all Participants will sign since the Participant will not see his output address in the proposed transaction.
 Outputs:
 {
   Address: "1abc..."
-  # This scheme maintains no link between the Inputs and the Outputs and ensures that we only add outputs owned by an input.
-  # 1. Decrypt my MessageVerification#EncryptedIdentifierPrivateKeys to get private key for MessageVerification#EncryptedIdentifier
-  # 2. Decrypt MessageVerification#EncryptedIdentifier with private key to get Identifier to allow signing
-  # 3. Hash (Identifier + Address) with Outputs#MessagePublicKey to CoinJoins#MessagePublicKey
   MessageVerification: '123...abc'
 }
 

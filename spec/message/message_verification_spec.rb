@@ -5,7 +5,7 @@ describe Coin2Coin::Message::MessageVerification do
     fake_all_network_connections
   end
 
-  let(:coin_join) { build(:coin_join_message_with_inputs) }
+  let(:coin_join) { build(:coin_join_message, :with_inputs) }
   let(:default_message) { Coin2Coin::Message::MessageVerification.build(coin_join) }
   let(:encrypted_message_identifier) { default_message.encrypted_message_identifier }
   let(:encrypted_secret_keys) { default_message.encrypted_secret_keys }

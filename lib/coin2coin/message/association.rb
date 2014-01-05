@@ -57,7 +57,7 @@ class Coin2Coin::Message::Association < Coin2Coin::Message::Base
   def insert(message)
     @messages << message
 
-    Coin2Coin::DataStore.instance.insert(insert_key, message.to_json) {}
+    Coin2Coin::DataStore.instance.insert(read_only_insert_key || insert_key, message.to_json) {}
 
     message
   end

@@ -5,9 +5,9 @@ class Coin2Coin::Digest
     Digest::SHA2.new(256).digest(message)
   end
   
-  def message_digest(message_identifier, *params)
+  def hex_message_digest(message_identifier, *params)
     message = ([message_identifier] + params).join(':')
-    digest(message)
+    hex_digest(message)
   end
   
   def hex_digest(message)

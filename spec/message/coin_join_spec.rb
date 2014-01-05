@@ -246,4 +246,69 @@ describe Coin2Coin::Message::CoinJoin do
     end
   end
   
+  context "message_verification_valid?" do
+    let(:coin_join) { build(:coin_join_message, :with_message_verification) }
+    let(:keys) { %w(foo bar) }
+    let(:message_identifier) { coin_join.message_verification.value.message_identifier }
+    let(:message_verification) { Coin2Coin::Digest.instance.hex_message_digest(message_identifier, 'foo', 'bar') }
+
+    before do
+      expect(coin_join.director?).to be_true
+      expect(coin_join.message_verification.created_with_build?).to be_true
+    end
+
+    subject do
+      coin_join.message_verification_valid?(message_verification, *keys)
+    end
+
+    context "with matching identifier and keys" do
+      it "returns true" do
+        expect(subject).to be_true
+      end
+    end
+
+    context "with incorrect identifier" do
+      let(:message_identifier) { "incorrect-identifier" }
+
+      it "returns false" do
+        expect(subject).to be_false
+      end
+    end
+
+    context "with incorrect key" do
+      let(:keys) { %w(foot bart) }
+
+      it "returns false" do
+        expect(subject).to be_false
+      end
+    end
+  end
+
+  context "build_message_verification" do
+    let(:coin_join) do
+      build(:coin_join_message, :with_inputs, :with_message_verification).tap do |coin_join|
+        # not realistic to be the director and have a built input, but ok for testing
+        coin_join.inputs.value.first.created_with_build = true
+      end
+    end
+    let(:keys) { %w(foo bar) }
+    let(:message_identifier) { coin_join.message_verification.value.message_identifier }
+    let(:input) { coin_join.inputs.value.detect(&:created_with_build?) }
+
+    before do
+      expect(coin_join.director?).to be_true
+      expect(coin_join.message_verification.created_with_build?).to be_true
+      expect(input).to_not be_nil
+    end
+
+    subject do
+      coin_join.build_message_verification(*keys)
+    end
+
+    context "with valid data" do
+      it "builds the correct verification message" do
+        expect(subject).to eq(Coin2Coin::Digest.instance.hex_message_digest(message_identifier, *keys))
+      end
+    end
+  end
 end
