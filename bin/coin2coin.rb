@@ -1,4 +1,4 @@
-#!/usr/bin/env bundle exec ruby -J-XstartOnFirstThread -Xdock:name=Coin2Coin
+#!/usr/bin/env bundle exec ruby -J-XstartOnFirstThread -J-Xdock:name=Coin2Coin
 
 require File.expand_path("../../lib/coin2coin", __FILE__)
 

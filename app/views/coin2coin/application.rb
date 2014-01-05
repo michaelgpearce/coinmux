@@ -63,7 +63,7 @@ class Coin2Coin::Application
   end
   
   def current_coin_join
-    @current_coin_join ||= Coin2Coin::CoinJoin.build
+    @current_coin_join ||= Coin2Coin::CoinJoin.new
   end
   
   def home_tab_item
@@ -72,7 +72,7 @@ class Coin2Coin::Application
         text "CoinJoins allow you to anonimize your Bitcoins by\ncombining them with other users on the Bitcoin network."
       }
       label {
-        text "To do this, this application needs access to your\nprivate keys. This information is never sent over the\nInternet and is never even stored to disk."
+        text "To do this, this application needs access to your\nprivate keys. This information is never sent over the\nInternet and is never stored to disk."
       }
     }
     composite {
