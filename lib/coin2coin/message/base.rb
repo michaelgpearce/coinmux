@@ -12,7 +12,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
       message = build_without_associations(coin_join)
 
       associations.each do |name, config|
-        message.send("#{name}=", Coin2Coin::Message::Association.build(coin_join, name, config[:type], config[:read_only]))
+        message[name] = Coin2Coin::Message::Association.build(coin_join, name, config[:type], config[:read_only])
       end
 
       message
@@ -44,9 +44,9 @@ class Coin2Coin::Message::Base < Hashie::Dash
           association = association_from_hash(coin_join, property, value)
           return nil if association.nil?
 
-          message.send("#{property}=", association)
+          message[property] = association
         else
-          message.send("#{property}=", value.is_a?(Hash) ? value.symbolize_keys : value)
+          message[property] = value.is_a?(Hash) ? value.symbolize_keys : value
         end
       end
 
