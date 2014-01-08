@@ -38,7 +38,7 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
   def build_message_verification(*keys)
     return nil unless input = inputs.value.detect(&:created_with_build?)
     return nil if message_verification.value.nil?
-    encoded_secret_message_key = message_verification.value.encrypted_secret_keys[input.address.to_sym]
+    encoded_secret_message_key = message_verification.value.encrypted_secret_keys[input.address]
     encrypted_secret_message_key = Base64.decode64(encoded_secret_message_key)
     message_private_key = input.message_private_key
 

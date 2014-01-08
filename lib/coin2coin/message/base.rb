@@ -46,7 +46,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
           message[property] = association
         else
-          message[property] = value.is_a?(Hash) ? value.symbolize_keys : value
+          message[property] = value
         end
       end
 

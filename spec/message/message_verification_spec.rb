@@ -77,7 +77,7 @@ describe Coin2Coin::Message::MessageVerification do
 
     context "with encrypted_secret_keys incorrectly encoded" do
       before do
-        message.encrypted_secret_keys[address.to_sym] = "not-base-64"
+        message.encrypted_secret_keys[address] = "not-base-64"
       end
 
       it "raises ArgumentError" do
@@ -87,7 +87,7 @@ describe Coin2Coin::Message::MessageVerification do
 
     context "with encrypted_secret_keys with invalid key" do
       before do
-        message.encrypted_secret_keys[address.to_sym] = Base64.encode64("incorrect key")
+        message.encrypted_secret_keys[address] = Base64.encode64("incorrect key")
       end
 
       it "raises ArgumentError" do

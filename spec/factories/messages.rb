@@ -83,7 +83,7 @@ FactoryGirl.define do
 
     status "Complete"
     transaction_id { "valid_transaction_id:#{rand}" }
-    updated_at { { :block_height => current_block_height_and_nonce.first, :nonce => current_block_height_and_nonce.last } }
+    updated_at { { 'block_height' => current_block_height_and_nonce.first, 'nonce' => current_block_height_and_nonce.last } }
 
     association :coin_join, factory: :coin_join_message, strategy: :build
   end

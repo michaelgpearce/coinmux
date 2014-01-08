@@ -29,7 +29,7 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
     # only selected inputs will get the secret to decrypt the identifier
     coin_join.inputs.value.inject({}) do |acc, input|
       encrypted_secret_key = Coin2Coin::PKI.instance.public_encrypt(input.message_public_key, secret_key)
-      acc[input.address.to_sym] = Base64.encode64(encrypted_secret_key)
+      acc[input.address] = Base64.encode64(encrypted_secret_key)
 
       acc
     end
@@ -40,7 +40,7 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
     input = coin_join.inputs.value.detect { |input| input.address.to_s == address.to_s }
     raise "Invalid state: no input!" if input.nil?
 
-    encoded_encrypted_secret_key = encrypted_secret_keys[address.to_sym]
+    encoded_encrypted_secret_key = encrypted_secret_keys[address]
     raise ArgumentError, "not found for address #{address}" if encoded_encrypted_secret_key.nil?
 
     encrypted_secret_key = (Base64.decode64(encoded_encrypted_secret_key) rescue nil) || ""

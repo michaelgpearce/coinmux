@@ -19,8 +19,8 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
 
       block_height, nonce = Coin2Coin::BitcoinNetwork.instance.current_block_height_and_nonce
       message.updated_at = {
-        :block_height => block_height,
-        :nonce => nonce
+        'block_height' => block_height,
+        'nonce' => nonce
       }
 
       message
@@ -52,7 +52,7 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   def updated_at_valid
     (errors[:updated_at] << "must be a hash" and return) unless updated_at.is_a?(Hash)
 
-    block_exists = Coin2Coin::BitcoinNetwork.instance.block_exists?(updated_at[:block_height].to_i, updated_at[:nonce].to_i)
+    block_exists = Coin2Coin::BitcoinNetwork.instance.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
     errors[:updated_at] << "is not a valid block" unless block_exists
   end
 

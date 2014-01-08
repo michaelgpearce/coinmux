@@ -15,8 +15,8 @@ describe Coin2Coin::Message::Status do
   let(:template_message) { build(:status_message) }
   let(:status) { template_message.status }
   let(:transaction_id) { template_message.transaction_id }
-  let(:current_block_height) { template_message.updated_at[:block_height] }
-  let(:current_nonce) { template_message.updated_at[:nonce] }
+  let(:current_block_height) { template_message.updated_at['block_height'] }
+  let(:current_nonce) { template_message.updated_at['nonce'] }
   let(:updated_at) { template_message.updated_at }
   let(:coin_join) { template_message.coin_join }
 
@@ -128,7 +128,7 @@ describe Coin2Coin::Message::Status do
       end
 
       context "with non-existant block height" do
-        let(:updated_at) { { :block_height => current_block_height + 1, :nonce => current_nonce } }
+        let(:updated_at) { { 'block_height' => current_block_height + 1, 'nonce' => current_nonce } }
 
         it "is invalid" do
           expect(subject).to be_false
@@ -137,7 +137,7 @@ describe Coin2Coin::Message::Status do
       end
 
       context "with invalid nonce" do
-        let(:updated_at) { { :block_height => current_block_height, :nonce => "wrong nonce" } }
+        let(:updated_at) { { 'block_height' => current_block_height, 'nonce' => "wrong nonce" } }
 
         it "is invalid" do
           expect(subject).to be_false
