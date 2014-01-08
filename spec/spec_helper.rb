@@ -14,7 +14,7 @@ require 'spec/fake/bitcoin_network'
 require 'factory_girl'
 require 'pry'
 
-FactoryGirl.find_definitions
+FactoryGirl.find_definitions rescue puts "Warn: #{$!}"
 
 # allow loading in console
 require 'rspec/mocks'
