@@ -66,15 +66,12 @@ Outputs:
   MessageVerification: '123...abc'
 }
 
-# Readable by anyone, writeable only by director
-# Director publishes only once a transaction that meets its criteria (number of outputs)
-# Participant only follows TransactionSignatures when all rules followed and correctly contains all of his inputs and outputs
+# Readable by anyone, writeable only by Director
+# Director publishes only once a transaction that meets its criteria (correct number of inputs and verified outputs)
+# Participant only creates TransactionSignatures when has correct number of inputs/outputs and correctly contains all of his inputs and outputs
 # Write-Once
 Transaction:
 {
-  # RedeemScript: "5234" # created from all input public keys, only necessary if multisig
-  # script should probably just be default and not present
-  TransactionHash: '1b5...bf5'
   Inputs: [
     {
       # PublicKey: "123...abc"

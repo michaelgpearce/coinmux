@@ -19,3 +19,6 @@ https://www.bitaddress.org/bitaddress.org-v2.6.5-SHA1-fa763c2bbc97e1b37bc6d39456
 
 # Address balance from transactions
 https://github.com/spesmilo/electrum/blob/master/lib/wallet.py#L1023
+
+# P2P
+http://tomp2p.net/doc/advanced/

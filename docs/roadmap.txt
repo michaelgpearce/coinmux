@@ -19,6 +19,6 @@ v1.0 - Stable enough and feature rich enough for novice users
 
 FUTURE FEATURES:
 
-* Embed Freenet (or move to P2P or Bitmessage)
+* Embed Freenet (or move to P2P [TomP2P] or Bitmessage)
 * Automatic retries of failed transactions
 * Acts as anonymous wallet
