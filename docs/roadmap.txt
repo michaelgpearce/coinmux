@@ -4,21 +4,29 @@ v0.1 - Functional Prototype
 * May have single point of failure (i.e. blockchain HTTP API)
 * May have external application dependencies (i.e. Freenet)
 
-v0.2 - Functional Prototype
+v0.2 - Functional Beta
 * Creates transactions with no bad actors present
 * Works for Mainnet usage for advanced users
+* Remove single points of failure
+* Support WIF private keys
 
 v0.3 - Improve deterrence of bad actors
-* Add proof of work for posting inputs
-* Require minimum confirmations for input address
+* Add proof of work for posting inputs / creating new CoinJoin (?)
+* Require minimum confirmations for input address (?)
 * Blacklist of "bad addresses" (probably not workable)
+* Encrypt all messages after publish of message_verification so only participants and director can decrypt
+* Can specify/create custom CoinJoin URI
 
 v1.0 - Stable enough and feature rich enough for novice users
 * Installers for OSX, Windows, Linux
-* Specify proxy settings
+* Improved UI/UX
+* User can use proxy server (i.e Tor)
+* Existing wallets can integrate CoinJoin protocol when sending transactions
 
 FUTURE FEATURES:
 
 * Embed Freenet (or move to P2P [TomP2P] or Bitmessage)
 * Automatic retries of failed transactions
-* Acts as anonymous wallet
+* Acts as anonymous wallet (mix to new address, the send)
+  * Support multiple inputs during CoinJoin
+* Allow inputs from single output with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
