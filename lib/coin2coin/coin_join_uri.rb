@@ -1,5 +1,5 @@
 class Coin2Coin::CoinJoinUri
-  attr_accessor :insert_key, :request_key, :application, :network
+  attr_accessor :identifier, :application, :network
 
   class << self
     def parse(uri)
@@ -13,7 +13,7 @@ class Coin2Coin::CoinJoinUri
         acc
       end
 
-      new(:application => match[1], :network => match[2], :insert_key => query_params['insert_key'], :request_key => query_params['request_key'])
+      new(:application => match[1], :network => match[2], :identifier => query_params['identifier'])
     end
   end
 

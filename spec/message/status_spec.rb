@@ -31,7 +31,6 @@ describe Coin2Coin::Message::Status do
     subject { message.valid? }
 
     it "is valid with default data" do
-      subject
       expect(subject).to be_true
     end
 
@@ -151,8 +150,7 @@ describe Coin2Coin::Message::Status do
     subject { Coin2Coin::Message::Status.build(coin_join, status, transaction_id) }
 
     it "builds valid input" do
-      input = subject
-      expect(input.valid?).to be_true
+      expect(subject.valid?).to be_true
     end
   end
 

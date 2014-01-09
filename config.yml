@@ -5,7 +5,7 @@ development:
 
 test:
   bitcoin_network: 'testnet3'
-  coin_join_uri: 'coinjoin://coin2coin/freenet?request_key=request-test-key&insert_key=insert-test-key'
+  coin_join_uri: 'coinjoin://coin2coin/test?identifier={"key":"test-key","can_insert":true,"can_request":true}'
 
 production:
   bitcoin_network: 'mainnet'

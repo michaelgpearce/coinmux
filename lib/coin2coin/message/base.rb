@@ -41,7 +41,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
       hash.each do |property_name, value|
         property = property_name.to_sym
         if associations[property]
-          association = association_from_hash(coin_join, property, value)
+          association = association_from_data_store_identifier(coin_join, property, value)
           return nil if association.nil?
 
           message[property] = association
@@ -63,6 +63,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
       associations[name] = options.merge(:type => type)
     end
 
+    def associations
+      @associations ||= {}
+    end
+    
     protected
 
     def build_without_associations(coin_join)
@@ -75,16 +79,10 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
     private
 
-    def association_from_hash(coin_join, property, hash)
-      return nil unless hash.is_a?(Hash)
-
+    def association_from_data_store_identifier(coin_join, property, identifier)
       config = associations[property]
 
-      Coin2Coin::Message::Association.from_hash(hash, coin_join, property, config[:type], config[:read_only])
-    end
-
-    def associations
-      @associations ||= {}
+      Coin2Coin::Message::Association.from_data_store_identifier(identifier, coin_join, property, config[:type], config[:read_only])
     end
   end
 
@@ -102,6 +100,13 @@ class Coin2Coin::Message::Base < Hashie::Dash
 
   def created_with_build?
     !!created_with_build
+  end
+
+  def to_hash
+    self.class.associations.keys.reduce(super) do |acc, property|
+      acc[property.to_s] = self[property].data_store_identifier
+      acc
+    end
   end
 
   private

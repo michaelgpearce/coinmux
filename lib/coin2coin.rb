@@ -50,6 +50,8 @@ require 'lib/coin2coin/message/status'
 require 'lib/coin2coin/message/input'
 require 'lib/coin2coin/message/message_verification'
 require 'lib/coin2coin/message/output'
+require 'lib/coin2coin/message/transaction'
+require 'lib/coin2coin/message/transaction_signature'
 
 require 'lib/coin2coin/state_machine/event'
 require 'lib/coin2coin/state_machine/director'

@@ -1,25 +1,35 @@
 class Coin2Coin::DataStore
   include Singleton
   
-  def initialize
-    @freenet_hash = FreenetHash.new
+  def generate_identifier
+    raise "TODO"
+  end
+
+  def convert_to_request_only_identifier(identifier)
+    raise "TODO"
+  end
+
+  def identifier_can_insert?(identifier)
+    raise "TODO"
+  end
+
+  def identifier_can_request?(identifier)
+    raise "TODO"
+  end
+
+  def insert(identifier, data, &callback)
+    raise "TODO"
   end
   
-  def generate_keypair
-    @freenet_hash.generate_keypair
+  def fetch_last(identifier, &callback)
+    raise "TODO"
   end
   
-  def insert(insert_key, data, &callback)
-    @freenet_hash.put(insert_key, data, &callback)
+  def fetch_all(identifier, &callback)
+    raise "TODO"
   end
   
-  def fetch_last(request_key, &callback)
-    @freenet_hash.fetch(request_key, &callback)
-  end
-  
-  def fetch_all(request_key, &callback)
-  end
-  
-  def fetch_most_recent(request_key, max_items, &callback)
+  def fetch_most_recent(identifier, max_items, &callback)
+    raise "TODO"
   end
 end

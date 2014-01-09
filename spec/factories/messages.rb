@@ -1,4 +1,18 @@
 FactoryGirl.define do
+  factory :association_message, :class => Coin2Coin::Message::Association do
+    sequence(:name) { |n| "association-#{n}" }
+    type :list
+    read_only false
+    data_store_identifier_from_build { Coin2Coin::DataStore.instance.generate_identifier }
+    data_store_identifier do
+      if read_only
+        Coin2Coin::DataStore.instance.convert_to_request_only_identifier(data_store_identifier_from_build)
+      else
+        data_store_identifier_from_build
+      end
+    end
+  end
+
   factory :coin_join_message, :class => Coin2Coin::Message::CoinJoin do
     ignore do
       template_message { Coin2Coin::Message::CoinJoin.build }
@@ -12,14 +26,12 @@ FactoryGirl.define do
     participants { template_message.participants }
     participant_transaction_fee { template_message.participant_transaction_fee }
 
-    after(:build) do |coin_join|
-      coin_join.inputs = Coin2Coin::Message::Association.build(coin_join, 'input', :list, false)
-      coin_join.outputs = Coin2Coin::Message::Association.build(coin_join, 'output', :list, false)
-      coin_join.message_verification = Coin2Coin::Message::Association.build(coin_join, 'message_verification', :fixed, true)
-      coin_join.transaction = Coin2Coin::Message::Association.build(coin_join, 'transaction', :fixed, true)
-      coin_join.transaction_signatures = Coin2Coin::Message::Association.build(coin_join, 'transaction_signature', :list, false)
-      coin_join.status = Coin2Coin::Message::Association.build(coin_join, 'status', :variable, true)
-    end
+    inputs { association :association_message, strategy: :build, name: 'input', type: :list, read_only: false, created_with_build: true }
+    outputs { association :association_message, strategy: :build, name: 'output', type: :list, read_only: false, created_with_build: true }
+    message_verification { association :association_message, strategy: :build, name: 'message_verification', type: :fixed, read_only: true, created_with_build: true }
+    transaction { association :association_message, strategy: :build, name: 'transaction', type: :fixed, read_only: true, created_with_build: true }
+    transaction_signatures { association :association_message, strategy: :build, name: 'transaction_signature', type: :list, read_only: false, created_with_build: true }
+    status { association :association_message, strategy: :build, name: 'status', type: :variable, read_only: true, created_with_build: true }
 
     #
     # NOTE: traits ordering is important and should probably be loaded in the order defined below
@@ -102,6 +114,14 @@ FactoryGirl.define do
     after(:build) do |message_verification|
       message_verification.encrypted_secret_keys = message_verification.build_encrypted_secret_keys
     end
+  end
+
+  factory :transaction_message, :class => Coin2Coin::Message::Transaction do
+    coin_join { association :coin_join_message }
+  end
+
+  factory :transaction_signature_message, :class => Coin2Coin::Message::TransactionSignature do
+    coin_join { association :coin_join_message }
   end
 end
 

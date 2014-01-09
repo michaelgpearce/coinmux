@@ -7,12 +7,12 @@ CoinJoins:
   Participants: 5 # number of inputs / outputs
   Amount: 200000000 # in satoshi, n^2
   ParticipantTransactionFee: 10000 # each participant must pay this fee (for now 0.0005 / num participants)
-  Inputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  MessageVerification: { InsertKey: null, RequestKey: "RequestKey" }
-  Outputs: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  Transaction: { InsertKey: null, RequestKey: "RequestKey" }
-  TransactionSignatures: { InsertKey: "InsertKey", RequestKey: "RequestKey" }
-  Status: { InsertKey: null, RequestKey: "RequestKey" }
+  Inputs: "insert_and_request_key"
+  MessageVerification: "request_key"
+  Outputs: "insert_and_request_key"
+  Transaction: "request_key"
+  TransactionSignatures: "insert_and_request_key"
+  Status: "request_key"
 }
 
 # Updated with status information

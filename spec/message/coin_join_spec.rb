@@ -126,9 +126,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.inputs.value).to eq([])
         expect(message.inputs.type).to eq(:list)
-        expect(message.inputs.read_only_insert_key).to be_nil
-        expect(message.inputs.insert_key).to_not be_nil
-        expect(message.inputs.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.inputs.data_store_identifier)).to be_true
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.inputs.data_store_identifier)).to be_true
       end
     end
 
@@ -136,9 +135,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.outputs.value).to eq([])
         expect(message.outputs.type).to eq(:list)
-        expect(message.outputs.read_only_insert_key).to be_nil
-        expect(message.outputs.insert_key).to_not be_nil
-        expect(message.outputs.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.outputs.data_store_identifier)).to be_true
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.outputs.data_store_identifier)).to be_true
       end
     end
 
@@ -146,9 +144,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.message_verification.value).to eq(nil)
         expect(message.message_verification.type).to eq(:fixed)
-        expect(message.message_verification.read_only_insert_key).to_not be_nil
-        expect(message.message_verification.insert_key).to be_nil
-        expect(message.message_verification.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.message_verification.data_store_identifier)).to be_false
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.message_verification.data_store_identifier)).to be_true
       end
     end
 
@@ -156,9 +153,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.transaction.value).to eq(nil)
         expect(message.transaction.type).to eq(:fixed)
-        expect(message.transaction.read_only_insert_key).to_not be_nil
-        expect(message.transaction.insert_key).to be_nil
-        expect(message.transaction.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.transaction.data_store_identifier)).to be_false
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.transaction.data_store_identifier)).to be_true
       end
     end
 
@@ -166,9 +162,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.transaction_signatures.value).to eq([])
         expect(message.transaction_signatures.type).to eq(:list)
-        expect(message.transaction_signatures.read_only_insert_key).to be_nil
-        expect(message.transaction_signatures.insert_key).to_not be_nil
-        expect(message.transaction_signatures.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.transaction_signatures.data_store_identifier)).to be_true
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.transaction_signatures.data_store_identifier)).to be_true
       end
     end
 
@@ -176,9 +171,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only variable association" do
         expect(message.status.value).to eq(nil)
         expect(message.status.type).to eq(:variable)
-        expect(message.status.read_only_insert_key).to_not be_nil
-        expect(message.status.insert_key).to be_nil
-        expect(message.status.request_key).to_not be_nil
+        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.status.data_store_identifier)).to be_false
+        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.status.data_store_identifier)).to be_true
       end
     end
   end
@@ -202,13 +196,13 @@ describe Coin2Coin::Message::CoinJoin do
         amount: message.amount,
         participants: message.participants,
         participant_transaction_fee: message.participant_transaction_fee,
-        inputs: { insert_key: message.inputs.insert_key, request_key: message.inputs.request_key },
-        message_verification: { insert_key: nil, request_key: message.message_verification.request_key },
-        outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
-        transaction: { insert_key: nil, request_key: message.transaction.request_key },
-        transaction_signatures: { insert_key: message.transaction_signatures.insert_key, request_key: message.transaction_signatures.request_key },
-        outputs: { insert_key: message.outputs.insert_key, request_key: message.outputs.request_key },
-        status: { insert_key: nil, request_key: message.status.request_key }
+        inputs: message.inputs.data_store_identifier,
+        message_verification: message.message_verification.data_store_identifier,
+        outputs: message.outputs.data_store_identifier,
+        transaction: message.transaction.data_store_identifier,
+        transaction_signatures: message.transaction_signatures.data_store_identifier,
+        outputs: message.outputs.data_store_identifier,
+        status: message.status.data_store_identifier
       }.to_json
     end
 
@@ -225,23 +219,17 @@ describe Coin2Coin::Message::CoinJoin do
       expect(subject.amount).to eq(message.amount)
       expect(subject.participants).to eq(message.participants)
       expect(subject.participant_transaction_fee).to eq(message.participant_transaction_fee)
-      expect(subject.inputs.insert_key).to eq(message.inputs.insert_key)
-      expect(subject.inputs.request_key).to eq(message.inputs.request_key)
+      expect(subject.inputs.data_store_identifier).to eq(message.inputs.data_store_identifier)
       expect(subject.inputs.value).to eq([])
-      expect(subject.message_verification.insert_key).to be_nil
-      expect(subject.message_verification.request_key).to eq(message.message_verification.request_key)
+      expect(subject.message_verification.data_store_identifier).to eq(message.message_verification.data_store_identifier)
       expect(subject.message_verification.value).to be_nil
-      expect(subject.outputs.insert_key).to eq(message.outputs.insert_key)
-      expect(subject.outputs.request_key).to eq(message.outputs.request_key)
+      expect(subject.outputs.data_store_identifier).to eq(message.outputs.data_store_identifier)
       expect(subject.outputs.value).to eq([])
-      expect(subject.transaction.insert_key).to be_nil
-      expect(subject.transaction.request_key).to eq(message.transaction.request_key)
+      expect(subject.transaction.data_store_identifier).to eq(message.transaction.data_store_identifier)
       expect(subject.transaction.value).to be_nil
-      expect(subject.transaction_signatures.insert_key).to eq(message.transaction_signatures.insert_key)
-      expect(subject.transaction_signatures.request_key).to eq(message.transaction_signatures.request_key)
+      expect(subject.transaction_signatures.data_store_identifier).to eq(message.transaction_signatures.data_store_identifier)
       expect(subject.transaction_signatures.value).to eq([])
-      expect(subject.status.insert_key).to be_nil
-      expect(subject.status.request_key).to eq(message.status.request_key)
+      expect(subject.status.data_store_identifier).to eq(message.status.data_store_identifier)
       expect(subject.status.value).to be_nil
     end
   end
