@@ -19,3 +19,5 @@ test/version_tmp
 tmp
 .DS_Store
 coin2coin.jar
+docs/wallet.txt
+
