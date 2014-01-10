@@ -53,6 +53,10 @@ def fake_bitcoin_network
   end
 end
 
+def load_fixture(name)
+  open(File.join(File.dirname(__FILE__), 'fixtures', name)) { |f| f.read }
+end
+
 module Helper
   @@bitcoin_infos = []
   @@bitcoin_info_index = 0

@@ -10,6 +10,7 @@ gem 'state_machine', '1.2.0'
 gem 'bitcoin-ruby', '0.0.2'
 gem 'hashie', '2.0.5'
 gem 'freenet_hash', :path => '../freenet_hash' #'0.0.1'
+gem 'em-http-request', '1.1.2'
 
 group :development do
   gem 'rake', '10.1.0'

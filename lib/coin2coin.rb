@@ -13,6 +13,9 @@ require 'swt'
 require 'glimmer'
 require 'base64'
 require 'set'
+require 'eventmachine'
+require 'em-http'
+
 Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 
 class Hash
@@ -31,6 +34,7 @@ module Coin2Coin
 end
 
 require 'lib/coin2coin/version'
+require 'lib/coin2coin/http'
 require 'lib/coin2coin/coin_join_uri'
 require 'lib/coin2coin/error'
 require 'lib/coin2coin/digest'
@@ -40,7 +44,7 @@ require 'lib/coin2coin/bitcoin_util'
 require 'lib/coin2coin/bitcoin_crypto'
 require 'lib/coin2coin/bitcoin_network'
 require 'lib/coin2coin/data_store'
-require 'lib/coin2coin/data_store_event'
+require 'lib/coin2coin/event'
 require 'lib/coin2coin/config'
 
 require 'lib/coin2coin/message/base'

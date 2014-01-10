@@ -6,6 +6,7 @@ class Coin2Coin::Config < Hashie::Dash
 
   property :bitcoin_network
   property :coin_join_uri
+  property :webbtc_host
   
   def initialize
     config_path = File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config.yml'))
