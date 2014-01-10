@@ -1,4 +1,4 @@
-class Coin2Coin::Message::Input < Coin2Coin::Message::Base
+class Coinmux::Message::Input < Coinmux::Message::Base
   add_properties :message_public_key, :address, :change_address, :signature
   
   attr_accessor :message_private_key, :private_key
@@ -12,11 +12,11 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   class << self
     def build(coin_join, private_key_hex, change_address = nil)
       message = super(coin_join)
-      message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
+      message.message_private_key, message.message_public_key = Coinmux::PKI.instance.generate_keypair
 
       message.private_key = private_key_hex
-      message.address = Coin2Coin::BitcoinCrypto.instance.address_for_private_key!(private_key_hex)
-      message.signature = Coin2Coin::BitcoinCrypto.instance.sign_message!(coin_join.identifier, private_key_hex)
+      message.address = Coinmux::BitcoinCrypto.instance.address_for_private_key!(private_key_hex)
+      message.signature = Coinmux::BitcoinCrypto.instance.sign_message!(coin_join.identifier, private_key_hex)
 
       message
     end
@@ -25,13 +25,13 @@ class Coin2Coin::Message::Input < Coin2Coin::Message::Base
   private
   
   def signature_correct
-    unless Coin2Coin::BitcoinCrypto.instance.verify_message(coin_join.identifier, signature, address)
+    unless Coinmux::BitcoinCrypto.instance.verify_message(coin_join.identifier, signature, address)
       errors[:signature] << "is not correct for address #{address}"
     end
   end
   
   def change_address_valid
-    unless Coin2Coin::BitcoinCrypto.instance.verify_address(change_address)
+    unless Coinmux::BitcoinCrypto.instance.verify_address(change_address)
       errors[:change_address] << "is not a valid address"
     end
   end

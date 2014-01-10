@@ -1,4 +1,4 @@
-class Coin2Coin::StateMachine::Event
+class Coinmux::StateMachine::Event
   attr_accessor :type, :data
   
   def initialize(params = {})

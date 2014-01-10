@@ -1,4 +1,4 @@
-class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
+class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   VERSION = 1
   SATOSHIS_PER_BITCOIN = 100_000_000
   DEFAULT_TRANSACTION_FEE = (0.0005 * SATOSHIS_PER_BITCOIN).to_i
@@ -25,8 +25,8 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
       message = super(nil)
 
       message.version = VERSION
-      message.identifier = Coin2Coin::Digest.instance.random_identifier
-      message.message_private_key, message.message_public_key = Coin2Coin::PKI.instance.generate_keypair
+      message.identifier = Coinmux::Digest.instance.random_identifier
+      message.message_private_key, message.message_public_key = Coinmux::PKI.instance.generate_keypair
       message.amount = amount
       message.participants = participants
       message.participant_transaction_fee = participant_transaction_fee
@@ -42,19 +42,19 @@ class Coin2Coin::Message::CoinJoin < Coin2Coin::Message::Base
     encrypted_secret_message_key = Base64.decode64(encoded_secret_message_key)
     message_private_key = input.message_private_key
 
-    return nil unless secret_message_key = Coin2Coin::PKI.instance.private_decrypt(message_private_key, encrypted_secret_message_key)
+    return nil unless secret_message_key = Coinmux::PKI.instance.private_decrypt(message_private_key, encrypted_secret_message_key)
 
-    return nil unless message_identifier = Coin2Coin::Cipher.instance.decrypt(
+    return nil unless message_identifier = Coinmux::Cipher.instance.decrypt(
       secret_message_key,
       Base64.decode64(message_verification.value.encrypted_message_identifier))
 
-    Coin2Coin::Digest.instance.hex_message_digest(message_identifier, *keys)
+    Coinmux::Digest.instance.hex_message_digest(message_identifier, *keys)
   end
 
   def message_verification_valid?(message_verification, *keys)
     raise ArgumentError, "Only director can check message verification validity" unless director?
 
-    message_verification == Coin2Coin::Digest.instance.hex_message_digest(self.message_verification.value.message_identifier, *keys)
+    message_verification == Coinmux::Digest.instance.hex_message_digest(self.message_verification.value.message_identifier, *keys)
   end
 
   def director?

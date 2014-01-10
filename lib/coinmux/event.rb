@@ -1,4 +1,4 @@
-class Coin2Coin::Event
+class Coinmux::Event
   attr_accessor :error, :data
   
   def initialize(params = {})

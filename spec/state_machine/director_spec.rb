@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Coin2Coin::StateMachine::Director do
+describe Coinmux::StateMachine::Director do
   before do
     fake_all
   end
   
   context "#initialize" do
     subject do
-      Coin2Coin::StateMachine::Director.new
+      Coinmux::StateMachine::Director.new
     end
     
     it "should be in the initialized state" do
@@ -16,10 +16,10 @@ describe Coin2Coin::StateMachine::Director do
   end
   
   context "#start" do
-    let(:director) { Coin2Coin::StateMachine::Director.new }
+    let(:director) { Coinmux::StateMachine::Director.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:participant_count) { 5 }
-    let(:coin_join_data_store_identifier) { Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).identifier }
+    let(:coin_join_data_store_identifier) { Coinmux::CoinJoinUri.parse(Coinmux::Config.instance['coin_join_uri']).identifier }
     
     subject do
       callback_events = []

@@ -1,2 +1,2 @@
-class Coin2Coin::StateMachine::Participant
+class Coinmux::StateMachine::Participant
 end

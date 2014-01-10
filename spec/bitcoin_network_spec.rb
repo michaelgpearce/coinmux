@@ -1,11 +1,11 @@
 require 'spec_helper'
 
-describe Coin2Coin::BitcoinNetwork do
+describe Coinmux::BitcoinNetwork do
   describe "build_unspent_inputs_from_data" do
     let(:data) { JSON.parse(load_fixture('webbtc_address.json')) }
     let(:address) { 'mjcSuqvGTuq8Ys82juwa69eAb4Z69VaqEE' }
 
-    subject { Coin2Coin::BitcoinNetwork.instance.send(:build_unspent_inputs_from_data, data, address) }
+    subject { Coinmux::BitcoinNetwork.instance.send(:build_unspent_inputs_from_data, data, address) }
 
     it "has correct unspent transaction / number and value" do
       expect(subject.size).to eq(1)
@@ -19,16 +19,16 @@ describe Coin2Coin::BitcoinNetwork do
     let(:on_error) { lambda { |e| @on_error = e } }
 
     before do
-      Coin2Coin::Http.instance.stub(:get).with(Coin2Coin::Config.instance.webbtc_host, path).and_yield(event)
+      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, path).and_yield(event)
     end
 
     subject do
-      Coin2Coin::BitcoinNetwork.instance.send(:webbtc_get_json, path, on_success: on_success, on_error: on_error)
+      Coinmux::BitcoinNetwork.instance.send(:webbtc_get_json, path, on_success: on_success, on_error: on_error)
     end
 
     context "with valid JSON" do
       let(:data) { '{"key": "valid data"}' }
-      let(:event) { Coin2Coin::Event.new(data: data) }
+      let(:event) { Coinmux::Event.new(data: data) }
 
       it "invokes on_success with parsed hash event data" do
         subject
@@ -38,7 +38,7 @@ describe Coin2Coin::BitcoinNetwork do
 
     context "with error event" do
       let(:error) { 'some error' }
-      let(:event) { Coin2Coin::Event.new(error: error) }
+      let(:event) { Coinmux::Event.new(error: error) }
 
       it "invokes on_error with error" do
         subject
@@ -47,7 +47,7 @@ describe Coin2Coin::BitcoinNetwork do
     end
 
     context "with invalid JSON" do
-      let(:event) { Coin2Coin::Event.new(data: 'Not JSON') }
+      let(:event) { Coinmux::Event.new(data: 'Not JSON') }
 
       it "invokes on_error with error" do
         subject
@@ -56,7 +56,7 @@ describe Coin2Coin::BitcoinNetwork do
     end
 
     context "with error JSON" do
-      let(:event) { Coin2Coin::Event.new(data: '{"error": "an error"}') }
+      let(:event) { Coinmux::Event.new(data: '{"error": "an error"}') }
 
       it "invokes on_error with error" do
         subject

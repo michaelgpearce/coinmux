@@ -1,4 +1,4 @@
-class Coin2Coin::Message::Association < Coin2Coin::Message::Base
+class Coinmux::Message::Association < Coinmux::Message::Base
   attr_accessor :name, :type, :data_store_identifier_from_build, :data_store_identifier, :read_only
 
   validate :data_store_identifier_has_correct_permissions, :unless => :created_with_build?
@@ -9,9 +9,9 @@ class Coin2Coin::Message::Association < Coin2Coin::Message::Base
       message.name = name.to_s
       message.type = type
       message.read_only = read_only
-      message.data_store_identifier_from_build = Coin2Coin::DataStore.instance.generate_identifier
+      message.data_store_identifier_from_build = Coinmux::DataStore.instance.generate_identifier
       message.data_store_identifier = read_only ?
-        Coin2Coin::DataStore.instance.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
+        Coinmux::DataStore.instance.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
         message.data_store_identifier_from_build
 
       message
@@ -57,7 +57,7 @@ class Coin2Coin::Message::Association < Coin2Coin::Message::Base
   def insert(message)
     @messages << message
 
-    Coin2Coin::DataStore.instance.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) {}
+    Coinmux::DataStore.instance.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) {}
 
     message
   end
@@ -71,8 +71,8 @@ class Coin2Coin::Message::Association < Coin2Coin::Message::Base
   private
 
   def data_store_identifier_has_correct_permissions
-    can_insert = Coin2Coin::DataStore.instance.identifier_can_insert?(data_store_identifier.to_s)
-    can_request = Coin2Coin::DataStore.instance.identifier_can_request?(data_store_identifier.to_s)
+    can_insert = Coinmux::DataStore.instance.identifier_can_insert?(data_store_identifier.to_s)
+    can_request = Coinmux::DataStore.instance.identifier_can_request?(data_store_identifier.to_s)
 
     errors[:data_store_identifier] << "must allow requests" unless can_request
     if !read_only
@@ -81,7 +81,7 @@ class Coin2Coin::Message::Association < Coin2Coin::Message::Base
   end
 
   def association_class
-    Coin2Coin::Message.const_get(name.split('_').collect(&:capitalize).join.gsub(/e?s$/, ''))
+    Coinmux::Message.const_get(name.split('_').collect(&:capitalize).join.gsub(/e?s$/, ''))
   end
 
   def build_message(json)

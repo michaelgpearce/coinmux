@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Coin2Coin::Message::Input do
+describe Coinmux::Message::Input do
   before do
     fake_all_network_connections
   end
@@ -54,7 +54,7 @@ describe Coin2Coin::Message::Input do
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::Input.build(coin_join, private_key) }
+    subject { Coinmux::Message::Input.build(coin_join, private_key) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true
@@ -66,8 +66,8 @@ describe Coin2Coin::Message::Input do
 
     it "has message_private_key and message_public_key for encrypting and decrypting" do
       message = "a random message #{rand}"
-      encrypted_message = Coin2Coin::PKI.instance.private_encrypt(subject.message_private_key, message)
-      expect(Coin2Coin::PKI.instance.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
+      encrypted_message = Coinmux::PKI.instance.private_encrypt(subject.message_private_key, message)
+      expect(Coinmux::PKI.instance.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
     end
   end
 
@@ -83,7 +83,7 @@ describe Coin2Coin::Message::Input do
     end
 
     subject do
-      Coin2Coin::Message::Input.from_json(json, coin_join)
+      Coinmux::Message::Input.from_json(json, coin_join)
     end
 
     it "creates a valid input" do

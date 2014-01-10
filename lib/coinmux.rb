@@ -26,45 +26,45 @@ class Hash
   end
 end
 
-module Coin2Coin
+module Coinmux
   module Message
   end
   module StateMachine
   end
 end
 
-require 'lib/coin2coin/version'
-require 'lib/coin2coin/http'
-require 'lib/coin2coin/coin_join_uri'
-require 'lib/coin2coin/error'
-require 'lib/coin2coin/digest'
-require 'lib/coin2coin/cipher'
-require 'lib/coin2coin/pki'
-require 'lib/coin2coin/bitcoin_util'
-require 'lib/coin2coin/bitcoin_crypto'
-require 'lib/coin2coin/bitcoin_network'
-require 'lib/coin2coin/data_store'
-require 'lib/coin2coin/event'
-require 'lib/coin2coin/config'
+require 'lib/coinmux/version'
+require 'lib/coinmux/http'
+require 'lib/coinmux/coin_join_uri'
+require 'lib/coinmux/error'
+require 'lib/coinmux/digest'
+require 'lib/coinmux/cipher'
+require 'lib/coinmux/pki'
+require 'lib/coinmux/bitcoin_util'
+require 'lib/coinmux/bitcoin_crypto'
+require 'lib/coinmux/bitcoin_network'
+require 'lib/coinmux/data_store'
+require 'lib/coinmux/event'
+require 'lib/coinmux/config'
 
-require 'lib/coin2coin/message/base'
-require 'lib/coin2coin/message/association'
-require 'lib/coin2coin/message/coin_join'
-require 'lib/coin2coin/message/status'
-require 'lib/coin2coin/message/input'
-require 'lib/coin2coin/message/message_verification'
-require 'lib/coin2coin/message/output'
-require 'lib/coin2coin/message/transaction'
-require 'lib/coin2coin/message/transaction_signature'
+require 'lib/coinmux/message/base'
+require 'lib/coinmux/message/association'
+require 'lib/coinmux/message/coin_join'
+require 'lib/coinmux/message/status'
+require 'lib/coinmux/message/input'
+require 'lib/coinmux/message/message_verification'
+require 'lib/coinmux/message/output'
+require 'lib/coinmux/message/transaction'
+require 'lib/coinmux/message/transaction_signature'
 
-require 'lib/coin2coin/state_machine/event'
-require 'lib/coin2coin/state_machine/director'
-require 'lib/coin2coin/state_machine/participant'
+require 'lib/coinmux/state_machine/event'
+require 'lib/coinmux/state_machine/director'
+require 'lib/coinmux/state_machine/participant'
 
-require 'app/models/coin2coin/base'
-require 'app/models/coin2coin/transaction'
-require 'app/models/coin2coin/input'
-require 'app/models/coin2coin/output'
-require 'app/models/coin2coin/coin_join'
+require 'app/models/coinmux/base'
+require 'app/models/coinmux/transaction'
+require 'app/models/coinmux/input'
+require 'app/models/coinmux/output'
+require 'app/models/coinmux/coin_join'
 
-require 'app/views/coin2coin/application'
+require 'app/views/coinmux/application'

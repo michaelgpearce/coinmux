@@ -1,4 +1,4 @@
-class Coin2Coin::Digest
+class Coinmux::Digest
   include Singleton
   
   def digest(message)

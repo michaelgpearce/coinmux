@@ -1,2 +1,2 @@
-class Coin2Coin::Error < StandardError
+class Coinmux::Error < StandardError
 end

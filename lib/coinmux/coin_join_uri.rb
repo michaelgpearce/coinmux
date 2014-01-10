@@ -1,4 +1,4 @@
-class Coin2Coin::CoinJoinUri
+class Coinmux::CoinJoinUri
   attr_accessor :identifier, :application, :network
 
   class << self

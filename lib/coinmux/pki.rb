@@ -1,6 +1,6 @@
 require 'openssl'
 
-class Coin2Coin::PKI
+class Coinmux::PKI
   include Singleton
   
   def generate_keypair

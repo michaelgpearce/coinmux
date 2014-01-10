@@ -1,4 +1,4 @@
-class Coin2Coin::StateMachine::Director
+class Coinmux::StateMachine::Director
   attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :participant_count, :callback
   
   STATUSES = %w(WaitingForInputs WaitingForOutputs WaitingForSignatures WaitingForConfirmation Failed Complete)
@@ -65,47 +65,47 @@ class Coin2Coin::StateMachine::Director
   def do_wait_for_inputs
     notify(:waiting_for_inputs)
     
-    Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
+    Coinmux::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
-        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
+        self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_identifier, status_message)
       else
-        Coin2Coin::Application.clear_interval(interval_id)
+        Coinmux::Application.clear_interval(interval_id)
       end
     end
     
-    Coin2Coin::Application.instance.interval_exec(60) do |interval_id|
+    Coinmux::Application.instance.interval_exec(60) do |interval_id|
       if state == 'waiting_for_inputs'
-        messages = fetch_all_messages(Coin2Coin::Message::Input, coin_join_message.inputs.request_key)
-        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
+        messages = fetch_all_messages(Coinmux::Message::Input, coin_join_message.inputs.request_key)
+        self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_identifier, status_message)
       else
-        Coin2Coin::Application.clear_interval(interval_id)
+        Coinmux::Application.clear_interval(interval_id)
       end
     end
     
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
     end
-    Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coinmux::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
     
     waiting_for_inputs_sleep = 60
     update_status_proc = Proc.new do
       if state == 'waiting_for_inputs'
-        self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
+        self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
         insert_message(status_message_identifier, status_message) do
-          Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
+          Coinmux::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
         end
       end
     end
-    Coin2Coin::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
+    Coinmux::Application.instance.future_exec(waiting_for_inputs_sleep, &update_status_proc)
   end
   
   def do_announce_coin_join
-    self.coin_join_message = Coin2Coin::Message::CoinJoin.build(bitcoin_amount, participant_count)
-    coin_join_message_data_store_identifier = Coin2Coin::CoinJoinUri.parse(Coin2Coin::Config.instance['coin_join_uri']).identifier
+    self.coin_join_message = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
+    coin_join_message_data_store_identifier = Coinmux::CoinJoinUri.parse(Coinmux::Config.instance['coin_join_uri']).identifier
     
-    self.status_message = Coin2Coin::Message::Status.build(coin_join_message, 'WaitingForInputs')
+    self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
     status_message_data_store_identifier = coin_join_message.status.data_store_identifier
     
     # insert messages in "reverse" order, status -> coin_join
@@ -124,7 +124,7 @@ class Coin2Coin::StateMachine::Director
   
   def insert_message(data_store_identifier, message, &block)
     if block_given?
-      Coin2Coin::DataStore.instance.insert(data_store_identifier, message.to_json) do |event|
+      Coinmux::DataStore.instance.insert(data_store_identifier, message.to_json) do |event|
         if event.error
           fail
         else
@@ -132,19 +132,19 @@ class Coin2Coin::StateMachine::Director
         end
       end
     else
-      Coin2Coin::DataStore.instance.insert(data_store_identifier, message.to_json)
+      Coinmux::DataStore.instance.insert(data_store_identifier, message.to_json)
     end
   end
   
   def fetch_all_messages(klass, data_store_identifier)
-    Coin2Coin::DataStore.instance.fetch_all(data_store_identifier).collect do |message_json|
+    Coinmux::DataStore.instance.fetch_all(data_store_identifier).collect do |message_json|
       klass.from_json(data) if message_json
     end
   end
   
   def notify(type, data = {})
-    event = Coin2Coin::StateMachine::Event.new(:type => type)
-    Coin2Coin::Application.instance.sync_exec do
+    event = Coinmux::StateMachine::Event.new(:type => type)
+    Coinmux::Application.instance.sync_exec do
       callback.call(event)
     end
   end

@@ -1,2 +1,2 @@
-class Coin2Coin::Message::TransactionSignature < Coin2Coin::Message::Base
+class Coinmux::Message::TransactionSignature < Coinmux::Message::Base
 end

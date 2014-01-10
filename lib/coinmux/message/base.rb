@@ -1,4 +1,4 @@
-class Coin2Coin::Message::Base < Hashie::Dash
+class Coinmux::Message::Base < Hashie::Dash
   include ActiveModel::Model
 
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
@@ -12,7 +12,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
       message = build_without_associations(coin_join)
 
       associations.each do |name, config|
-        message[name] = Coin2Coin::Message::Association.build(coin_join, name, config[:type], config[:read_only])
+        message[name] = Coinmux::Message::Association.build(coin_join, name, config[:type], config[:read_only])
       end
 
       message
@@ -82,7 +82,7 @@ class Coin2Coin::Message::Base < Hashie::Dash
     def association_from_data_store_identifier(coin_join, property, identifier)
       config = associations[property]
 
-      Coin2Coin::Message::Association.from_data_store_identifier(identifier, coin_join, property, config[:type], config[:read_only])
+      Coinmux::Message::Association.from_data_store_identifier(identifier, coin_join, property, config[:type], config[:read_only])
     end
   end
 

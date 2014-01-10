@@ -1,4 +1,4 @@
-class Coin2Coin::Fake::DataStore
+class Coinmux::Fake::DataStore
   attr_accessor :hash
   
   def initialize
@@ -27,20 +27,20 @@ class Coin2Coin::Fake::DataStore
       array << data
     end
     
-    yield(Coin2Coin::Event.new(:data => data))
+    yield(Coinmux::Event.new(:data => data))
   end
   
   def fetch_last(identifier, &callback)
-    yield(Coin2Coin::Event.new(:data => fetch(identifier).last))
+    yield(Coinmux::Event.new(:data => fetch(identifier).last))
   end
   
   def fetch_all(identifier, &callback)
-    yield(Coin2Coin::Event.new(:data => fetch(identifier)))
+    yield(Coinmux::Event.new(:data => fetch(identifier)))
   end
   
   def fetch_most_recent(identifier, max_items, &callback)
     return [] if max_items <= 0
-    yield(Coin2Coin::Event.new(:data => fetch(identifier)))[-1*max_items..-1]
+    yield(Coinmux::Event.new(:data => fetch(identifier)))[-1*max_items..-1]
   end
   
   def fetch(identifier)

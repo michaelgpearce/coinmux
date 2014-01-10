@@ -1,16 +1,16 @@
 require 'spec_helper'
 
-describe Coin2Coin::Message::MessageVerification do
+describe Coinmux::Message::MessageVerification do
   before do
     fake_all_network_connections
   end
 
   let(:coin_join) { build(:coin_join_message, :with_inputs) }
-  let(:template_message) { Coin2Coin::Message::MessageVerification.build(coin_join) }
+  let(:template_message) { Coinmux::Message::MessageVerification.build(coin_join) }
   let(:encrypted_message_identifier) { template_message.encrypted_message_identifier }
   let(:encrypted_secret_keys) { template_message.encrypted_secret_keys }
   let(:message) do
-    Coin2Coin::Message::MessageVerification.new(
+    Coinmux::Message::MessageVerification.new(
       coin_join: coin_join,
       encrypted_message_identifier: encrypted_message_identifier,
       encrypted_secret_keys: encrypted_secret_keys)
@@ -97,7 +97,7 @@ describe Coin2Coin::Message::MessageVerification do
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::MessageVerification.build(coin_join) }
+    subject { Coinmux::Message::MessageVerification.build(coin_join) }
 
     it "builds valid input" do
       input = subject
@@ -106,7 +106,7 @@ describe Coin2Coin::Message::MessageVerification do
   end
 
   describe "from_json" do
-    let(:message) { Coin2Coin::Message::MessageVerification.build(coin_join) }
+    let(:message) { Coinmux::Message::MessageVerification.build(coin_join) }
     let(:json) do
       {
         encrypted_message_identifier: message.encrypted_message_identifier,
@@ -115,7 +115,7 @@ describe Coin2Coin::Message::MessageVerification do
     end
 
     subject do
-      Coin2Coin::Message::MessageVerification.from_json(json, coin_join)
+      Coinmux::Message::MessageVerification.from_json(json, coin_join)
     end
 
     it "creates a valid input" do

@@ -1,4 +1,4 @@
-class Coin2Coin::Base
+class Coinmux::Base
   include ActiveModel::Model
   
   class << self

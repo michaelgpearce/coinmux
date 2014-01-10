@@ -1,8 +1,8 @@
-require File.join(File.dirname(__FILE__), '..', 'lib', 'coin2coin')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'coinmux')
 
-ENV['COIN2COIN_ENV'] = 'test'
+ENV['COINMUX_ENV'] = 'test'
 
-module Coin2Coin
+module Coinmux
   module Fake
   end
 end
@@ -33,23 +33,23 @@ end
 
 def fake_application
   @fake_application ||= (
-    Coin2Coin::Fake::Application.new.tap do |application|
-      Coin2Coin::Application.stub(:instance).and_return(application)
+    Coinmux::Fake::Application.new.tap do |application|
+      Coinmux::Application.stub(:instance).and_return(application)
     end
   )
 end
 
 def fake_data_store
   @fake_data_store ||= (
-    Coin2Coin::Fake::DataStore.new.tap do |data_store|
-      Coin2Coin::DataStore.stub(:instance).and_return(data_store)
+    Coinmux::Fake::DataStore.new.tap do |data_store|
+      Coinmux::DataStore.stub(:instance).and_return(data_store)
     end
   )
 end
 
 def fake_bitcoin_network
-  @fake_bitcoin_network ||= Coin2Coin::Fake::BitcoinNetwork.new.tap do |bitcoin_network|
-    Coin2Coin::BitcoinNetwork.stub(:instance).and_return(bitcoin_network)
+  @fake_bitcoin_network ||= Coinmux::Fake::BitcoinNetwork.new.tap do |bitcoin_network|
+    Coinmux::BitcoinNetwork.stub(:instance).and_return(bitcoin_network)
   end
 end
 
@@ -65,10 +65,10 @@ module Helper
     if (bitcoin_info = @@bitcoin_infos[@@bitcoin_info_index]).nil?
       bitcoin_info = {}
       bitcoin_info[:private_key] = "%064x" % (@@bitcoin_info_index + 1)
-      bitcoin_info[:public_key] = Coin2Coin::BitcoinCrypto.instance.public_key_for_private_key!(bitcoin_info[:private_key])
-      bitcoin_info[:address] = Coin2Coin::BitcoinCrypto.instance.address_for_public_key!(bitcoin_info[:public_key])
+      bitcoin_info[:public_key] = Coinmux::BitcoinCrypto.instance.public_key_for_private_key!(bitcoin_info[:private_key])
+      bitcoin_info[:address] = Coinmux::BitcoinCrypto.instance.address_for_public_key!(bitcoin_info[:public_key])
       bitcoin_info[:identifier] = "valid-identifier-#{@@bitcoin_info_index + 1}"
-      bitcoin_info[:signature] = Coin2Coin::BitcoinCrypto.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
+      bitcoin_info[:signature] = Coinmux::BitcoinCrypto.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
 
       @@bitcoin_infos << bitcoin_info
     end

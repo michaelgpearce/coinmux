@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Coin2Coin::Message::Output do
+describe Coinmux::Message::Output do
   before do
     fake_all_network_connections
   end
@@ -51,7 +51,7 @@ describe Coin2Coin::Message::Output do
   describe "build" do
     let(:address) { message.address }
 
-    subject { Coin2Coin::Message::Output.build(coin_join, address) }
+    subject { Coinmux::Message::Output.build(coin_join, address) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true
@@ -75,7 +75,7 @@ describe Coin2Coin::Message::Output do
     end
 
     subject do
-      Coin2Coin::Message::Output.from_json(json, coin_join)
+      Coinmux::Message::Output.from_json(json, coin_join)
     end
 
     it "creates a valid input" do

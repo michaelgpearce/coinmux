@@ -1,7 +1,7 @@
-#!/usr/bin/env bundle exec ruby -J-XstartOnFirstThread -J-Xdock:name=Coin2Coin
+#!/usr/bin/env bundle exec ruby -J-XstartOnFirstThread -J-Xdock:name=Coinmux
 
-require File.expand_path("../../lib/coin2coin", __FILE__)
+require File.expand_path("../../lib/coinmux", __FILE__)
 
-Swt::Widgets::Display.set_app_name "Coin2Coin"
+Swt::Widgets::Display.set_app_name "Coinmux"
 
-Coin2Coin::Application.instance.start
+Coinmux::Application.instance.start

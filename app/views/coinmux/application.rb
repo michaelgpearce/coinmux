@@ -1,4 +1,4 @@
-class Coin2Coin::Application
+class Coinmux::Application
   include Glimmer, Singleton
   
   include_package 'org.eclipse.swt'
@@ -47,7 +47,7 @@ class Coin2Coin::Application
     @intervals = Set.new
     
     @shell = shell {
-      text "Coin2Coin - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer"
+      text "Coinmux - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer"
       
       tab_folder {
         tab_item {
@@ -63,7 +63,7 @@ class Coin2Coin::Application
   end
   
   def current_coin_join
-    @current_coin_join ||= Coin2Coin::CoinJoin.new
+    @current_coin_join ||= Coinmux::CoinJoin.new
   end
   
   def home_tab_item
@@ -85,7 +85,7 @@ class Coin2Coin::Application
   end
   
   def new_input
-    @new_input ||= Coin2Coin::Input.new
+    @new_input ||= Coinmux::Input.new
   end
   
   def coin_join_transaction
@@ -107,7 +107,7 @@ class Coin2Coin::Application
           button {
             text "Add"
             on_widget_selected {
-              input = Coin2Coin::Input.find_by_private_key(new_input.private_key)
+              input = Coinmux::Input.find_by_private_key(new_input.private_key)
               if input.valid?
                 current_coin_join.inputs << input
                 

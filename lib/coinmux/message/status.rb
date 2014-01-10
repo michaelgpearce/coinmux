@@ -1,4 +1,4 @@
-class Coin2Coin::Message::Status < Coin2Coin::Message::Base
+class Coinmux::Message::Status < Coinmux::Message::Base
   STATUSES_REQUIRING_TRANSACTION_ID = %w(WaitingForConfirmation Complete)
 
   property :status
@@ -17,7 +17,7 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
       message.status = status
       message.transaction_id = transaction_id
 
-      block_height, nonce = Coin2Coin::BitcoinNetwork.instance.current_block_height_and_nonce
+      block_height, nonce = Coinmux::BitcoinNetwork.instance.current_block_height_and_nonce
       message.updated_at = {
         'block_height' => block_height,
         'nonce' => nonce
@@ -46,17 +46,17 @@ class Coin2Coin::Message::Status < Coin2Coin::Message::Base
   end
 
   def status_valid
-    errors[:status] << "is not a valid status" unless Coin2Coin::StateMachine::Director::STATUSES.include?(status)
+    errors[:status] << "is not a valid status" unless Coinmux::StateMachine::Director::STATUSES.include?(status)
   end
 
   def updated_at_valid
     (errors[:updated_at] << "must be a hash" and return) unless updated_at.is_a?(Hash)
 
-    block_exists = Coin2Coin::BitcoinNetwork.instance.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
+    block_exists = Coinmux::BitcoinNetwork.instance.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
     errors[:updated_at] << "is not a valid block" unless block_exists
   end
 
   def transaction_confirmed
-    errors[:transaction_id] << "is not confirmed" unless Coin2Coin::BitcoinNetwork.instance.transaction_confirmations(transaction_id.to_s).to_i > 0
+    errors[:transaction_id] << "is not confirmed" unless Coinmux::BitcoinNetwork.instance.transaction_confirmations(transaction_id.to_s).to_i > 0
   end
 end

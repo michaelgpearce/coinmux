@@ -1,5 +1,5 @@
-class Coin2Coin::BitcoinNetwork
-  include Singleton, Coin2Coin::BitcoinUtil
+class Coinmux::BitcoinNetwork
+  include Singleton, Coinmux::BitcoinUtil
 
   def current_block_height_and_nonce(&callback)
     raise "TODO"
@@ -18,7 +18,7 @@ class Coin2Coin::BitcoinNetwork
 
   def unspent_inputs_from_address(address, &callback)
     webbtc_get_json("/address/#{address}.json", on_error: callback, on_success: lambda do |data|
-      yield(Coin2Coin::Event.new(data: build_unspent_inputs_from_data(data, address)))
+      yield(Coinmux::Event.new(data: build_unspent_inputs_from_data(data, address)))
     end)
   end
 
@@ -48,15 +48,15 @@ class Coin2Coin::BitcoinNetwork
   end
 
   def webbtc_get_json(path, options = {})
-    Coin2Coin::Http.instance.get(Coin2Coin::Config.instance.webbtc_host, path) do |event|
+    Coinmux::Http.instance.get(Coinmux::Config.instance.webbtc_host, path) do |event|
       if event.error
         options[:on_error].call(event)
       else
         hash = JSON.parse(event.data) rescue nil
         if hash.nil?
-          options[:on_error].call(Coin2Coin::Event.new(error: "Unable to parse JSON"))
+          options[:on_error].call(Coinmux::Event.new(error: "Unable to parse JSON"))
         elsif hash['error']
-          options[:on_error].call(Coin2Coin::Event.new(error: "Invalid request: #{hash['error']}"))
+          options[:on_error].call(Coinmux::Event.new(error: "Invalid request: #{hash['error']}"))
         else
           options[:on_success].call(hash)
         end

@@ -1,21 +1,21 @@
 FactoryGirl.define do
-  factory :association_message, :class => Coin2Coin::Message::Association do
+  factory :association_message, :class => Coinmux::Message::Association do
     sequence(:name) { |n| "association-#{n}" }
     type :list
     read_only false
-    data_store_identifier_from_build { Coin2Coin::DataStore.instance.generate_identifier }
+    data_store_identifier_from_build { Coinmux::DataStore.instance.generate_identifier }
     data_store_identifier do
       if read_only
-        Coin2Coin::DataStore.instance.convert_to_request_only_identifier(data_store_identifier_from_build)
+        Coinmux::DataStore.instance.convert_to_request_only_identifier(data_store_identifier_from_build)
       else
         data_store_identifier_from_build
       end
     end
   end
 
-  factory :coin_join_message, :class => Coin2Coin::Message::CoinJoin do
+  factory :coin_join_message, :class => Coinmux::Message::CoinJoin do
     ignore do
-      template_message { Coin2Coin::Message::CoinJoin.build }
+      template_message { Coinmux::Message::CoinJoin.build }
     end
 
     version { template_message.version }
@@ -58,10 +58,10 @@ FactoryGirl.define do
     end
   end
 
-  factory :input_message, :class => Coin2Coin::Message::Input do
+  factory :input_message, :class => Coinmux::Message::Input do
     ignore do
       bitcoin_info { Helper.next_bitcoin_info }
-      message_keys { Coin2Coin::PKI.instance.generate_keypair }
+      message_keys { Coinmux::PKI.instance.generate_keypair }
     end
 
     address { bitcoin_info[:address] }
@@ -74,7 +74,7 @@ FactoryGirl.define do
     coin_join { association :coin_join_message, strategy: :build, identifier: bitcoin_info[:identifier] }
   end
 
-  factory :output_message, :class => Coin2Coin::Message::Output do
+  factory :output_message, :class => Coinmux::Message::Output do
     ignore do
       bitcoin_info { Helper.next_bitcoin_info }
     end
@@ -88,9 +88,9 @@ FactoryGirl.define do
     end
   end
 
-  factory :status_message, :class => Coin2Coin::Message::Status do
+  factory :status_message, :class => Coinmux::Message::Status do
     ignore do
-      current_block_height_and_nonce { Coin2Coin::BitcoinNetwork.instance.current_block_height_and_nonce }
+      current_block_height_and_nonce { Coinmux::BitcoinNetwork.instance.current_block_height_and_nonce }
     end
 
     status "Complete"
@@ -100,9 +100,9 @@ FactoryGirl.define do
     association :coin_join, factory: :coin_join_message, strategy: :build
   end
 
-  factory :message_verification_message, :class => Coin2Coin::Message::MessageVerification do
+  factory :message_verification_message, :class => Coinmux::Message::MessageVerification do
     ignore do
-      template_message { Coin2Coin::Message::MessageVerification.build(Coin2Coin::Message::CoinJoin.build) }
+      template_message { Coinmux::Message::MessageVerification.build(Coinmux::Message::CoinJoin.build) }
     end
 
     message_identifier { template_message.message_identifier }
@@ -116,11 +116,11 @@ FactoryGirl.define do
     end
   end
 
-  factory :transaction_message, :class => Coin2Coin::Message::Transaction do
+  factory :transaction_message, :class => Coinmux::Message::Transaction do
     coin_join { association :coin_join_message }
   end
 
-  factory :transaction_signature_message, :class => Coin2Coin::Message::TransactionSignature do
+  factory :transaction_signature_message, :class => Coinmux::Message::TransactionSignature do
     coin_join { association :coin_join_message }
   end
 end

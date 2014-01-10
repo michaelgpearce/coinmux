@@ -1,4 +1,4 @@
-class Coin2Coin::CoinJoin < Coin2Coin::Base
+class Coinmux::CoinJoin < Coinmux::Base
   add_attributes :created_at, :amount, :inputs, :outputs, :change_output
   
   validate :has_inputs?

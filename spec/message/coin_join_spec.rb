@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Coin2Coin::Message::CoinJoin do
+describe Coinmux::Message::CoinJoin do
   before do
     fake_all_network_connections
   end
 
-  let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN }
+  let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN }
   let(:participants) { 2 }
-  let(:participant_transaction_fee) { Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE / 2 }
-  let(:version) { Coin2Coin::Message::CoinJoin::VERSION }
+  let(:participant_transaction_fee) { Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE / 2 }
+  let(:version) { Coinmux::Message::CoinJoin::VERSION }
   
   describe "validations" do
     let(:message) { build(:coin_join_message, amount: amount, participants: participants, participant_transaction_fee: participant_transaction_fee, version: version) }
@@ -60,29 +60,29 @@ describe Coin2Coin::Message::CoinJoin do
       end
 
       context "with greater than DEFAULT_TRANSACTION_FEE" do
-        let(:participant_transaction_fee) { Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE + 1 }
+        let(:participant_transaction_fee) { Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE + 1 }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:participant_transaction_fee]).to include("may not be greater than #{Coin2Coin::Message::CoinJoin::DEFAULT_TRANSACTION_FEE}")
+          expect(message.errors[:participant_transaction_fee]).to include("may not be greater than #{Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE}")
         end
       end
     end
 
     describe "version_matches" do
       context "with version other than VERSION" do
-        let(:version) { Coin2Coin::Message::CoinJoin::VERSION - 1 }
+        let(:version) { Coinmux::Message::CoinJoin::VERSION - 1 }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:version]).to include("must be #{Coin2Coin::Message::CoinJoin::VERSION}")
+          expect(message.errors[:version]).to include("must be #{Coinmux::Message::CoinJoin::VERSION}")
         end
       end
     end
 
     describe "amount_is_base_2_bitcoin" do
       context "with base 2 bitcoin amount less than 1" do
-        let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN / 2 }
+        let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN / 2 }
 
         it "is valid" do
           expect(subject).to be_true
@@ -90,7 +90,7 @@ describe Coin2Coin::Message::CoinJoin do
       end
 
       context "with base 2 bitcoin amount greater than 1" do
-        let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 2 }
+        let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 2 }
 
         it "is valid" do
           expect(subject).to be_true
@@ -99,7 +99,7 @@ describe Coin2Coin::Message::CoinJoin do
 
       context "with bitcoin amount is not base 2" do
         context "and not divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN - 1 }
+          let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN - 1 }
 
           it "is invalid" do
             expect(subject).to be_false
@@ -108,7 +108,7 @@ describe Coin2Coin::Message::CoinJoin do
         end
 
         context "and divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { Coin2Coin::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 3 }
+          let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 3 }
 
           it "is invalid" do
             expect(subject).to be_false
@@ -126,8 +126,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.inputs.value).to eq([])
         expect(message.inputs.type).to eq(:list)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.inputs.data_store_identifier)).to be_true
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.inputs.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.inputs.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.inputs.data_store_identifier)).to be_true
       end
     end
 
@@ -135,8 +135,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.outputs.value).to eq([])
         expect(message.outputs.type).to eq(:list)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.outputs.data_store_identifier)).to be_true
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.outputs.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.outputs.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.outputs.data_store_identifier)).to be_true
       end
     end
 
@@ -144,8 +144,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.message_verification.value).to eq(nil)
         expect(message.message_verification.type).to eq(:fixed)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.message_verification.data_store_identifier)).to be_false
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.message_verification.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.message_verification.data_store_identifier)).to be_false
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.message_verification.data_store_identifier)).to be_true
       end
     end
 
@@ -153,8 +153,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.transaction.value).to eq(nil)
         expect(message.transaction.type).to eq(:fixed)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.transaction.data_store_identifier)).to be_false
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.transaction.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.transaction.data_store_identifier)).to be_false
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.transaction.data_store_identifier)).to be_true
       end
     end
 
@@ -162,8 +162,8 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.transaction_signatures.value).to eq([])
         expect(message.transaction_signatures.type).to eq(:list)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.transaction_signatures.data_store_identifier)).to be_true
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.transaction_signatures.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.transaction_signatures.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.transaction_signatures.data_store_identifier)).to be_true
       end
     end
 
@@ -171,14 +171,14 @@ describe Coin2Coin::Message::CoinJoin do
       it "is a read-only variable association" do
         expect(message.status.value).to eq(nil)
         expect(message.status.type).to eq(:variable)
-        expect(Coin2Coin::DataStore.instance.identifier_can_insert?(message.status.data_store_identifier)).to be_false
-        expect(Coin2Coin::DataStore.instance.identifier_can_request?(message.status.data_store_identifier)).to be_true
+        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.status.data_store_identifier)).to be_false
+        expect(Coinmux::DataStore.instance.identifier_can_request?(message.status.data_store_identifier)).to be_true
       end
     end
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::CoinJoin.build(amount, participants) }
+    subject { Coinmux::Message::CoinJoin.build(amount, participants) }
 
     it "builds valid input" do
       input = subject
@@ -207,7 +207,7 @@ describe Coin2Coin::Message::CoinJoin do
     end
 
     subject do
-      Coin2Coin::Message::CoinJoin.from_json(json)
+      Coinmux::Message::CoinJoin.from_json(json)
     end
 
     it "creates a valid input" do
@@ -238,7 +238,7 @@ describe Coin2Coin::Message::CoinJoin do
     let(:coin_join) { build(:coin_join_message, :with_message_verification) }
     let(:keys) { %w(foo bar) }
     let(:message_identifier) { coin_join.message_verification.value.message_identifier }
-    let(:message_verification) { Coin2Coin::Digest.instance.hex_message_digest(message_identifier, 'foo', 'bar') }
+    let(:message_verification) { Coinmux::Digest.instance.hex_message_digest(message_identifier, 'foo', 'bar') }
 
     before do
       expect(coin_join.director?).to be_true
@@ -295,7 +295,7 @@ describe Coin2Coin::Message::CoinJoin do
 
     context "with valid data" do
       it "builds the correct verification message" do
-        expect(subject).to eq(Coin2Coin::Digest.instance.hex_message_digest(message_identifier, *keys))
+        expect(subject).to eq(Coinmux::Digest.instance.hex_message_digest(message_identifier, *keys))
       end
     end
   end

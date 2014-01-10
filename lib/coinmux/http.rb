@@ -1,4 +1,4 @@
-class Coin2Coin::Http
+class Coinmux::Http
   include Singleton
 
   def get(host, path, options = {}, &callback)
@@ -7,7 +7,7 @@ class Coin2Coin::Http
 
       http.errback do
         begin
-          callback.call(Coin2Coin::Event.new(error: http.error.to_s))
+          callback.call(Coinmux::Event.new(error: http.error.to_s))
         ensure
           EM.stop
         end
@@ -16,9 +16,9 @@ class Coin2Coin::Http
       http.callback do
         begin
           if http.response_header.status.to_s == '200'
-            callback.call(Coin2Coin::Event.new(data: http.response))
+            callback.call(Coinmux::Event.new(data: http.response))
           else
-            callback.call(Coin2Coin::Event.new(error: "Unexpected status code: #{http.response_header.status}"))
+            callback.call(Coinmux::Event.new(error: "Unexpected status code: #{http.response_header.status}"))
           end
         ensure
           EM.stop

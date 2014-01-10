@@ -1,4 +1,4 @@
-class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
+class Coinmux::Message::MessageVerification < Coinmux::Message::Base
   property :encrypted_message_identifier
   property :encrypted_secret_keys
   
@@ -14,10 +14,10 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
     def build(coin_join)
       message = super(coin_join)
 
-      message.message_identifier = Coin2Coin::Digest.instance.random_identifier
-      message.secret_key = Coin2Coin::Digest.instance.random_identifier
+      message.message_identifier = Coinmux::Digest.instance.random_identifier
+      message.secret_key = Coinmux::Digest.instance.random_identifier
       
-      message.encrypted_message_identifier = Base64.encode64(Coin2Coin::Cipher.instance.encrypt(message.secret_key, message.message_identifier)).strip
+      message.encrypted_message_identifier = Base64.encode64(Coinmux::Cipher.instance.encrypt(message.secret_key, message.message_identifier)).strip
       
       message.encrypted_secret_keys = message.build_encrypted_secret_keys
 
@@ -28,7 +28,7 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
   def build_encrypted_secret_keys
     # only selected inputs will get the secret to decrypt the identifier
     coin_join.inputs.value.inject({}) do |acc, input|
-      encrypted_secret_key = Coin2Coin::PKI.instance.public_encrypt(input.message_public_key, secret_key)
+      encrypted_secret_key = Coinmux::PKI.instance.public_encrypt(input.message_public_key, secret_key)
       acc[input.address] = Base64.encode64(encrypted_secret_key)
 
       acc
@@ -44,7 +44,7 @@ class Coin2Coin::Message::MessageVerification < Coin2Coin::Message::Base
     raise ArgumentError, "not found for address #{address}" if encoded_encrypted_secret_key.nil?
 
     encrypted_secret_key = (Base64.decode64(encoded_encrypted_secret_key) rescue nil) || ""
-    secret_key = Coin2Coin::PKI.instance.private_decrypt(input.message_private_key, encrypted_secret_key) rescue nil
+    secret_key = Coinmux::PKI.instance.private_decrypt(input.message_private_key, encrypted_secret_key) rescue nil
     raise ArgumentError, "cannot be decrypted" if secret_key.nil?
 
     secret_key

@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Coin2Coin::Message::Status do
+describe Coinmux::Message::Status do
   before do
     fake_all_network_connections
   end
 
   before do
     if !transaction_id.nil?
-      Coin2Coin::BitcoinNetwork.instance.test_add_transaction_id_to_pool(transaction_id)
-      Coin2Coin::BitcoinNetwork.instance.test_confirm_block
+      Coinmux::BitcoinNetwork.instance.test_add_transaction_id_to_pool(transaction_id)
+      Coinmux::BitcoinNetwork.instance.test_confirm_block
     end
   end
 
@@ -36,7 +36,7 @@ describe Coin2Coin::Message::Status do
 
     describe "transaction_id" do
       context "when present" do
-        Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
+        Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -46,7 +46,7 @@ describe Coin2Coin::Message::Status do
           end
         end
 
-        (Coin2Coin::StateMachine::Director::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coinmux::StateMachine::Director::STATUSES - Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -61,7 +61,7 @@ describe Coin2Coin::Message::Status do
       context "when nil" do
         let(:transaction_id) { nil }
 
-        Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
+        Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -72,7 +72,7 @@ describe Coin2Coin::Message::Status do
           end
         end
 
-        (Coin2Coin::StateMachine::Director::STATUSES - Coin2Coin::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coinmux::StateMachine::Director::STATUSES - Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -147,7 +147,7 @@ describe Coin2Coin::Message::Status do
   end
 
   describe "build" do
-    subject { Coin2Coin::Message::Status.build(coin_join, status, transaction_id) }
+    subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true
@@ -165,7 +165,7 @@ describe Coin2Coin::Message::Status do
     end
 
     subject do
-      Coin2Coin::Message::Status.from_json(json, coin_join)
+      Coinmux::Message::Status.from_json(json, coin_join)
     end
 
     it "creates a valid input" do

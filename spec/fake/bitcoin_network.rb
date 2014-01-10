@@ -1,4 +1,4 @@
-class Coin2Coin::Fake::BitcoinNetwork
+class Coinmux::Fake::BitcoinNetwork
   def initialize
     @blocks = []
     @transaction_pool = []

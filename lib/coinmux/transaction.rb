@@ -1,4 +1,4 @@
-require './lib/coin2coin'
+require './lib/coinmux'
 require 'bitcoin'
 
 import 'com.google.bitcoin.core.Transaction'
@@ -17,7 +17,7 @@ import 'com.google.bitcoin.net.discovery.DnsDiscovery'
 import 'org.spongycastle.util.encoders.Hex'
 
 def network_params
-  Coin2Coin::Config.instance.bitcoin_network == 'mainnet' ? NetworkParameters.prodNet() : NetworkParameters.testNet3()
+  Coinmux::Config.instance.bitcoin_network == 'mainnet' ? NetworkParameters.prodNet() : NetworkParameters.testNet3()
 end
 
 TX_JSON_1 = <<-JSON
@@ -223,7 +223,7 @@ puts "--- DIRECTOR SIGNED TX HASH: #{signed_tx.getHash()}"
 
 
 peer_group = PeerGroup.new(network_params)
-peer_group.setUserAgent("Coin2Coin", Coin2Coin::VERSION)
+peer_group.setUserAgent("Coinmux", Coinmux::VERSION)
 peer_group.addPeerDiscovery(DnsDiscovery.new(network_params))
 peer_group.startAndWait()
 peer_group.broadcastTransaction(signed_tx).get()

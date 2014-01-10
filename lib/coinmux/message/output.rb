@@ -1,4 +1,4 @@
-class Coin2Coin::Message::Output < Coin2Coin::Message::Base
+class Coinmux::Message::Output < Coinmux::Message::Base
   add_properties :address, :message_verification
   
   validates :address, :message_verification, :presence => true
@@ -31,7 +31,7 @@ class Coin2Coin::Message::Output < Coin2Coin::Message::Base
   end
 
   def address_valid
-    unless Coin2Coin::BitcoinCrypto.instance.verify_address(address)
+    unless Coinmux::BitcoinCrypto.instance.verify_address(address)
       errors[:address] << "is not a valid address"
     end
   end

@@ -1,4 +1,4 @@
-class Coin2Coin::Fake::Application
+class Coinmux::Fake::Application
   class Invocation < Hashie::Dash
     property :block
     property :time
