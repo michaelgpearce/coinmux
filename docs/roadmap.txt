@@ -16,6 +16,7 @@ v0.3 - Improve deterrence of bad actors
 * Blacklist of "bad addresses" (probably not workable)
 * Encrypt all messages after publish of message_verification so only participants and director can decrypt
 * Can specify/create custom CoinJoin URI
+* Dependent Gems are part of project
 
 v1.0 - Stable enough and feature rich enough for novice users
 * Installers for OSX, Windows, Linux
