@@ -1,8 +1,6 @@
 class Coin2Coin::BitcoinNetwork
   include Singleton, Coin2Coin::BitcoinUtil
 
-  SATOSHIS_PER_BITCOIN = 100_000_000
-
   def current_block_height_and_nonce(&callback)
     raise "TODO"
     # http://blockchain.info/latestblock
