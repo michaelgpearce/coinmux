@@ -9,6 +9,7 @@ v0.2 - Functional Beta
 * Works for Mainnet usage for advanced users
 * Remove single points of failure
 * Support WIF private keys
+* Transaction fee calculation use transaction size info.
 
 v0.3 - Improve deterrence of bad actors
 * Add proof of work for posting inputs / creating new CoinJoin (?)
@@ -30,4 +31,4 @@ FUTURE FEATURES:
 * Automatic retries of failed transactions
 * Acts as anonymous wallet (mix to new address, the send)
   * Support multiple inputs during CoinJoin
-* Allow inputs from single output with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
+* Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
