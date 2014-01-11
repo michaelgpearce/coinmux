@@ -13,8 +13,6 @@ require 'swt'
 require 'glimmer'
 require 'base64'
 require 'set'
-require 'eventmachine'
-require 'em-http'
 
 Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 

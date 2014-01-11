@@ -10,13 +10,14 @@ gem 'state_machine', '1.2.0'
 gem 'bitcoin-ruby', '0.0.2'
 gem 'hashie', '2.0.5'
 gem 'freenet_hash', :path => '../freenet_hash' #'0.0.1'
-gem 'em-http-request', '1.1.2'
+gem 'httpclient', '2.3.4.1'
 
 group :development do
   gem 'rake', '10.1.0'
   gem 'wirble', '0.1.3'
   gem 'rspec', '2.14.1'
   gem 'warbler', '1.4.0'
+  gem 'yard', '0.8.7.3'
 end
 
 group :development, :test do

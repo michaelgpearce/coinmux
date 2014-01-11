@@ -5,9 +5,9 @@ describe Coinmux::Message::CoinJoin do
     fake_all_network_connections
   end
 
-  let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN }
+  let(:amount) { SATOSHIS_PER_BITCOIN }
   let(:participants) { 2 }
-  let(:participant_transaction_fee) { Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE / 2 }
+  let(:participant_transaction_fee) { DEFAULT_TRANSACTION_FEE / 2 }
   let(:version) { Coinmux::Message::CoinJoin::VERSION }
   
   describe "validations" do
@@ -60,11 +60,11 @@ describe Coinmux::Message::CoinJoin do
       end
 
       context "with greater than DEFAULT_TRANSACTION_FEE" do
-        let(:participant_transaction_fee) { Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE + 1 }
+        let(:participant_transaction_fee) { DEFAULT_TRANSACTION_FEE + 1 }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:participant_transaction_fee]).to include("may not be greater than #{Coinmux::Message::CoinJoin::DEFAULT_TRANSACTION_FEE}")
+          expect(message.errors[:participant_transaction_fee]).to include("may not be greater than #{DEFAULT_TRANSACTION_FEE}")
         end
       end
     end
@@ -82,7 +82,7 @@ describe Coinmux::Message::CoinJoin do
 
     describe "amount_is_base_2_bitcoin" do
       context "with base 2 bitcoin amount less than 1" do
-        let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN / 2 }
+        let(:amount) { SATOSHIS_PER_BITCOIN / 2 }
 
         it "is valid" do
           expect(subject).to be_true
@@ -90,7 +90,7 @@ describe Coinmux::Message::CoinJoin do
       end
 
       context "with base 2 bitcoin amount greater than 1" do
-        let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 2 }
+        let(:amount) { SATOSHIS_PER_BITCOIN * 2 }
 
         it "is valid" do
           expect(subject).to be_true
@@ -99,7 +99,7 @@ describe Coinmux::Message::CoinJoin do
 
       context "with bitcoin amount is not base 2" do
         context "and not divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN - 1 }
+          let(:amount) { SATOSHIS_PER_BITCOIN - 1 }
 
           it "is invalid" do
             expect(subject).to be_false
@@ -108,7 +108,7 @@ describe Coinmux::Message::CoinJoin do
         end
 
         context "and divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { Coinmux::Message::CoinJoin::SATOSHIS_PER_BITCOIN * 3 }
+          let(:amount) { SATOSHIS_PER_BITCOIN * 3 }
 
           it "is invalid" do
             expect(subject).to be_false

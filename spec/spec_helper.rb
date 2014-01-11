@@ -16,6 +16,8 @@ require 'pry'
 
 FactoryGirl.find_definitions rescue puts "Warn: #{$!}"
 
+include Coinmux::BitcoinUtil
+
 # allow loading in console
 require 'rspec/mocks'
 RSpec::Mocks::setup(Object.new)

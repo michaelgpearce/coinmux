@@ -1,7 +1,7 @@
 class Coinmux::Message::CoinJoin < Coinmux::Message::Base
+  include Coinmux::BitcoinUtil
+  
   VERSION = 1
-  SATOSHIS_PER_BITCOIN = 100_000_000
-  DEFAULT_TRANSACTION_FEE = (0.0005 * SATOSHIS_PER_BITCOIN).to_i
   
   add_properties :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee
   add_association :inputs, :list, :read_only => false

@@ -20,4 +20,4 @@ tmp
 .DS_Store
 coinmux.jar
 docs/wallet.txt
-
+bin/transaction.rb

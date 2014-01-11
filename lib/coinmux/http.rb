@@ -1,29 +1,26 @@
+require 'httpclient'
+
 class Coinmux::Http
   include Singleton
 
-  def get(host, path, options = {}, &callback)
-    EM.run do
-      http = EM::HttpRequest.new("#{host}#{path}").get({'Accept-Encoding' => 'gzip,deflate,sdch'}.merge!(options))
+  def get(host, path)
+    begin
+      result = client.get("#{host}#{path}")
 
-      http.errback do
-        begin
-          callback.call(Coinmux::Event.new(error: http.error.to_s))
-        ensure
-          EM.stop
-        end
-      end
+      raise Coinmux::Error, "Invalid response code: #{response.code}" if result.code.to_s != '200'
 
-      http.callback do
-        begin
-          if http.response_header.status.to_s == '200'
-            callback.call(Coinmux::Event.new(data: http.response))
-          else
-            callback.call(Coinmux::Event.new(error: "Unexpected status code: #{http.response_header.status}"))
-          end
-        ensure
-          EM.stop
-        end
-      end
+      result.content
+    rescue SocketError => e
+      raise Coinmux::Error, e.message
+    rescue StandardError => e
+      puts e, e.backtrace
+      raise Coinmux::Error, "Unknown error: #{e.message}"
     end
+  end
+
+  private
+
+  def client
+    @client ||= HTTPClient.new
   end
 end
