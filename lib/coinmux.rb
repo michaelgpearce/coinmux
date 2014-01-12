@@ -32,6 +32,7 @@ module Coinmux
 end
 
 require 'lib/coinmux/version'
+require 'lib/coinmux/coinmux_facades'
 require 'lib/coinmux/http'
 require 'lib/coinmux/coin_join_uri'
 require 'lib/coinmux/error'

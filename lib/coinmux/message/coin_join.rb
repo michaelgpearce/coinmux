@@ -25,8 +25,8 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       message = super(nil)
 
       message.version = VERSION
-      message.identifier = Coinmux::Digest.instance.random_identifier
-      message.message_private_key, message.message_public_key = Coinmux::PKI.instance.generate_keypair
+      message.identifier = digest_facade.random_identifier
+      message.message_private_key, message.message_public_key = pki_facade.generate_keypair
       message.amount = amount
       message.participants = participants
       message.participant_transaction_fee = participant_transaction_fee
@@ -42,19 +42,19 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     encrypted_secret_message_key = Base64.decode64(encoded_secret_message_key)
     message_private_key = input.message_private_key
 
-    return nil unless secret_message_key = Coinmux::PKI.instance.private_decrypt(message_private_key, encrypted_secret_message_key)
+    return nil unless secret_message_key = pki_facade.private_decrypt(message_private_key, encrypted_secret_message_key)
 
-    return nil unless message_identifier = Coinmux::Cipher.instance.decrypt(
+    return nil unless message_identifier = cipher_facade.decrypt(
       secret_message_key,
       Base64.decode64(message_verification.value.encrypted_message_identifier))
 
-    Coinmux::Digest.instance.hex_message_digest(message_identifier, *keys)
+      digest_facade.hex_message_digest(message_identifier, *keys)
   end
 
   def message_verification_valid?(message_verification, *keys)
     raise ArgumentError, "Only director can check message verification validity" unless director?
 
-    message_verification == Coinmux::Digest.instance.hex_message_digest(self.message_verification.value.message_identifier, *keys)
+    message_verification == digest_facade.hex_message_digest(self.message_verification.value.message_identifier, *keys)
   end
 
   def director?

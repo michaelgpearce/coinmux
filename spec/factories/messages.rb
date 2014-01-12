@@ -3,10 +3,10 @@ FactoryGirl.define do
     sequence(:name) { |n| "association-#{n}" }
     type :list
     read_only false
-    data_store_identifier_from_build { Coinmux::DataStore.instance.generate_identifier }
+    data_store_identifier_from_build { data_store_facade.generate_identifier }
     data_store_identifier do
       if read_only
-        Coinmux::DataStore.instance.convert_to_request_only_identifier(data_store_identifier_from_build)
+        data_store_facade.convert_to_request_only_identifier(data_store_identifier_from_build)
       else
         data_store_identifier_from_build
       end
@@ -79,7 +79,7 @@ FactoryGirl.define do
   factory :input_message, :class => Coinmux::Message::Input do
     ignore do
       bitcoin_info { Helper.next_bitcoin_info }
-      message_keys { Coinmux::PKI.instance.generate_keypair }
+      message_keys { pki_facade.generate_keypair }
     end
 
     address { bitcoin_info[:address] }

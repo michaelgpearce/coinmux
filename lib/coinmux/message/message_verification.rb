@@ -14,10 +14,10 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
     def build(coin_join)
       message = super(coin_join)
 
-      message.message_identifier = Coinmux::Digest.instance.random_identifier
-      message.secret_key = Coinmux::Digest.instance.random_identifier
+      message.message_identifier = digest_facade.random_identifier
+      message.secret_key = digest_facade.random_identifier
       
-      message.encrypted_message_identifier = Base64.encode64(Coinmux::Cipher.instance.encrypt(message.secret_key, message.message_identifier)).strip
+      message.encrypted_message_identifier = Base64.encode64(cipher_facade.encrypt(message.secret_key, message.message_identifier)).strip
       
       message.encrypted_secret_keys = message.build_encrypted_secret_keys
 
@@ -28,7 +28,7 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
   def build_encrypted_secret_keys
     # only selected inputs will get the secret to decrypt the identifier
     coin_join.inputs.value.inject({}) do |acc, input|
-      encrypted_secret_key = Coinmux::PKI.instance.public_encrypt(input.message_public_key, secret_key)
+      encrypted_secret_key = pki_facade.public_encrypt(input.message_public_key, secret_key)
       acc[input.address] = Base64.encode64(encrypted_secret_key)
 
       acc
@@ -44,7 +44,7 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
     raise ArgumentError, "not found for address #{address}" if encoded_encrypted_secret_key.nil?
 
     encrypted_secret_key = (Base64.decode64(encoded_encrypted_secret_key) rescue nil) || ""
-    secret_key = Coinmux::PKI.instance.private_decrypt(input.message_private_key, encrypted_secret_key) rescue nil
+    secret_key = pki_facade.private_decrypt(input.message_private_key, encrypted_secret_key) rescue nil
     raise ArgumentError, "cannot be decrypted" if secret_key.nil?
 
     secret_key

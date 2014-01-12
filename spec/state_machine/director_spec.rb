@@ -19,7 +19,7 @@ describe Coinmux::StateMachine::Director do
     let(:director) { Coinmux::StateMachine::Director.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:participant_count) { 5 }
-    let(:coin_join_data_store_identifier) { Coinmux::CoinJoinUri.parse(Coinmux::Config.instance['coin_join_uri']).identifier }
+    let(:coin_join_data_store_identifier) { Coinmux::CoinJoinUri.parse(config_facade['coin_join_uri']).identifier }
     
     subject do
       callback_events = []
@@ -45,13 +45,13 @@ describe Coinmux::StateMachine::Director do
       it "inserts coin join message" do
         subject
 
-        expect(fake_data_store.fetch(coin_join_data_store_identifier).last).to eq(director.coin_join_message.to_json)
+        expect(data_store_facade.fetch(coin_join_data_store_identifier).last).to eq(director.coin_join_message.to_json)
       end
 
       it "inserts status message" do
         subject
 
-        expect(fake_data_store.fetch(director.coin_join_message.status.data_store_identifier).last).to eq(director.status_message.to_json)
+        expect(data_store_facade.fetch(director.coin_join_message.status.data_store_identifier).last).to eq(director.status_message.to_json)
         expect(director.status_message.status).to eq('WaitingForInputs')
         expect(director.status_message.transaction_id).to be_nil
       end

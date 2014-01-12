@@ -203,11 +203,11 @@ class Coinmux::BitcoinNetwork
   end
 
   def webbtc_get_bin(path)
-    Coinmux::Http.instance.get(Coinmux::Config.instance.webbtc_host, path)
+    http_facade.get(config_facade.webbtc_host, path)
   end
 
   def webbtc_get_json(path)
-    result = Coinmux::Http.instance.get(Coinmux::Config.instance.webbtc_host, path)
+    result = http_facade.get(config_facade.webbtc_host, path)
     hash = JSON.parse(result) rescue nil
 
     if hash.nil?

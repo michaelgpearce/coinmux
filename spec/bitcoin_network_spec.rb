@@ -6,10 +6,10 @@ describe Coinmux::BitcoinNetwork do
     let(:address) { 'mjcSuqvGTuq8Ys82juwa69eAb4Z69VaqEE' }
 
     before do
-      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, "/address/#{address}.json").and_return(data)
+      http_facade.stub(:get).with(config_facade.webbtc_host, "/address/#{address}.json").and_return(data)
     end
 
-    subject { Coinmux::BitcoinNetwork.instance.unspent_inputs_for_address(address) }
+    subject { bitcoin_network_facade.unspent_inputs_for_address(address) }
 
     it "has correct unspent transaction / number and value" do
       expect(subject.size).to eq(1)
@@ -25,7 +25,7 @@ describe Coinmux::BitcoinNetwork do
     let(:outputs) { [{ address: Helper.next_bitcoin_info[:address], amount: 100000000 }, { address: Helper.next_bitcoin_info[:address], amount: 300000000 }] }
 
     before do
-      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
+      http_facade.stub(:get).with(config_facade.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
     end
 
     subject { Coinmux::BitcoinNetwork.instance.build_unsigned_transaction(unspent_inputs, outputs) }
@@ -49,7 +49,7 @@ describe Coinmux::BitcoinNetwork do
 
     context "with transaction that cannot be found" do
       it "raises an Coinmux::Error" do
-        Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, "/tx/#{transaction_id}.bin").and_raise(Coinmux::Error.new('An http error'))
+        http_facade.stub(:get).with(config_facade.webbtc_host, "/tx/#{transaction_id}.bin").and_raise(Coinmux::Error.new('An http error'))
         expect { subject }.to raise_error(Coinmux::Error, 'An http error')
       end
     end
@@ -69,15 +69,15 @@ describe Coinmux::BitcoinNetwork do
     let(:unspent_inputs) { [{id: transaction_id, index: transaction_index}] }
     let(:amount) { 400000000 }
     let(:outputs) { [{ address: Helper.next_bitcoin_info[:address], amount: 100000000 }, { address: Helper.next_bitcoin_info[:address], amount: 300000000 }] }
-    let(:transaction) { Coinmux::BitcoinNetwork.instance.build_unsigned_transaction(unspent_inputs, outputs) }
+    let(:transaction) { bitcoin_network_facade.build_unsigned_transaction(unspent_inputs, outputs) }
     let(:input_index) { 0 }
     let(:private_key_hex) { "FA45A0CE998DBC372DB1DD323D689A6FDBA18F5EF8D5E4453EA2454AC4EC4B10" }
 
     before do
-      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
+      http_facade.stub(:get).with(config_facade.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
     end
 
-    subject { Coinmux::BitcoinNetwork.instance.build_transaction_input_script_sig(transaction, input_index, private_key_hex) }
+    subject { bitcoin_network_facade.build_transaction_input_script_sig(transaction, input_index, private_key_hex) }
 
     context "with valid inputs" do
       it "creates a script_sig" do
@@ -114,16 +114,16 @@ describe Coinmux::BitcoinNetwork do
     let(:unspent_inputs) { [{id: transaction_id, index: transaction_index}] }
     let(:amount) { 400000000 }
     let(:outputs) { [{ address: Helper.next_bitcoin_info[:address], amount: 100000000 }, { address: Helper.next_bitcoin_info[:address], amount: 300000000 }] }
-    let(:transaction) { Coinmux::BitcoinNetwork.instance.build_unsigned_transaction(unspent_inputs, outputs) }
+    let(:transaction) { bitcoin_network_facade.build_unsigned_transaction(unspent_inputs, outputs) }
     let(:input_index) { 0 }
     let(:private_key_hex) { "FA45A0CE998DBC372DB1DD323D689A6FDBA18F5EF8D5E4453EA2454AC4EC4B10" }
-    let(:script_sig) { Coinmux::BitcoinNetwork.instance.build_transaction_input_script_sig(transaction, input_index, private_key_hex) }
+    let(:script_sig) { bitcoin_network_facade.build_transaction_input_script_sig(transaction, input_index, private_key_hex) }
 
     before do
-      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
+      http_facade.stub(:get).with(config_facade.webbtc_host, "/tx/#{transaction_id}.bin").and_return(load_fixture("#{transaction_id}.bin"))
     end
 
-    subject { Coinmux::BitcoinNetwork.instance.sign_transaction_input(transaction, input_index, script_sig) }
+    subject { bitcoin_network_facade.sign_transaction_input(transaction, input_index, script_sig) }
 
     context "with valid inputs" do
       it "creates a script_sig" do
@@ -152,11 +152,11 @@ describe Coinmux::BitcoinNetwork do
     let(:path) { '/a/valid/path' }
 
     before do
-      Coinmux::Http.instance.stub(:get).with(Coinmux::Config.instance.webbtc_host, path).and_return(data)
+      http_facade.stub(:get).with(config_facade.webbtc_host, path).and_return(data)
     end
 
     subject do
-      Coinmux::BitcoinNetwork.instance.send(:webbtc_get_json, path)
+      bitcoin_network_facade.send(:webbtc_get_json, path)
     end
 
     context "with valid JSON" do

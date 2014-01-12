@@ -8,7 +8,7 @@ describe Coinmux::BitcoinCrypto do
   let(:signature_base_64) { "HIZQbBLAGJLhSZ310FCQMAo9l1X2ysxyt0kXkf6KcBN3znl2iClC6V9wz9Nkn6mMDUaq4kRlgYQDUUlsm29Bl0o=" }
 
   describe "verify_message!" do
-    subject { Coinmux::BitcoinCrypto.instance.verify_message!(message, signature_base_64, address) }
+    subject { bitcoin_crypto_facade.verify_message!(message, signature_base_64, address) }
 
     it "returns true" do
       expect(subject).to be_true
@@ -16,15 +16,15 @@ describe Coinmux::BitcoinCrypto do
   end
 
   describe "sign_message!" do
-    subject { Coinmux::BitcoinCrypto.instance.sign_message!(message, private_key_hex) }
+    subject { bitcoin_crypto_facade.sign_message!(message, private_key_hex) }
 
     it "verifies" do
-      expect(Coinmux::BitcoinCrypto.instance.verify_message!(message, subject, address)).to be_true
+      expect(bitcoin_crypto_facade.verify_message!(message, subject, address)).to be_true
     end
   end
 
   describe "address_for_public_key!" do
-    subject { Coinmux::BitcoinCrypto.instance.address_for_public_key!(public_key_hex) }
+    subject { bitcoin_crypto_facade.address_for_public_key!(public_key_hex) }
 
     it "returns the bitcoin address" do
       expect(subject).to eq(address)
@@ -32,7 +32,7 @@ describe Coinmux::BitcoinCrypto do
   end
 
   describe "public_key_for_private_key!" do
-    subject { Coinmux::BitcoinCrypto.instance.public_key_for_private_key!(private_key_hex) }
+    subject { bitcoin_crypto_facade.public_key_for_private_key!(private_key_hex) }
 
     it "returns the public key" do
       expect(subject).to eq(public_key_hex)
@@ -40,7 +40,7 @@ describe Coinmux::BitcoinCrypto do
   end
 
   describe "address_for_private_key!" do
-    subject { Coinmux::BitcoinCrypto.instance.address_for_private_key!(private_key_hex) }
+    subject { bitcoin_crypto_facade.address_for_private_key!(private_key_hex) }
 
     it "returns the address" do
       expect(subject).to eq(address)
@@ -48,7 +48,7 @@ describe Coinmux::BitcoinCrypto do
   end
 
   describe "verify_address!" do
-    subject { Coinmux::BitcoinCrypto.instance.verify_address!(address) }
+    subject { bitcoin_crypto_facade.verify_address!(address) }
 
     it "returns true" do
       expect(subject).to be_true

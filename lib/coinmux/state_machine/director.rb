@@ -1,4 +1,6 @@
 class Coinmux::StateMachine::Director
+  include Coinmux::CoinmuxFacades
+
   attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :participant_count, :callback
   
   STATUSES = %w(WaitingForInputs WaitingForOutputs WaitingForSignatures WaitingForConfirmation Failed Complete)
@@ -103,7 +105,7 @@ class Coinmux::StateMachine::Director
   
   def do_announce_coin_join
     self.coin_join_message = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
-    coin_join_message_data_store_identifier = Coinmux::CoinJoinUri.parse(Coinmux::Config.instance['coin_join_uri']).identifier
+    coin_join_message_data_store_identifier = Coinmux::CoinJoinUri.parse(config_facade['coin_join_uri']).identifier
     
     self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
     status_message_data_store_identifier = coin_join_message.status.data_store_identifier
@@ -124,7 +126,7 @@ class Coinmux::StateMachine::Director
   
   def insert_message(data_store_identifier, message, &block)
     if block_given?
-      Coinmux::DataStore.instance.insert(data_store_identifier, message.to_json) do |event|
+      data_store_facade.insert(data_store_identifier, message.to_json) do |event|
         if event.error
           fail
         else
@@ -132,12 +134,12 @@ class Coinmux::StateMachine::Director
         end
       end
     else
-      Coinmux::DataStore.instance.insert(data_store_identifier, message.to_json)
+      data_store_facade.insert(data_store_identifier, message.to_json)
     end
   end
   
   def fetch_all_messages(klass, data_store_identifier)
-    Coinmux::DataStore.instance.fetch_all(data_store_identifier).collect do |message_json|
+    data_store_facade.fetch_all(data_store_identifier).collect do |message_json|
       klass.from_json(data) if message_json
     end
   end

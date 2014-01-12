@@ -9,9 +9,9 @@ class Coinmux::Message::Association < Coinmux::Message::Base
       message.name = name.to_s
       message.type = type
       message.read_only = read_only
-      message.data_store_identifier_from_build = Coinmux::DataStore.instance.generate_identifier
+      message.data_store_identifier_from_build = data_store_facade.generate_identifier
       message.data_store_identifier = read_only ?
-        Coinmux::DataStore.instance.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
+        data_store_facade.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
         message.data_store_identifier_from_build
 
       message
@@ -57,7 +57,7 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   def insert(message)
     @messages << message
 
-    Coinmux::DataStore.instance.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) {}
+    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) {}
 
     message
   end
@@ -71,8 +71,8 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   private
 
   def data_store_identifier_has_correct_permissions
-    can_insert = Coinmux::DataStore.instance.identifier_can_insert?(data_store_identifier.to_s)
-    can_request = Coinmux::DataStore.instance.identifier_can_request?(data_store_identifier.to_s)
+    can_insert = data_store_facade.identifier_can_insert?(data_store_identifier.to_s)
+    can_request = data_store_facade.identifier_can_request?(data_store_identifier.to_s)
 
     errors[:data_store_identifier] << "must allow requests" unless can_request
     if !read_only

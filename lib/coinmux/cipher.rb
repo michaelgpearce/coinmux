@@ -1,9 +1,9 @@
 class Coinmux::Cipher
-  include Singleton
+  include Singleton, Coinmux::CoinmuxFacades
 
   def encrypt(secret_key, clear_text)
     cipher = build_cipher(:encrypt)
-    cipher.key = Coinmux::Digest.instance.digest(secret_key)
+    cipher.key = digest_facade.digest(secret_key)
     cipher.iv = iv = cipher.random_iv # 16 bytes
     
     encrypted = cipher.update(clear_text)
@@ -13,7 +13,7 @@ class Coinmux::Cipher
 
   def decrypt(secret_key, encrypted_text)
     cipher = build_cipher(:decrypt)
-    cipher.key = Coinmux::Digest.instance.digest(secret_key)
+    cipher.key = digest_facade.digest(secret_key)
     cipher.iv = encrypted_text[0...16] # first 16 bytes are IV
     encrypted_text = encrypted_text[16..-1]
 

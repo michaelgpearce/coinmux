@@ -66,8 +66,8 @@ describe Coinmux::Message::Input do
 
     it "has message_private_key and message_public_key for encrypting and decrypting" do
       message = "a random message #{rand}"
-      encrypted_message = Coinmux::PKI.instance.private_encrypt(subject.message_private_key, message)
-      expect(Coinmux::PKI.instance.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
+      encrypted_message = pki_facade.private_encrypt(subject.message_private_key, message)
+      expect(pki_facade.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
     end
   end
 

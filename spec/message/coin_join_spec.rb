@@ -126,8 +126,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.inputs.value).to eq([])
         expect(message.inputs.type).to eq(:list)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.inputs.data_store_identifier)).to be_true
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.inputs.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.inputs.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_request?(message.inputs.data_store_identifier)).to be_true
       end
     end
 
@@ -135,8 +135,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.outputs.value).to eq([])
         expect(message.outputs.type).to eq(:list)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.outputs.data_store_identifier)).to be_true
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.outputs.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.outputs.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_request?(message.outputs.data_store_identifier)).to be_true
       end
     end
 
@@ -144,8 +144,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.message_verification.value).to eq(nil)
         expect(message.message_verification.type).to eq(:fixed)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.message_verification.data_store_identifier)).to be_false
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.message_verification.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.message_verification.data_store_identifier)).to be_false
+        expect(data_store_facade.identifier_can_request?(message.message_verification.data_store_identifier)).to be_true
       end
     end
 
@@ -153,8 +153,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-only fixed association" do
         expect(message.transaction.value).to eq(nil)
         expect(message.transaction.type).to eq(:fixed)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.transaction.data_store_identifier)).to be_false
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.transaction.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.transaction.data_store_identifier)).to be_false
+        expect(data_store_facade.identifier_can_request?(message.transaction.data_store_identifier)).to be_true
       end
     end
 
@@ -162,8 +162,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-write list association" do
         expect(message.transaction_signatures.value).to eq([])
         expect(message.transaction_signatures.type).to eq(:list)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.transaction_signatures.data_store_identifier)).to be_true
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.transaction_signatures.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.transaction_signatures.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_request?(message.transaction_signatures.data_store_identifier)).to be_true
       end
     end
 
@@ -171,8 +171,8 @@ describe Coinmux::Message::CoinJoin do
       it "is a read-only variable association" do
         expect(message.status.value).to eq(nil)
         expect(message.status.type).to eq(:variable)
-        expect(Coinmux::DataStore.instance.identifier_can_insert?(message.status.data_store_identifier)).to be_false
-        expect(Coinmux::DataStore.instance.identifier_can_request?(message.status.data_store_identifier)).to be_true
+        expect(data_store_facade.identifier_can_insert?(message.status.data_store_identifier)).to be_false
+        expect(data_store_facade.identifier_can_request?(message.status.data_store_identifier)).to be_true
       end
     end
   end
@@ -238,7 +238,7 @@ describe Coinmux::Message::CoinJoin do
     let(:coin_join) { build(:coin_join_message, :with_message_verification) }
     let(:keys) { %w(foo bar) }
     let(:message_identifier) { coin_join.message_verification.value.message_identifier }
-    let(:message_verification) { Coinmux::Digest.instance.hex_message_digest(message_identifier, 'foo', 'bar') }
+    let(:message_verification) { digest_facade.hex_message_digest(message_identifier, 'foo', 'bar') }
 
     before do
       expect(coin_join.director?).to be_true
@@ -295,7 +295,7 @@ describe Coinmux::Message::CoinJoin do
 
     context "with valid data" do
       it "builds the correct verification message" do
-        expect(subject).to eq(Coinmux::Digest.instance.hex_message_digest(message_identifier, *keys))
+        expect(subject).to eq(digest_facade.hex_message_digest(message_identifier, *keys))
       end
     end
   end

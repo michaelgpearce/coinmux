@@ -1,5 +1,5 @@
 class Coinmux::Message::Base < Hashie::Dash
-  include ActiveModel::Model
+  include ActiveModel::Model, Coinmux::CoinmuxFacades
 
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
 
