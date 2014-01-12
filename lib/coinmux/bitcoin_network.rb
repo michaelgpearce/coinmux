@@ -34,7 +34,7 @@ class Coinmux::BitcoinNetwork
 
   # @address [String] Input address.
   # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
-  # @return [Array] Array of hashes with keys being `:id` (transaction hash identifier), `:index` (the index of the transaction output that is unspent) and the value being the unspent amount.
+  # @return [Hash] Hash with keys being `{:id: 'transaction hash identifier', :index: 'unspent transaction output index'}` and the value being the unspent amount.
   # @raise [Coinmux::Error] when no callback
   def unspent_inputs_for_address(address, &callback)
     exec(callback) do
