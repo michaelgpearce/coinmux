@@ -19,7 +19,7 @@ describe Coinmux::StateMachine::Director do
     let(:director) { Coinmux::StateMachine::Director.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:participant_count) { 5 }
-    let(:coin_join_data_store_identifier) { Coinmux::CoinJoinUri.parse(config_facade['coin_join_uri']).identifier }
+    let(:coin_join_data_store_identifier) { Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).identifier }
     
     subject do
       callback_events = []

@@ -105,7 +105,7 @@ class Coinmux::StateMachine::Director
   
   def do_announce_coin_join
     self.coin_join_message = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
-    coin_join_message_data_store_identifier = Coinmux::CoinJoinUri.parse(config_facade['coin_join_uri']).identifier
+    coin_join_message_data_store_identifier = Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).identifier
     
     self.status_message = Coinmux::Message::Status.build(coin_join_message, 'WaitingForInputs')
     status_message_data_store_identifier = coin_join_message.status.data_store_identifier
