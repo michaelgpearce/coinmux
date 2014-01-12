@@ -149,7 +149,7 @@ describe Coinmux::Message::Status do
   describe "build" do
     subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
 
-    it "builds valid input" do
+    it "builds valid status" do
       expect(subject.valid?).to be_true
     end
   end
@@ -168,7 +168,7 @@ describe Coinmux::Message::Status do
       Coinmux::Message::Status.from_json(json, coin_join)
     end
 
-    it "creates a valid input" do
+    it "creates a valid status" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
       expect(subject.status).to eq(message.status)
