@@ -74,19 +74,14 @@ Transaction:
 {
   Inputs: [
     {
-      # PublicKey: "123...abc"
       TransactionId: "123...abc"
-      # OutputIndex: 0
-      Amount: 1234
-      # Verification: "123...abc"
+      OutputIndex: 0
     },
     {
-      # PublicKey: "789...xyz"
       TransactionId: "789...xyz"
-      # OutputIndex: 0
-      Amount: 2345
-      # Verification: "789...xyz"
-    }
+      OutputIndex: 0
+    },
+    ...
   ]
   Outputs: [
     {

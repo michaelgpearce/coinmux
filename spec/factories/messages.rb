@@ -22,8 +22,8 @@ FactoryGirl.define do
     identifier { template_message.identifier }
     message_private_key { template_message.message_private_key }
     message_public_key { template_message.message_public_key }
-    amount { template_message.amount }
-    participants { template_message.participants }
+    amount { 100_000_000 }
+    participants { 2 }
     participant_transaction_fee { template_message.participant_transaction_fee }
 
     inputs { association :association_message, strategy: :build, name: 'input', type: :list, read_only: false, created_with_build: true }
@@ -54,6 +54,24 @@ FactoryGirl.define do
       after(:build) do |coin_join|
         coin_join.outputs.insert(FactoryGirl.build(:output_message, :coin_join => coin_join, :created_with_build => true))
         coin_join.outputs.insert(FactoryGirl.build(:output_message, :coin_join => coin_join, :created_with_build => false))
+      end
+    end
+
+    trait :with_transaction do
+      after(:build) do |coin_join|
+        inputs = coin_join.inputs.value.collect do |input|
+          { 'transaction_id' => "tx-#{input.address}", 'output_index' => rand(0..1) }
+        end
+
+        outputs = coin_join.outputs.value.each_with_index.collect do |output|
+          { 'address' => output.address, 'amount' => coin_join.amount }
+        end
+
+        outputs += coin_join.inputs.value.each_with_index.collect do |input|
+          { 'address' => input.change_address, 'amount' => rand(1..4) * Coinmux::BitcoinUtil::SATOSHIS_PER_BITCOIN - coin_join.participant_transaction_fee }
+        end
+
+        coin_join.transaction.insert(FactoryGirl.build(:transaction_message, :coin_join => coin_join, :inputs => inputs, :outputs => outputs))
       end
     end
   end
@@ -116,12 +134,16 @@ FactoryGirl.define do
     end
   end
 
+  # To create a valid transaction_message:
+  #   FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction).transaction.value
   factory :transaction_message, :class => Coinmux::Message::Transaction do
-    coin_join { association :coin_join_message }
+    inputs { [] }
+    outputs { [] }
   end
 
+  # To create a valid transaction_signature_message:
+  #   FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction, :with_transaction_signatures).transaction_signatures.first
   factory :transaction_signature_message, :class => Coinmux::Message::TransactionSignature do
-    coin_join { association :coin_join_message }
   end
 end
 

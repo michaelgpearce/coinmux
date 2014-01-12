@@ -55,6 +55,22 @@ def fake_bitcoin_network
   end
 end
 
+def stub_bitcoin_network_for_coin_join(coin_join)
+  coin_join.transaction.value.inputs.each do |hash|
+    address = hash['transaction_id'].split('-').last # we format the transaction id: "tx-address"
+    change_address = coin_join.inputs.value.detect { |input| input.address == address }.change_address
+    change_amount = coin_join.transaction.value.outputs.detect { |output| output['address'] == change_address }['amount']
+    tx_amount = coin_join.amount + change_amount + coin_join.participant_transaction_fee
+
+    result = {}.tap do |result|
+      key = {id: hash['transaction_id'], index: hash['output_index']}
+      result[key] = tx_amount
+    end
+
+    Coinmux::BitcoinNetwork.instance.stub(:unspent_inputs_for_address).with(address).and_return(result)
+  end
+end
+
 def load_fixture(name)
   open(File.join(File.dirname(__FILE__), 'fixtures', name)) { |f| f.read }
 end
