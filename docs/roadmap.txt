@@ -32,3 +32,6 @@ FUTURE FEATURES:
 * Acts as anonymous wallet (mix to new address, the send)
   * Support multiple inputs during CoinJoin
 * Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
+
+Error case:
+* Handle address with incoming transactions during coin join (only use inputs older than created_at block time)
