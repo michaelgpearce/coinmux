@@ -5,11 +5,15 @@ class Coinmux::Http
 
   def get(host, path)
     begin
-      result = client.get("#{host}#{path}")
+      with_cache(host, path) do
+        response = client.get("#{host}#{path}")
 
-      raise Coinmux::Error, "Invalid response code: #{response.code}" if result.code.to_s != '200'
+        raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
 
-      result.content
+        response.content
+      end
+    rescue Coinmux::Error => e
+      raise e
     rescue SocketError => e
       raise Coinmux::Error, e.message
     rescue StandardError => e
@@ -19,6 +23,24 @@ class Coinmux::Http
   end
 
   private
+
+  def cache
+    @cache ||= {}
+  end
+
+  def clear_cache
+    cache.clear
+  end
+
+  def with_cache(host, path, &block)
+    key = [host, path]
+
+    if (result = @cache[key]).nil?
+      result = @cache[key] = yield
+    end
+
+    result
+  end
 
   def client
     @client ||= HTTPClient.new
