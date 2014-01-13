@@ -27,6 +27,7 @@ v1.0 - Stable enough and feature rich enough for novice users
 
 FUTURE FEATURES:
 
+* Fund by creating a new address and starting coin_join once funds confirmed (instead of/in addition to specifying private key)
 * Embed Freenet (or move to P2P [TomP2P] or Bitmessage)
 * Automatic retries of failed transactions
 * Acts as anonymous wallet (mix to new address, the send)
