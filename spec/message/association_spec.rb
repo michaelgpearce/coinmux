@@ -32,7 +32,7 @@ describe Coinmux::Message::Association do
       expect(subject).to be_true
     end
 
-    describe "data_store_identifier_has_correct_permissions" do
+    describe "#data_store_identifier_has_correct_permissions" do
       let(:created_with_build) { false }
 
       context "when data_store_identifier does not allow requests" do
@@ -67,7 +67,7 @@ describe Coinmux::Message::Association do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::Association.build(coin_join, name, type, read_only) }
 
     it "builds valid input" do
@@ -102,7 +102,7 @@ describe Coinmux::Message::Association do
     end
   end
 
-  describe "from_data_store_identifier" do
+  describe "#from_data_store_identifier" do
     let(:message) { template_message }
     let(:data_store_identifier) { message.data_store_identifier }
 
@@ -110,7 +110,7 @@ describe Coinmux::Message::Association do
       Coinmux::Message::Association.from_data_store_identifier(data_store_identifier, coin_join, name, type, read_only)
     end
 
-    it "creates a valid input" do
+    it "creates a valid association" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
       expect(subject.name).to eq(message.name)

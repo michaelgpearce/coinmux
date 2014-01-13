@@ -5,7 +5,7 @@ describe Coinmux::StateMachine::Director do
     fake_all
   end
   
-  context "#initialize" do
+  describe "#initialize" do
     subject do
       Coinmux::StateMachine::Director.new
     end
@@ -15,7 +15,7 @@ describe Coinmux::StateMachine::Director do
     end
   end
   
-  context "#start" do
+  describe "#start" do
     let(:director) { Coinmux::StateMachine::Director.new }
     let(:bitcoin_amount) { 100_000_000 }
     let(:participant_count) { 5 }

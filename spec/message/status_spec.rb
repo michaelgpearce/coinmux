@@ -34,7 +34,7 @@ describe Coinmux::Message::Status do
       expect(subject).to be_true
     end
 
-    describe "transaction_id" do
+    describe "#transaction_id" do
       context "when present" do
         Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
           context "with #{test_status} status" do
@@ -84,7 +84,7 @@ describe Coinmux::Message::Status do
       end
     end
 
-    describe "transaction_confirmed" do
+    describe "#transaction_confirmed" do
       context "when in Complete state" do
         let(:status) { 'Complete' }
 
@@ -105,7 +105,7 @@ describe Coinmux::Message::Status do
       end
     end
 
-    describe "status_valid" do
+    describe "#status_valid" do
       context "when status is invalid" do
         let(:status) { 'InvalidStatus' }
 
@@ -116,7 +116,7 @@ describe Coinmux::Message::Status do
       end
     end
 
-    describe "updated_at" do
+    describe "#updated_at" do
       context "with non-Hash" do
         let(:updated_at) { nil }
 
@@ -146,7 +146,7 @@ describe Coinmux::Message::Status do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
 
     it "builds valid status" do
@@ -154,7 +154,7 @@ describe Coinmux::Message::Status do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { template_message }
     let(:json) do
       {

@@ -20,7 +20,7 @@ describe Coinmux::Message::CoinJoin do
       expect(subject).to be_true
     end
 
-    describe "participants_numericality" do
+    describe "#participants_numericality" do
       context "with non numeric value" do
         let(:participants) { "non-numeric" }
 
@@ -40,7 +40,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    describe "participant_transaction_fee_numericality" do
+    describe "#participant_transaction_fee_numericality" do
       context "with non numeric value" do
         let(:participant_transaction_fee) { "non-numeric" }
 
@@ -69,7 +69,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    describe "version_matches" do
+    describe "#version_matches" do
       context "with version other than VERSION" do
         let(:version) { Coinmux::Message::CoinJoin::VERSION - 1 }
 
@@ -80,7 +80,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    describe "amount_is_base_2_bitcoin" do
+    describe "#amount_is_base_2_bitcoin" do
       context "with base 2 bitcoin amount less than 1" do
         let(:amount) { SATOSHIS_PER_BITCOIN / 2 }
 
@@ -122,7 +122,7 @@ describe Coinmux::Message::CoinJoin do
   describe "associations" do
     let(:message) { build(:coin_join_message) }
 
-    context "inputs" do
+    describe "#inputs" do
       it "is a read-write list association" do
         expect(message.inputs.value).to eq([])
         expect(message.inputs.type).to eq(:list)
@@ -131,7 +131,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    context "outputs" do
+    describe "#outputs" do
       it "is a read-write list association" do
         expect(message.outputs.value).to eq([])
         expect(message.outputs.type).to eq(:list)
@@ -140,7 +140,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    context "message_verification" do
+    describe "#message_verification" do
       it "is a read-only fixed association" do
         expect(message.message_verification.value).to eq(nil)
         expect(message.message_verification.type).to eq(:fixed)
@@ -149,7 +149,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    context "transaction" do
+    describe "#transaction" do
       it "is a read-only fixed association" do
         expect(message.transaction.value).to eq(nil)
         expect(message.transaction.type).to eq(:fixed)
@@ -158,7 +158,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    context "transaction_signatures" do
+    describe "#transaction_signatures" do
       it "is a read-write list association" do
         expect(message.transaction_signatures.value).to eq([])
         expect(message.transaction_signatures.type).to eq(:list)
@@ -167,7 +167,7 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
-    context "status" do
+    describe "#status" do
       it "is a read-only variable association" do
         expect(message.status.value).to eq(nil)
         expect(message.status.type).to eq(:variable)
@@ -177,7 +177,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::CoinJoin.build(amount, participants) }
 
     it "builds valid input" do
@@ -186,7 +186,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { build(:coin_join_message, amount: amount, participants: participants, participant_transaction_fee: participant_transaction_fee, version: version) }
     let(:json) do
       {
@@ -234,7 +234,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
   
-  context "message_verification_valid?" do
+  describe "#message_verification_valid?" do
     let(:coin_join) { build(:coin_join_message, :with_message_verification) }
     let(:prefix) { :the_prefix }
     let(:keys) { %w(foo bar) }
@@ -273,7 +273,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  context "build_message_verification" do
+  describe "#build_message_verification" do
     let(:coin_join) do
       build(:coin_join_message, :with_inputs, :with_message_verification).tap do |coin_join|
         # not realistic to be the director and have a built input, but ok for testing
@@ -302,7 +302,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  context "build_transaction_inputs" do
+  describe "#build_transaction_inputs" do
     let(:coin_join) { build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction) }
 
     before do
@@ -324,7 +324,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  context "build_transaction_outputs" do
+  describe "#build_transaction_outputs" do
     let(:coin_join) { build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction) }
 
     before do
@@ -368,7 +368,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  context "retrieve_minimum_unspent_transaction_inputs" do
+  describe "#retrieve_minimum_unspent_transaction_inputs" do
     let(:message) { build(:coin_join_message) }
     let(:unspent_inputs) do
       {

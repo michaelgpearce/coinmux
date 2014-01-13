@@ -24,7 +24,7 @@ describe Coinmux::Message::MessageVerification do
       expect(subject).to be_true
     end
 
-    context "ensure_owned_input_can_decrypt_message_identifier" do
+    describe "#ensure_owned_input_can_decrypt_message_identifier" do
       context "with no invalid encrypted secret key" do
         before do
           message.encrypted_secret_keys.keys.each do |address|
@@ -39,7 +39,7 @@ describe Coinmux::Message::MessageVerification do
       end
     end
 
-    context "ensure_has_addresses_for_all_encrypted_secret_keys" do
+    describe "#ensure_has_addresses_for_all_encrypted_secret_keys" do
       context "with unknown encrypted_secret_keys address" do
         before do
           message.encrypted_secret_keys[:unknown_address] = "should be here"
@@ -53,7 +53,7 @@ describe Coinmux::Message::MessageVerification do
     end
   end
 
-  describe "get_secret_key_for_address!" do
+  describe "#get_secret_key_for_address!" do
     let(:message) { template_message }
     let(:input) { coin_join.inputs.value.first }
     let(:address) { input.address }
@@ -96,16 +96,16 @@ describe Coinmux::Message::MessageVerification do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::MessageVerification.build(coin_join) }
 
-    it "builds valid input" do
+    it "builds valid message verification" do
       input = subject
       expect(input.valid?).to be_true
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { Coinmux::Message::MessageVerification.build(coin_join) }
     let(:json) do
       {
@@ -118,7 +118,7 @@ describe Coinmux::Message::MessageVerification do
       Coinmux::Message::MessageVerification.from_json(json, coin_join)
     end
 
-    it "creates a valid input" do
+    it "creates a valid message verification" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
       expect(subject.encrypted_message_identifier).to eq(message.encrypted_message_identifier)

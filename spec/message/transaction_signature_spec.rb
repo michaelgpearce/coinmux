@@ -30,7 +30,7 @@ describe Coinmux::Message::Transaction do
       expect(subject).to be_true
     end
 
-    context "message_verification_correct" do
+    describe "#message_verification_correct" do
       let(:message_verification) { 'invalid-message-verification' }
 
       it "is invalid with incorrect message_verification" do
@@ -39,7 +39,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "transaction_input_index_valid" do
+    describe "#transaction_input_index_valid" do
       it "is invalid with spent transaction" do
         bitcoin_network_facade.should_receive(:transaction_input_unspent?).with(coin_join.transaction_object, transaction_input_index).and_return(false)
 
@@ -48,7 +48,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "script_sig_valid" do
+    describe "#script_sig_valid" do
       it "is invalid with script_sig" do
         bitcoin_network_facade.should_receive(:script_sig_valid?).with(coin_join.transaction_object, transaction_input_index, Base64.decode64(script_sig)).and_return(false)
 
@@ -58,7 +58,7 @@ describe Coinmux::Message::Transaction do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     let(:private_key_hex) { Helper.next_bitcoin_info[:private_key] }
     let(:script_sig) { "scriptsig-#{rand}" }
 
@@ -88,7 +88,7 @@ describe Coinmux::Message::Transaction do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { template_message }
     let(:json) do
       {

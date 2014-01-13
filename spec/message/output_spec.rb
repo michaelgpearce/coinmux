@@ -17,7 +17,7 @@ describe Coinmux::Message::Output do
     end
 
 
-    describe "message_verification_correct" do
+    describe "#message_verification_correct" do
       before do
         expect(coin_join.director?).to be_true
       end
@@ -34,7 +34,7 @@ describe Coinmux::Message::Output do
       end
     end
 
-    describe "address_valid" do
+    describe "#address_valid" do
       context "with invalid address" do
         before do
           message.address = "invalid_address"
@@ -48,7 +48,7 @@ describe Coinmux::Message::Output do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     let(:address) { message.address }
 
     subject { Coinmux::Message::Output.build(coin_join, address) }
@@ -66,7 +66,7 @@ describe Coinmux::Message::Output do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:json) do
       {
         address: message.address,

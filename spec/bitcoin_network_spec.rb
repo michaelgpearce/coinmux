@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Coinmux::BitcoinNetwork do
-  describe "unspent_inputs_for_address" do
+  describe "#unspent_inputs_for_address" do
     let(:data) { load_fixture("#{address}.json") }
     let(:address) { 'mjcSuqvGTuq8Ys82juwa69eAb4Z69VaqEE' }
 
@@ -17,7 +17,7 @@ describe Coinmux::BitcoinNetwork do
     end
   end
 
-  describe "build_unsigned_transaction" do
+  describe "#build_unsigned_transaction" do
     let(:transaction_id) { "50faf760057b52e4a9011d7989a1322b2727f5ce7f1750d5796a3883c1bf0fc7" }
     let(:transaction_index) { 1 }
     let(:unspent_inputs) { [{id: transaction_id, index: transaction_index}] }
@@ -63,7 +63,7 @@ describe Coinmux::BitcoinNetwork do
     end
   end
 
-  describe "build_transaction_input_script_sig" do
+  describe "#build_transaction_input_script_sig" do
     let(:transaction_id) { "50faf760057b52e4a9011d7989a1322b2727f5ce7f1750d5796a3883c1bf0fc7" }
     let(:transaction_index) { 1 }
     let(:unspent_inputs) { [{id: transaction_id, index: transaction_index}] }
@@ -108,7 +108,7 @@ describe Coinmux::BitcoinNetwork do
     end
   end
 
-  describe "sign_transaction_input" do
+  describe "#sign_transaction_input" do
     let(:transaction_id) { "50faf760057b52e4a9011d7989a1322b2727f5ce7f1750d5796a3883c1bf0fc7" }
     let(:transaction_index) { 1 }
     let(:unspent_inputs) { [{id: transaction_id, index: transaction_index}] }
@@ -148,7 +148,7 @@ describe Coinmux::BitcoinNetwork do
     end
   end
 
-  describe "webbtc_get_json" do
+  describe "#webbtc_get_json" do
     let(:path) { '/a/valid/path' }
 
     before do

@@ -30,7 +30,7 @@ describe Coinmux::Message::Input do
       expect(subject).to be_true
     end
 
-    describe "signature_correct" do
+    describe "#signature_correct" do
       context "with invalid signature" do
         let(:signature) { Base64.encode64('invalid').strip }
 
@@ -41,7 +41,7 @@ describe Coinmux::Message::Input do
       end
     end
 
-    describe "change_address_valid" do
+    describe "#change_address_valid" do
       context "with invalid change address" do
         let(:change_address) { "invalid_address" }
 
@@ -53,7 +53,7 @@ describe Coinmux::Message::Input do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::Input.build(coin_join, private_key) }
 
     it "builds valid input" do
@@ -71,7 +71,7 @@ describe Coinmux::Message::Input do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { template_message }
     let(:json) do
       {

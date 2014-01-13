@@ -28,7 +28,7 @@ describe Coinmux::Message::Transaction do
       expect(subject).to be_true
     end
 
-    context "inputs_is_array_of_hashes" do
+    describe "#inputs_is_array_of_hashes" do
       context "with non-array" do
         let(:inputs) { 'not an array' }
 
@@ -48,7 +48,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "inputs_is_array_of_hashes" do
+    describe "#inputs_is_array_of_hashes" do
       context "with non-array" do
         let(:outputs) { 'not an array' }
 
@@ -68,7 +68,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "has_minimum_number_of_coin_join_amount_outputs" do
+    describe "#has_minimum_number_of_coin_join_amount_outputs" do
       let(:removed_output) { template_message.outputs.detect { |output| output['amount'] == coin_join.amount } }
       let(:outputs) { template_message.outputs.select { |output| output != removed_output } }
 
@@ -78,7 +78,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "has_no_duplicate_inputs" do
+    describe "#has_no_duplicate_inputs" do
       let(:inputs) { template_message.inputs + [template_message.inputs.first] }
 
       it "is invalid with duplicate inputs" do
@@ -87,7 +87,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "has_no_duplicate_outputs" do
+    describe "#has_no_duplicate_outputs" do
       let(:outputs) { template_message.outputs + [template_message.outputs.first] }
 
       it "is invalid with duplicate outputs" do
@@ -96,7 +96,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "has_correct_participant_inputs" do
+    describe "#has_correct_participant_inputs" do
       let(:removed_input_tx) { template_message.send(:participant_input_transactions).first }
       let(:inputs) { template_message.inputs.select { |input| input['transaction_id'] != removed_input_tx[:id] } }
 
@@ -106,7 +106,7 @@ describe Coinmux::Message::Transaction do
       end
     end
 
-    context "has_correct_participant_outputs" do
+    describe "#has_correct_participant_outputs" do
       let(:participant_output_address) { template_message.send(:participant_output_address) }
       let(:participant_change_address) { template_message.send(:participant_change_address) }
       let(:participant_output_hash) { outputs.detect { |output| output['address'] == participant_output_address } }
@@ -148,7 +148,7 @@ describe Coinmux::Message::Transaction do
     end
   end
 
-  describe "build" do
+  describe "#build" do
     subject { Coinmux::Message::Transaction.build(coin_join, inputs, outputs) }
 
     it "builds valid transaction" do
@@ -156,7 +156,7 @@ describe Coinmux::Message::Transaction do
     end
   end
 
-  describe "from_json" do
+  describe "#from_json" do
     let(:message) { template_message }
     let(:json) do
       {
