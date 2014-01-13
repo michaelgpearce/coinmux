@@ -11,7 +11,7 @@ describe Coinmux::Http do
     let(:path) { '/valid/path.html' }
     let(:code) { 200 }
     let(:content) { 'some content' }
-    let(:response) { stub(code: code, content: content) }
+    let(:response) { double(code: code, content: content) }
 
     before do
       http.send(:client).stub(:get).with("#{host}#{path}").and_return(response)
