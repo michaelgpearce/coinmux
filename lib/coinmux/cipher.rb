@@ -1,5 +1,5 @@
 class Coinmux::Cipher
-  include Singleton, Coinmux::CoinmuxFacades
+  include Singleton, Coinmux::Facades
 
   def encrypt(secret_key, clear_text)
     cipher = build_cipher(:encrypt)

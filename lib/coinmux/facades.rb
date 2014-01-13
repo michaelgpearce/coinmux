@@ -1,4 +1,4 @@
-module Coinmux::CoinmuxFacades
+module Coinmux::Facades
   def bitcoin_crypto_facade
     Coinmux::BitcoinCrypto.instance
   end

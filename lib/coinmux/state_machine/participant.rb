@@ -1,4 +1,4 @@
 class Coinmux::StateMachine::Participant
-  include Coinmux::CoinmuxFacades
+  include Coinmux::Facades
   
 end

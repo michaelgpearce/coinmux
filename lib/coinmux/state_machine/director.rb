@@ -1,5 +1,5 @@
 class Coinmux::StateMachine::Director
-  include Coinmux::CoinmuxFacades
+  include Coinmux::Facades
 
   attr_accessor :coin_join_message, :status_message, :bitcoin_amount, :participant_count, :callback
   
