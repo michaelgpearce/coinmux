@@ -236,9 +236,10 @@ describe Coinmux::Message::CoinJoin do
   
   context "message_verification_valid?" do
     let(:coin_join) { build(:coin_join_message, :with_message_verification) }
+    let(:prefix) { :the_prefix }
     let(:keys) { %w(foo bar) }
     let(:message_identifier) { coin_join.message_verification.value.message_identifier }
-    let(:message_verification) { digest_facade.hex_message_digest(message_identifier, 'foo', 'bar') }
+    let(:message_verification) { digest_facade.hex_message_digest(prefix, message_identifier, 'foo', 'bar') }
 
     before do
       expect(coin_join.director?).to be_true
@@ -246,7 +247,7 @@ describe Coinmux::Message::CoinJoin do
     end
 
     subject do
-      coin_join.message_verification_valid?(message_verification, *keys)
+      coin_join.message_verification_valid?(prefix, message_verification, *keys)
     end
 
     context "with matching identifier and keys" do
@@ -279,6 +280,7 @@ describe Coinmux::Message::CoinJoin do
         coin_join.inputs.value.first.created_with_build = true
       end
     end
+    let(:prefix) { :a_valid_prefix }
     let(:keys) { %w(foo bar) }
     let(:message_identifier) { coin_join.message_verification.value.message_identifier }
     let(:input) { coin_join.inputs.value.detect(&:created_with_build?) }
@@ -290,12 +292,131 @@ describe Coinmux::Message::CoinJoin do
     end
 
     subject do
-      coin_join.build_message_verification(*keys)
+      coin_join.build_message_verification(prefix, *keys)
     end
 
     context "with valid data" do
       it "builds the correct verification message" do
-        expect(subject).to eq(digest_facade.hex_message_digest(message_identifier, *keys))
+        expect(subject).to eq(digest_facade.hex_message_digest(prefix, message_identifier, *keys))
+      end
+    end
+  end
+
+  context "build_transaction_inputs" do
+    let(:coin_join) { build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction) }
+
+    before do
+      stub_bitcoin_network_for_coin_join(coin_join)
+    end
+
+    subject { coin_join.build_transaction_inputs }
+
+    context "when in valid state" do
+      it "maps input transactions for address" do
+        expect(subject).to eq(coin_join.inputs.value.inject([]) do |acc, input|
+          acc += coin_join.minimum_unspent_transaction_inputs(input.address).collect do |tx_input|
+            { 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
+          end
+
+          acc
+        end)
+      end
+    end
+  end
+
+  context "build_transaction_outputs" do
+    let(:coin_join) { build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction) }
+
+    before do
+      stub_bitcoin_network_for_coin_join(coin_join)
+    end
+
+    subject { coin_join.build_transaction_outputs }
+
+    context "when in valid state" do
+      context "with change addresses on input" do
+        it "maps output address and change address" do
+          expected = coin_join.outputs.value.collect do |output|
+            { 'address' => output.address, 'amount' => coin_join.amount }
+          end
+
+          expected += coin_join.inputs.value.collect do |input|
+            unspent_input_amount = bitcoin_network_facade.unspent_inputs_for_address(input.address).values.inject(&:+)
+            change_amount = unspent_input_amount - coin_join.amount - coin_join.participant_transaction_fee
+            { 'address' => input.address, 'amount' => change_amount }
+          end
+
+          expect(subject).to eq(expected)
+        end
+      end
+
+      context "with no change addresses on input" do
+        before do
+          coin_join.inputs.value.each do |input|
+            input.change_address = nil
+          end
+        end
+
+        it "maps output address with no change address" do
+          expected = coin_join.outputs.value.collect do |output|
+            { 'address' => output.address, 'amount' => coin_join.amount }
+          end
+
+          expect(subject).to eq(expected)
+        end
+      end
+    end
+  end
+
+  context "retrieve_minimum_unspent_transaction_inputs" do
+    let(:message) { build(:coin_join_message) }
+    let(:unspent_inputs) do
+      {
+        { id: "a", index: 4 } => 10,
+        { id: "b", index: 0 } => 20,
+        { id: "c", index: 3 } => 15,
+      }
+    end
+
+    subject { message.retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount) }
+
+    context "with minimum_amount less than largest transaction" do
+      let(:minimum_amount) { 15 }
+
+      it "retrieves returns only largest transaction" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+      end
+    end
+
+    context "with minimum_amount equal largest transaction" do
+      let(:minimum_amount) { 20 }
+
+      it "retrieves only largest transaction" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+      end
+    end
+
+    context "with minimum_amount greater than largest transaction" do
+      let(:minimum_amount) { 25 }
+
+      it "retrieves largest two transactions" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }])
+      end
+    end
+
+    context "with minimum_amount equal all transactions" do
+      let(:minimum_amount) { 45 }
+
+      it "retrieves only largest transaction" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }, { id: "a", index: 4, amount: 10 }])
+      end
+    end
+
+    context "with minimum_amount greater than all transactions" do
+      let(:minimum_amount) { 46 }
+
+      it "raises error" do
+        expect { subject }.to raise_error(Coinmux::Error)
       end
     end
   end

@@ -74,6 +74,18 @@ FactoryGirl.define do
         coin_join.transaction.insert(FactoryGirl.build(:transaction_message, :coin_join => coin_join, :inputs => inputs, :outputs => outputs))
       end
     end
+
+    trait :with_transaction_signatures do
+      after(:build) do |coin_join|
+        coin_join.transaction.value.inputs.each_with_index do |input_hash, index|
+          script_sig = "scriptsig-#{index}"
+
+          message_verification = coin_join.build_message_verification(:transaction_signature, index, script_sig)
+
+          coin_join.transaction_signatures.insert(FactoryGirl.build(:transaction_signature_message, coin_join: coin_join, transaction_input_index: index, script_sig: Base64.encode64(script_sig), message_verification: message_verification))
+        end
+      end
+    end
   end
 
   factory :input_message, :class => Coinmux::Message::Input do
@@ -134,16 +146,25 @@ FactoryGirl.define do
     end
   end
 
-  # To create a valid transaction_message:
-  #   FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction).transaction.value
   factory :transaction_message, :class => Coinmux::Message::Transaction do
-    inputs { [] }
-    outputs { [] }
+    ignore do
+      template_message { FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction).transaction.value }
+    end
+
+    inputs { template_message.inputs }
+    outputs { template_message.outputs }
+    coin_join { template_message.coin_join }
   end
 
-  # To create a valid transaction_signature_message:
-  #   FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction, :with_transaction_signatures).transaction_signatures.first
   factory :transaction_signature_message, :class => Coinmux::Message::TransactionSignature do
+    ignore do
+      template_message { FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction, :with_transaction_signatures).transaction_signatures.value.first }
+    end
+
+    transaction_input_index { template_message.transaction_input_index }
+    script_sig { template_message.script_sig }
+    message_verification { template_message.message_verification }
+    coin_join { template_message.coin_join }
   end
 end
 

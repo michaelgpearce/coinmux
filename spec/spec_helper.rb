@@ -56,6 +56,8 @@ def fake_bitcoin_network
 end
 
 def stub_bitcoin_network_for_coin_join(coin_join)
+  coin_join.stub(:transaction_object).and_return(double('transaction object double'))
+
   coin_join.transaction.value.inputs.each do |hash|
     address = hash['transaction_id'].split('-').last # we format the transaction id: "tx-address"
     change_address = coin_join.inputs.value.detect { |input| input.address == address }.change_address
@@ -68,6 +70,13 @@ def stub_bitcoin_network_for_coin_join(coin_join)
     end
 
     Coinmux::BitcoinNetwork.instance.stub(:unspent_inputs_for_address).with(address).and_return(result)
+  end
+
+  Coinmux::BitcoinNetwork.instance.stub(:transaction_input_unspent?).and_return(true)
+  Coinmux::BitcoinNetwork.instance.stub(:script_sig_valid?).and_return(true)
+
+  coin_join.transaction.value.inputs.each_with_index do |input_hash, transaction_input_index|
+    Coinmux::BitcoinNetwork.instance.stub(:build_transaction_input_script_sig).with(coin_join.transaction_object, transaction_input_index, "privkey-#{transaction_input_index}").and_return("scriptsig-#{transaction_input_index}")
   end
 end
 
@@ -93,6 +102,10 @@ module Helper
 
     @@bitcoin_info_index += 1
     bitcoin_info
+  end
+
+  def self.bitcoin_info_for_address(address)
+    @@bitcoin_infos.detect { |bitcoin_info| bitcoin_info[:address] == address }
   end
 end
 

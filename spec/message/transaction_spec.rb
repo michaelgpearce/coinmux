@@ -5,8 +5,8 @@ describe Coinmux::Message::Transaction do
     fake_data_store
   end
 
-  let(:coin_join) { FactoryGirl.build(:coin_join_message, :with_inputs, :with_message_verification, :with_outputs, :with_transaction) }
-  let(:template_message) { coin_join.transaction.value }
+  let(:template_message) { build(:transaction_message) }
+  let(:coin_join) { template_message.coin_join }
   let(:inputs) { template_message.inputs }
   let(:outputs) { template_message.outputs }
 
@@ -39,7 +39,7 @@ describe Coinmux::Message::Transaction do
       end
 
       context "with non-hash array element" do
-        let(:inputs) { [{}, 'not a hash'] }
+        let(:inputs) { ['not a hash'] }
 
         it "is invalid" do
           expect(subject).to be_false
@@ -59,7 +59,7 @@ describe Coinmux::Message::Transaction do
       end
 
       context "with non-hash array element" do
-        let(:outputs) { [{}, 'not a hash'] }
+        let(:outputs) { ['not a hash'] }
 
         it "is invalid" do
           expect(subject).to be_false
@@ -151,7 +151,7 @@ describe Coinmux::Message::Transaction do
   describe "build" do
     subject { Coinmux::Message::Transaction.build(coin_join, inputs, outputs) }
 
-    it "builds valid input" do
+    it "builds valid transaction" do
       expect(subject.valid?).to be_true
     end
   end
@@ -174,59 +174,6 @@ describe Coinmux::Message::Transaction do
       expect(subject.valid?).to be_true
       expect(subject.inputs).to eq(message.inputs)
       expect(subject.outputs).to eq(message.outputs)
-    end
-  end
-  
-  context "retrieve_minimum_unspent_transaction_inputs" do
-    let(:message) { template_message }
-    let(:unspent_inputs) do
-      {
-        { id: "a", index: 4 } => 10,
-        { id: "b", index: 0 } => 20,
-        { id: "c", index: 3 } => 15,
-      }
-    end
-
-    subject { message.send(:retrieve_minimum_unspent_transaction_inputs, unspent_inputs, minimum_amount) }
-
-    context "with minimum_amount less than largest transaction" do
-      let(:minimum_amount) { 15 }
-
-      it "retrieves returns only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
-      end
-    end
-
-    context "with minimum_amount equal largest transaction" do
-      let(:minimum_amount) { 20 }
-
-      it "retrieves only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
-      end
-    end
-
-    context "with minimum_amount greater than largest transaction" do
-      let(:minimum_amount) { 25 }
-
-      it "retrieves largest two transactions" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }])
-      end
-    end
-
-    context "with minimum_amount equal all transactions" do
-      let(:minimum_amount) { 45 }
-
-      it "retrieves only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }, { id: "a", index: 4, amount: 10 }])
-      end
-    end
-
-    context "with minimum_amount greater than all transactions" do
-      let(:minimum_amount) { 46 }
-
-      it "raises error" do
-        expect { subject }.to raise_error(Coinmux::Error)
-      end
     end
   end
 end

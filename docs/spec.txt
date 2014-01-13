@@ -57,7 +57,7 @@ MessageVerification:
 # MessageVerification is created by the following:
 # 1. Decrypt my MessageVerification#EncryptedSecretKeys for my Inputs#Address using private key of Inputs#MessagePublicKey to get secret key for MessageVerification#EncryptedMessageIdentifier.
 # 2. Decrypt MessageVerification#EncryptedMessageIdentifier with secret key to get MessageVerification#MessageIdentifier used for Outputs#MessageVerification.
-# 3. Ouputs#MessageVerifcation is the SHA256 Hash of ("${MessageVerification#MessageIdentifier}:output:${Outputs#Address}") to show knowledge of MessageVerification#MessageIdentifier.
+# 3. Ouputs#MessageVerifcation is the SHA256 Hash of ("output:${MessageVerification#MessageIdentifier}:${Outputs#Address}") to show knowledge of MessageVerification#MessageIdentifier.
 #
 # Note: it is possible for a participant to create multiple Outputs with different addresses and the Outputs will have a valid MessageVerification since all Participants share the same MessageIdentifier. This will cause the Director to create a transaction that not all Participants will sign since the Participant will not see his output address in the proposed transaction.
 Outputs:
@@ -100,11 +100,10 @@ Transaction:
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
 # Director creates transaction, polls for valid signatures, then sends transaction once received and validated, updating Status
+# TransactionSignatures#MessageVerifcation is the SHA256 Hash of ("transaction_signature:${MessageVerification#MessageIdentifier}:${TransactionSignatures#TransactionInputIndex}:${TransactionSignatures#ScriptSig}") to show knowledge of MessageVerification#MessageIdentifier.
 TransactionSignatures:
 {
   TransactionInputIndex: 0
-  ScriptSig: '3046... 04e3...' # this is unique for every transaction
-  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
-  # 3. Signature (Identifier + InputIndex + ScriptSig) with TransactionSignatures#MessagePublicKey to CoinJoins#MessagePublicKey
+  ScriptSig: '304604e3...==' # Base64 encoded
   MessageVerification: '123...abc'
 }

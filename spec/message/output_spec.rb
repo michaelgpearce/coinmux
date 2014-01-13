@@ -53,7 +53,7 @@ describe Coinmux::Message::Output do
 
     subject { Coinmux::Message::Output.build(coin_join, address) }
 
-    it "builds valid input" do
+    it "builds valid output" do
       expect(subject.valid?).to be_true
     end
 
@@ -62,7 +62,7 @@ describe Coinmux::Message::Output do
     end
 
     it "has message verification" do
-      expect(subject.message_verification).to eq(message.build_message_verification)
+      expect(subject.message_verification).to eq(coin_join.build_message_verification(:output, address))
     end
   end
 
@@ -78,7 +78,7 @@ describe Coinmux::Message::Output do
       Coinmux::Message::Output.from_json(json, coin_join)
     end
 
-    it "creates a valid input" do
+    it "creates a valid output" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
       expect(subject.address).to eq(message.address)

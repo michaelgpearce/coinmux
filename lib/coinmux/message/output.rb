@@ -25,7 +25,7 @@ class Coinmux::Message::Output < Coinmux::Message::Base
   def message_verification_correct
     return unless director? # only the director can validation these messages; participants wait for transaction message
 
-    unless coin_join.message_verification_valid?(message_verification, :output, address)
+    unless coin_join.message_verification_valid?(:output, message_verification, address)
       errors[:message_verification] << "cannot be verified"
     end
   end

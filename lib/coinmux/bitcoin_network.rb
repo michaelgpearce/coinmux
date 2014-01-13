@@ -85,22 +85,36 @@ class Coinmux::BitcoinNetwork
 
   # @transaction [Object] Transaction returned from `#build_unsigned_transaction`
   # @input_index [Fixnum] The index of the input.
+  # @return [true, false]
+  def transaction_input_unspent?(transaction, input_index)
+    begin
+      get_unspent_tx_input(transaction, input_index)
+      true
+    rescue Coinmux::Error
+      false
+    end
+  end
+
+  # @transaction [Object] Transaction returned from `#build_unsigned_transaction`
+  # @input_index [Fixnum] The index of the input.
+  # @script_sig [String] The script_sig used for signing this index.
+  # @return [true, false]
+  def script_sig_valid?(transaction, input_index, script_sig)
+    begin
+      set_transaction_script_sig(transaction, input_index, script_sig, true)
+      true
+    rescue Coinmux::Error
+      false
+    end
+  end
+
+  # @transaction [Object] Transaction returned from `#build_unsigned_transaction`
+  # @input_index [Fixnum] The index of the input.
   # @script_sig [String] The script_sig used for signing this index.
   # @raise [Coinmux::Error]
   def sign_transaction_input(transaction, input_index, script_sig)
-    begin
-      script_sig = Script.new(script_sig.unpack('c*').to_java(:byte))
-
-      tx_input = get_unspent_tx_input(transaction, input_index)
-      tx_input.setScriptSig(script_sig)
-      tx_input.verify()
-
-      nil
-    rescue ScriptException => e
-      raise Coinmux::Error, "Unable to verify signature: #{e}"
-    rescue VerificationException => e
-      raise Coinmux::Error, "Unable to verify signature: #{e}"
-    end
+    set_transaction_script_sig(transaction, input_index, script_sig, false)
+    nil
   end
 
   # @transaction [Object] Transaction returned from `#build_unsigned_transaction` and all inputs signed with `#sign_transaction_input`
@@ -121,6 +135,26 @@ class Coinmux::BitcoinNetwork
   end
 
   private
+
+  def set_transaction_script_sig(transaction, input_index, script_sig, verify_only)
+    begin
+      script_sig = Script.new(script_sig.unpack('c*').to_java(:byte))
+
+      tx_input = get_unspent_tx_input(transaction, input_index)
+      tx_input.setScriptSig(script_sig)
+      begin
+        tx_input.verify()
+      ensure
+        tx_input.setScriptSig(nil) if verify_only
+      end
+
+      tx_input
+    rescue ScriptException => e
+      raise Coinmux::Error, "Unable to verify signature: #{e}"
+    rescue VerificationException => e
+      raise Coinmux::Error, "Unable to verify signature: #{e}"
+    end
+  end
 
   def fetch_transaction(transaction_hash)
     bytes = webbtc_get_bin("/tx/#{transaction_hash}.bin").unpack('c*').to_java(:byte)

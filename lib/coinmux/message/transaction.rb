@@ -22,57 +22,12 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
 
   private
   
-  # Retrieves the minimum number of inputs that can be used to satisfy the `coin_join#amount` requirement.
-  # @address [String] Participant address.
-  # @return [Array] Array of hashes with `:id` (transaction hash identifier), `:index` (the index of the transaction output that is unspent) and `:amount` (the unspent amount) sorted from largest amount to smallest amount.
-  # @raise [Coinmux::Error] Unable to retrieve inputs or input data invalid
-  def minimum_unspent_transaction_inputs(address)
-    @minimum_unspent_transaction_inputs_hash ||= {}
-    
-    if (inputs = @minimum_unspent_transaction_inputs_hash[address]).nil?
-      inputs = retrieve_minimum_unspent_transaction_inputs(Coinmux::BitcoinNetwork.instance.unspent_inputs_for_address(address), coin_join.amount + coin_join.participant_transaction_fee)
-
-      @minimum_unspent_transaction_inputs_hash[address] = inputs
-    end
-
-    inputs
-  end
-
-  def retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount)
-    total_amount = 0
-
-    inputs = unspent_inputs.collect do |key, amount|
-      { id: key[:id], index: key[:index], amount: amount }
-    end.sort do |left, right|
-      result = right[:amount] <=> left[:amount]
-      result = right[:id] <=> left[:id] if result == 0 # ensure always sort the same way when amounts are equal
-      result
-    end.select do |hash|
-      if total_amount < minimum_amount
-        total_amount += hash[:amount]
-        true
-      end
-    end
-
-    raise Coinmux::Error, "does not have #{minimum_amount} unspent" if total_amount < minimum_amount
-
-    inputs
-  end
-
-  def inputs_is_array_of_hashes
-    (errors[:inputs] << "is not an array" and return) unless inputs.is_a?(Array)
-
-    inputs.each do |input|
-      (errors[:inputs] << "is not a hash" and return) unless input.is_a?(Hash)
-    end
-  end
-  
   def participant_input
     @participant_input ||= coin_join.inputs.value.detect(&:created_with_build?)
   end
 
   def participant_input_transactions
-    @participant_input_transactions ||= minimum_unspent_transaction_inputs(participant_input.address)
+    @participant_input_transactions ||= coin_join.minimum_unspent_transaction_inputs(participant_input.address)
   end
 
   def participant_output_address
@@ -91,11 +46,20 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
     @participant_change_amount ||= participant_input_amount - coin_join.amount - coin_join.participant_transaction_fee
   end
 
+  def inputs_is_array_of_hashes
+    array_of_hashes_is_valid(inputs, :inputs, 'transaction_id', 'output_index')
+  end
+  
   def outputs_is_array_of_hashes
-    (errors[:outputs] << "is not an array" and return) unless outputs.is_a?(Array)
+    array_of_hashes_is_valid(outputs, :outputs, 'address', 'amount')
+  end
 
-    outputs.each do |output|
-      (errors[:outputs] << "is not a hash" and return) unless output.is_a?(Hash)
+  def array_of_hashes_is_valid(array, property, *required_keys)
+    (errors[property] << "is not an array" and return) unless array.is_a?(Array)
+
+    array.each do |element|
+      (errors[property] << "is not a hash" and return) unless element.is_a?(Hash)
+      (errors[property] << "does not have correct keys" and return) unless required_keys.sort == element.keys.sort
     end
   end
   
