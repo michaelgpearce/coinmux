@@ -30,7 +30,7 @@ class Coinmux::StateMachine::Director
     state :complete do
     end
     
-    event :fail do
+    event :failure do
       transition any => :failed
     end
     
@@ -128,7 +128,7 @@ class Coinmux::StateMachine::Director
     if block_given?
       data_store_facade.insert(data_store_identifier, message.to_json) do |event|
         if event.error
-          fail
+          failure
         else
           yield
         end
