@@ -1,4 +1,4 @@
-class Coinmux::CoinJoin < Coinmux::Base
+class Gui::Model::CoinJoin < Gui::Model::Base
   add_attributes :created_at, :amount, :inputs, :outputs, :change_output
   
   validate :has_inputs?

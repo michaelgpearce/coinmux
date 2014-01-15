@@ -1,6 +1,5 @@
 $:.unshift(File.expand_path("../..", __FILE__))
 
-require 'swt'
 require 'active_model'
 require 'json'
 require 'state_machine'
@@ -9,8 +8,6 @@ require 'freenet_hash'
 require 'singleton'
 require 'openssl'
 require 'digest/sha2'
-require 'swt'
-require 'glimmer'
 require 'base64'
 require 'set'
 
@@ -60,10 +57,4 @@ require 'lib/coinmux/state_machine/event'
 require 'lib/coinmux/state_machine/director'
 require 'lib/coinmux/state_machine/participant'
 
-require 'app/models/coinmux/base'
-require 'app/models/coinmux/transaction'
-require 'app/models/coinmux/input'
-require 'app/models/coinmux/output'
-require 'app/models/coinmux/coin_join'
-
-require 'app/views/coinmux/application'
+require 'lib/coinmux/application'

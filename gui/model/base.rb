@@ -1,4 +1,4 @@
-class Coinmux::Base
+class Gui::Model::Base
   include ActiveModel::Model
   
   class << self

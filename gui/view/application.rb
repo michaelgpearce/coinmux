@@ -1,4 +1,4 @@
-class Coinmux::Application
+class Gui::View::Application
   include Glimmer, Singleton
   
   include_package 'org.eclipse.swt'
@@ -63,7 +63,7 @@ class Coinmux::Application
   end
   
   def current_coin_join
-    @current_coin_join ||= Coinmux::CoinJoin.new
+    @current_coin_join ||= Gui::Model::CoinJoin.new
   end
   
   def home_tab_item
@@ -85,7 +85,7 @@ class Coinmux::Application
   end
   
   def new_input
-    @new_input ||= Coinmux::Input.new
+    @new_input ||= Gui::Model::Input.new
   end
   
   def coin_join_transaction
@@ -107,7 +107,7 @@ class Coinmux::Application
           button {
             text "Add"
             on_widget_selected {
-              input = Coinmux::Input.find_by_private_key(new_input.private_key)
+              input = Gui::Model::Input.find_by_private_key(new_input.private_key)
               if input.valid?
                 current_coin_join.inputs << input
                 

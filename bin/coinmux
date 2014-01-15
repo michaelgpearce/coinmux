@@ -1,0 +1,19 @@
+#!/usr/bin/env /bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
+
+if [[ $OSTYPE == darwin* ]]; then
+  OS_OPTIONS='-J-XstartOnFirstThread -J-Xdock:name=Coinmux'
+fi
+
+if [[ "${COINMUX_ENV}." == "." ]]; then
+  COINMUX_ENV='production'
+fi
+
+if [[ "$1." == "." ]]; then
+  COINMUX_ENV=${COINMUX_ENV} bundle exec ruby ${OS_OPTIONS} ./coinmux_gui.rb
+else
+  echo Arguments not supported.
+fi
+

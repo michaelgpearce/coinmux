@@ -1,4 +1,4 @@
-class Coinmux::Input < Coinmux::Base
+class Gui::Model::Input < Gui::Model::Base
   add_attributes :amount, :bitcoin_address, :private_key, :public_key, :transactions
 
   def initialize(attrs = {})
@@ -12,7 +12,7 @@ class Coinmux::Input < Coinmux::Base
     def find_by_private_key(private_key)
       public_key = get_public_key(private_key)
       bitcoin_address = get_bitcoin_address(public_key)
-      unspent_transactions = Coinmux::Transaction.find_all_unspent_by_bitcoin_address(bitcoin_address)
+      unspent_transactions = Gui::Model::Transaction.find_all_unspent_by_bitcoin_address(bitcoin_address)
       
       self.new(
         :amount => unspent_transactions.collect(&:amount).sum,
