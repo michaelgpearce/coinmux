@@ -1,7 +1,7 @@
 ---
 development:
   bitcoin_network: 'testnet3'
-  coin_join_uri: 'coinjoin://coinmux/freenet?request_key=TODO&insert_key=TODO'
+  coin_join_uri: 'coinjoin://coinmux/p2p?pub=1234&priv=abcd'
   webbtc_host: 'http://test.webbtc.com'
 
 test:

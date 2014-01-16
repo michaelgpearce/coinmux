@@ -1,19 +1,43 @@
-#!/usr/bin/env /bin/bash
+#!/usr/bin/env bundle exec ruby
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR
+require 'rbconfig'
 
-if [[ $OSTYPE == darwin* ]]; then
-  OS_OPTIONS='-J-XstartOnFirstThread -J-Xdock:name=Coinmux'
-fi
+def os
+  @os ||= (
+    host_os = RbConfig::CONFIG['host_os']
+    case host_os
+    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+      :windows
+    when /darwin|mac os/
+      :macosx
+    when /linux/
+      :linux
+    when /solaris|bsd/
+      :unix
+    else
+      raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+    end
+  )
+end
 
-if [[ "${COINMUX_ENV}." == "." ]]; then
-  COINMUX_ENV='production'
-fi
+args = []
 
-if [[ "$1." == "." ]]; then
-  COINMUX_ENV=${COINMUX_ENV} bundle exec ruby ${OS_OPTIONS} ./coinmux_gui.rb
+if os == :macosx
+  args << '-J-XstartOnFirstThread'
+  args << '-J-Xdock:name=Coinmux'
+end
+
+env = {
+  'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'production'
+}
+
+args = %w(exec ruby) + args
+if ARGV.length == 0
+  args << './bin/coinmux_gui.rb'
+  system(env, "bundle", *args)
 else
-  echo Arguments not supported.
-fi
+  args << './bin/coinmux_cli.rb'
+  args += ARGV
+  system(env, "bundle", *args)
+end
 

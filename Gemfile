@@ -6,12 +6,15 @@ gem 'activemodel', '4.0.1'
 gem 'activesupport', '4.0.1'
 gem 'state_machine', '1.2.0'
 gem 'hashie', '2.0.5'
-gem 'freenet_hash', :path => '../freenet_hash' #'0.0.1'
 gem 'httpclient', '2.3.4.1'
 
 group :gui do
   gem 'swt', '0.18'
   gem 'glimmer', '0.1.3'
+end
+
+group :cli do
+  gem 'slop', '3.4.7'
 end
 
 group :development do

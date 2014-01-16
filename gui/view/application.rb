@@ -47,7 +47,7 @@ class Gui::View::Application
     @intervals = Set.new
     
     @shell = shell {
-      text "Coinmux - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer"
+      text Coinmux::BANNER
       
       tab_folder {
         tab_item {
