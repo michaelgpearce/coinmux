@@ -28,7 +28,7 @@ if os == :macosx
 end
 
 env = {
-  'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'production'
+  'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'development' # TODO: This should be production by default
 }
 
 args = %w(exec ruby) + args
