@@ -64,11 +64,11 @@ FactoryGirl.define do
         end
 
         outputs = coin_join.outputs.value.each_with_index.collect do |output|
-          { 'address' => output.address, 'amount' => coin_join.amount }
+          { 'address' => output.address, 'amount' => coin_join.amount, 'identifier' => output.transaction_output_identifier }
         end
 
         outputs += coin_join.inputs.value.each_with_index.collect do |input|
-          { 'address' => input.change_address, 'amount' => rand(1..4) * Coinmux::BitcoinUtil::SATOSHIS_PER_BITCOIN - coin_join.participant_transaction_fee }
+          { 'address' => input.change_address, 'amount' => rand(1..4) * Coinmux::BitcoinUtil::SATOSHIS_PER_BITCOIN - coin_join.participant_transaction_fee, 'identifier' => input.change_transaction_output_identifier }
         end
 
         coin_join.transaction.insert(FactoryGirl.build(:transaction_message, :coin_join => coin_join, :inputs => inputs, :outputs => outputs))
@@ -98,6 +98,7 @@ FactoryGirl.define do
     private_key { bitcoin_info[:private_key] }
     signature { bitcoin_info[:signature] }
     change_address { Helper.next_bitcoin_info[:address] }
+    change_transaction_output_identifier { rand.to_s }
     message_private_key { message_keys.first }
     message_public_key { message_keys.last }
 
@@ -110,7 +111,7 @@ FactoryGirl.define do
     end
 
     address { bitcoin_info[:address] }
-
+    transaction_output_identifier { rand.to_s }
     coin_join { association :coin_join_message, strategy: :build, identifier: bitcoin_info[:identifier] }
 
     after(:build) do |output|

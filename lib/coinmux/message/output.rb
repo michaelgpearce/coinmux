@@ -1,7 +1,7 @@
 class Coinmux::Message::Output < Coinmux::Message::Base
-  add_properties :address, :message_verification
+  add_properties :address, :message_verification, :transaction_output_identifier
   
-  validates :address, :message_verification, :presence => true
+  validates :address, :message_verification, :transaction_output_identifier, :presence => true
   validate :message_verification_correct, :if => :message_verification
   validate :address_valid, :if => :address
  
@@ -10,6 +10,7 @@ class Coinmux::Message::Output < Coinmux::Message::Base
       message = super(coin_join)
 
       message.address = address
+      message.transaction_output_identifier = digest_facade.random_identifier
       message.message_verification = message.build_message_verification
 
       message

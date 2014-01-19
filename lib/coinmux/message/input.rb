@@ -1,9 +1,9 @@
 class Coinmux::Message::Input < Coinmux::Message::Base
-  add_properties :message_public_key, :address, :change_address, :signature
+  add_properties :message_public_key, :address, :change_address, :change_transaction_output_identifier, :signature
   
   attr_accessor :message_private_key, :private_key
   
-  validates :message_public_key, :address, :signature, :presence => true
+  validates :message_public_key, :address, :signature, :change_transaction_output_identifier, :presence => true
   validate :signature_correct
   validate :change_address_valid, :if => :change_address
   validate :change_amount_not_more_than_transaction_fee, :unless => :change_address
@@ -17,6 +17,9 @@ class Coinmux::Message::Input < Coinmux::Message::Base
       message.private_key = private_key_hex
       message.address = bitcoin_crypto_facade.address_for_private_key!(private_key_hex)
       message.signature = bitcoin_crypto_facade.sign_message!(coin_join.identifier, private_key_hex)
+
+      message.change_address = change_address
+      message.change_transaction_output_identifier = digest_facade.random_identifier
 
       message
     end

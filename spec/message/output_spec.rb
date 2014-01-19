@@ -61,6 +61,10 @@ describe Coinmux::Message::Output do
       expect(subject.address).to eq(address)
     end
 
+    it "has random identifier for transaction_output_identifier" do
+      expect(subject.transaction_output_identifier).to_not be_nil
+    end
+
     it "has message verification" do
       expect(subject.message_verification).to eq(coin_join.build_message_verification(:output, address))
     end
@@ -70,6 +74,7 @@ describe Coinmux::Message::Output do
     let(:json) do
       {
         address: message.address,
+        transaction_output_identifier: message.transaction_output_identifier,
         message_verification: message.message_verification,
       }.to_json
     end
@@ -82,6 +87,7 @@ describe Coinmux::Message::Output do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
       expect(subject.address).to eq(message.address)
+      expect(subject.transaction_output_identifier).to eq(message.transaction_output_identifier)
       expect(subject.message_verification).to eq(message.message_verification)
     end
   end

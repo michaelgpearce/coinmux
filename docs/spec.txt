@@ -34,6 +34,7 @@ Inputs:
   MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey; ensure uniqueness
   Address: "1abc..." # ensure uniqueness
   ChangeAddress: "1abc" # Null if no change
+  ChangeTransactionOutputIdentifier: 67890 # A unique identifier to ensure my change output exists in the transaction
   Verification: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
 }
 
@@ -64,6 +65,7 @@ Outputs:
 {
   Address: "1abc..."
   MessageVerification: '123...abc'
+  TransactionOutputIdentifier: 12345 # A unique identifier to ensure my output exists in the transaction when multiple outputs going to the same address (https://bitcointalk.org/index.php?topic=279249.msg4577566#msg4577566)
 }
 
 # Readable by anyone, writeable only by Director
@@ -87,10 +89,12 @@ Transaction:
     {
       Address: "1abc..." # coin join addresses
       Amount: 200000000
+      Identifier: 12345
     },
     {
       Address: "1xyz..." # change addresses
       Amount: 2345
+      Identifier: 67890
     },
     ...
   ]

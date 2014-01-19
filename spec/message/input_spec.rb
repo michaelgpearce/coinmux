@@ -11,6 +11,7 @@ describe Coinmux::Message::Input do
   let(:private_key) { template_message.private_key }
   let(:signature) { template_message.signature }
   let(:change_address) { template_message.change_address }
+  let(:change_transaction_output_identifier) { template_message.change_transaction_output_identifier }
   let(:coin_join) { template_message.coin_join }
   
   describe "validations" do
@@ -20,6 +21,7 @@ describe Coinmux::Message::Input do
         private_key: private_key,
         signature: signature,
         change_address: change_address,
+        change_transaction_output_identifier: change_transaction_output_identifier,
         coin_join: coin_join)
     end
 
@@ -54,7 +56,7 @@ describe Coinmux::Message::Input do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Input.build(coin_join, private_key) }
+    subject { Coinmux::Message::Input.build(coin_join, private_key, change_address) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true
@@ -69,6 +71,14 @@ describe Coinmux::Message::Input do
       encrypted_message = pki_facade.private_encrypt(subject.message_private_key, message)
       expect(pki_facade.public_decrypt(subject.message_public_key, encrypted_message)).to eq(message)
     end
+
+    it "has change address" do
+      expect(subject.change_address).to eq(change_address)
+    end
+
+    it "has random identifier for change_transaction_output_identifier" do
+      expect(subject.change_transaction_output_identifier).to_not be_nil
+    end
   end
 
   describe "#from_json" do
@@ -78,6 +88,7 @@ describe Coinmux::Message::Input do
         message_public_key: message.message_public_key,
         address: message.address,
         change_address: message.change_address,
+        change_transaction_output_identifier: message.change_transaction_output_identifier,
         signature: message.signature
       }.to_json
     end

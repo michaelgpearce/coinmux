@@ -26,16 +26,12 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
     @participant_input ||= coin_join.inputs.value.detect(&:created_with_build?)
   end
 
+  def participant_output
+    @participant_output ||= coin_join.outputs.value.detect(&:created_with_build?)
+  end
+
   def participant_input_transactions
     @participant_input_transactions ||= coin_join.minimum_unspent_transaction_inputs(participant_input.address)
-  end
-
-  def participant_output_address
-    @participant_output_address ||= coin_join.outputs.value.detect(&:created_with_build?).address
-  end
-
-  def participant_change_address
-    @participant_change_address ||= coin_join.inputs.value.detect(&:created_with_build?).change_address
   end
 
   def participant_input_amount
@@ -51,7 +47,7 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   end
   
   def outputs_is_array_of_hashes
-    array_of_hashes_is_valid(outputs, :outputs, 'address', 'amount')
+    array_of_hashes_is_valid(outputs, :outputs, 'address', 'amount', 'identifier')
   end
 
   def array_of_hashes_is_valid(array, property, *required_keys)
@@ -102,22 +98,26 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   def has_correct_participant_outputs
     return unless errors[:outputs].empty?
 
-    if outputs.detect { |output| output['address'] == participant_output_address && output['amount'] == coin_join.amount }.nil?
-      errors[:outputs] << "does not have output to #{participant_output_address} for #{coin_join.amount}"
+    if !output_exists?(participant_output.address, coin_join.amount, participant_output.transaction_output_identifier)
+      errors[:outputs] << "does not have output to #{participant_output.address} for #{coin_join.amount}"
       return
     end
 
-    if participant_change_address.nil?
+    if participant_input.change_address.nil?
       # this shouldn't ever happen here, but let's make sure we don't send any change as miner fees
       if participant_change_amount != 0
         errors[:outputs] << "has no change address for amount #{participant_change_amount}"
         return
       end
     else
-      if outputs.detect { |output| output['address'] == participant_change_address && output['amount'] == participant_change_amount }.nil?
-        errors[:outputs] << "does not have output to #{participant_change_address} for #{participant_change_amount}"
+      if !output_exists?(participant_input.change_address, participant_change_amount, participant_input.change_transaction_output_identifier)
+        errors[:outputs] << "does not have output to #{participant_input.change_address} for #{participant_change_amount}"
         return
       end
     end
+  end
+
+  def output_exists?(address, amount, identifier)
+    !!outputs.detect { |output| output['address'] == address && output['amount'] == amount && output['identifier'] == identifier }
   end
 end
