@@ -123,7 +123,7 @@ FactoryGirl.define do
       current_block_height_and_nonce { Coinmux::BitcoinNetwork.instance.current_block_height_and_nonce }
     end
 
-    status "Complete"
+    status "completed"
     transaction_id { "valid_transaction_id:#{rand}" }
     updated_at { { 'block_height' => current_block_height_and_nonce.first, 'nonce' => current_block_height_and_nonce.last } }
 

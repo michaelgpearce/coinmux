@@ -2,7 +2,6 @@ $:.unshift(File.expand_path("../..", __FILE__))
 
 require 'active_model'
 require 'json'
-require 'state_machine'
 require 'hashie'
 require 'singleton'
 require 'openssl'

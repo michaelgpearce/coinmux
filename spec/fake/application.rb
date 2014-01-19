@@ -2,7 +2,6 @@ class Coinmux::Fake::Application
   class Invocation < Hashie::Dash
     property :block
     property :time
-    property :interval
     property :seconds
     property :interval_identifier
 

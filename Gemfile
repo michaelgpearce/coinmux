@@ -4,7 +4,6 @@ gem 'bouncy-castle-java', '1.5.0147'
 gem 'jruby-openssl', '0.9.4'
 gem 'activemodel', '4.0.1'
 gem 'activesupport', '4.0.1'
-gem 'state_machine', '1.2.0'
 gem 'hashie', '2.0.5'
 gem 'httpclient', '2.3.4.1'
 

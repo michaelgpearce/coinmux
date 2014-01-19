@@ -17,9 +17,27 @@ class Coinmux::BitcoinNetwork
   import 'com.google.bitcoin.net.discovery.DnsDiscovery'
   import 'org.spongycastle.util.encoders.Hex'
 
+  # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
+  # @return [Coinmux::Event] Data is a hash `{block_height: 1234, nonce: 1234567}`. Only returns when no callback.
+  # @raise [Coinmux::Error] Only raises when no callback.
   def current_block_height_and_nonce(&callback)
-    raise "TODO"
-    # http://blockchain.info/latestblock
+    # TODO
+  # http://blockchain.info/latestblock
+  #   https://blockchain.info/latestblock
+  #   {
+  # "hash":"0000000000000001fae0eebbecfa1c4bd08654093e43389c6b90ec46425c5819",
+  # "time":1390071687,
+  # "block_index":461409,
+  # "height":281183,
+  # "txIndexes":[108279892,108279900]
+  #   }
+    Thread.new do
+      begin
+        yield(Coinmux::Event.new(data: {block_height: 1234, nonce: 1234567}))
+      rescue Exception => e
+        puts e, e.backtrace
+      end
+    end
   end
   
   def block_exists?(block_height, nonce, &callback)
@@ -34,8 +52,8 @@ class Coinmux::BitcoinNetwork
 
   # @address [String] Input address.
   # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
-  # @return [Hash] Hash with keys being `{:id: 'transaction hash identifier', :index: 'unspent transaction output index'}` and the value being the unspent amount.
-  # @raise [Coinmux::Error] when no callback
+  # @return [Hash] Hash with keys being `{id: 'transaction hash identifier', index: 'unspent transaction output index'}` and the value being the unspent amount. Only returns when no callback.
+  # @raise [Coinmux::Error] Only raises when no callback
   def unspent_inputs_for_address(address, &callback)
     exec(callback) do
       data = webbtc_get_json("/address/#{address}.json")
@@ -47,8 +65,8 @@ class Coinmux::BitcoinNetwork
   # @unspent_inputs [Array] Array of hashes with keys being `:id` (transaction hash identifier), `:index` (the index of the unspent output).
   # @outputs [Array] Array of hashes with keys being `:address` and `:amount`.
   # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
-  # @return [Object] A transaction with inputs linked to the transactions from `unspent_transaction_input_hashes` in the order specified.
-  # @raise [Coinmux::Error] when no callback
+  # @return [Object] A transaction with inputs linked to the transactions from `unspent_transaction_input_hashes` in the order specified. Only returns when no callback.
+  # @raise [Coinmux::Error] Only raises when no callback
   def build_unsigned_transaction(unspent_inputs, outputs, &callback)
     exec(callback) do
       Transaction.new(network_params).tap do |transaction|
@@ -119,8 +137,8 @@ class Coinmux::BitcoinNetwork
 
   # @transaction [Object] Transaction returned from `#build_unsigned_transaction` and all inputs signed with `#sign_transaction_input`
   # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
-  # @return [NilClass] nil
-  # @raise [Coinmux::Error] when no callback
+  # @return [String] The transaction hash. Only returns when no callback.
+  # @raise [Coinmux::Error] Only raises when no callback
   def post_transaction(transaction, &callback)
     exec(callback) do
       peer_group = PeerGroup.new(network_params)
@@ -130,7 +148,7 @@ class Coinmux::BitcoinNetwork
       peer_group.broadcastTransaction(transaction).get()
       peer_group.stopAndWait()
 
-      nil
+      transaction.getHash().to_s
     end
   end
 

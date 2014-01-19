@@ -19,8 +19,8 @@ CoinJoins:
 # Updatable
 Status:
 {
-  Status: "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Complete"
-  TransactionId: null | "123...abc" # transaction indicates complete and should be published to block chain
+  Status: "Initializing" | "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Completed"
+  TransactionId: null | "123...abc" # transaction id available during while waiting for confirmations or completed
   UpdatedAt: {
     BlockHeight: 270794
     Nonce: 2617132268

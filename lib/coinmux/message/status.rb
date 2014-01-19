@@ -1,5 +1,5 @@
 class Coinmux::Message::Status < Coinmux::Message::Base
-  STATUSES_REQUIRING_TRANSACTION_ID = %w(WaitingForConfirmation Complete)
+  STATUSES_REQUIRING_TRANSACTION_ID = %w(waiting_for_confirmation completed)
 
   property :status
   property :transaction_id
@@ -7,17 +7,15 @@ class Coinmux::Message::Status < Coinmux::Message::Base
   
   validates :status, :updated_at, :presence => true
   validate :transaction_id_presence
-  validate :transaction_confirmed, :if => :is_complete?
+  validate :transaction_confirmed, :if => :is_completed?
   validate :status_valid
   validate :updated_at_valid
 
   class << self
-    def build(coin_join, status, transaction_id = nil)
+    def build(coin_join, status, block_height, nonce, transaction_id = nil)
       message = super(coin_join)
       message.status = status
       message.transaction_id = transaction_id
-
-      block_height, nonce = Coinmux::BitcoinNetwork.instance.current_block_height_and_nonce
       message.updated_at = {
         'block_height' => block_height,
         'nonce' => nonce
@@ -38,11 +36,11 @@ class Coinmux::Message::Status < Coinmux::Message::Base
   end
 
   def is_waiting_for_confirmation?
-    status == 'WaitingForConfirmation'
+    status == 'waiting_for_confirmation'
   end
 
-  def is_complete?
-    status == 'Complete'
+  def is_completed?
+    status == 'completed'
   end
 
   def status_valid

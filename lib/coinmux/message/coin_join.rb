@@ -21,7 +21,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
-    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5, participant_transaction_fee = (DEFAULT_TRANSACTION_FEE / participants).to_i)
+    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5, participant_transaction_fee = (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / participants).to_i)
       message = super(nil)
 
       message.version = VERSION

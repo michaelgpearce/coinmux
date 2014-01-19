@@ -85,8 +85,8 @@ describe Coinmux::Message::Status do
     end
 
     describe "#transaction_confirmed" do
-      context "when in Complete state" do
-        let(:status) { 'Complete' }
+      context "when in completed state" do
+        let(:status) { 'completed' }
 
         context "with confirmed transaction" do
           it "is valid" do
@@ -147,7 +147,7 @@ describe Coinmux::Message::Status do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
+    subject { Coinmux::Message::Status.build(coin_join, status, current_block_height, current_nonce, transaction_id) }
 
     it "builds valid status" do
       expect(subject.valid?).to be_true
