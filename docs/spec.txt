@@ -1,100 +1,100 @@
 # public insert_key and request_key
-CoinJoins:
+coin_joins:
 {
-  Version: 1
-  Identifier: 12345 # Random value used for Inputs#Verification
-  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey
-  Participants: 5 # number of inputs / outputs
-  Amount: 200000000 # in satoshi, n^2
-  ParticipantTransactionFee: 10000 # each participant must pay this fee (for now 0.0005 / num participants)
-  Inputs: "insert_and_request_key"
-  MessageVerification: "request_key"
-  Outputs: "insert_and_request_key"
-  Transaction: "request_key"
-  TransactionSignatures: "insert_and_request_key"
-  Status: "request_key"
+  version: 1
+  identifier: 12345 # Random value used for inputs#verification
+  message_public_key: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other message_public_key
+  participants: 5 # number of inputs / outputs
+  amount: 200000000 # in satoshi, n^2
+  participant_transaction_fee: 10000 # each participant must pay this fee (for now 0.0005 / num participants)
+  inputs: "insert_and_request_key"
+  message_verification: "request_key"
+  outputs: "insert_and_request_key"
+  transaction: "request_key"
+  transaction_signatures: "insert_and_request_key"
+  status: "request_key"
 }
 
 # Updated with status information
 # Updatable
-Status:
+status:
 {
-  Status: "Initializing" | "WaitingForInputs" | "WaitingForOutputs" | "WaitingForSignatures" | "WaitingForConfirmation" | "Failed" | "Completed"
-  TransactionId: null | "123...abc" # transaction id available during while waiting for confirmations or completed
-  UpdatedAt: {
-    BlockHeight: 270794
-    Nonce: 2617132268
+  status: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "waiting_for_confirmation" | "failed" | "completed"
+  transaction_id: null | "123...abc" # transaction id available during while waiting for confirmations or completed
+  updated_at: {
+    block_height: 270794
+    nonce: 2617132268
   }
 }
 
 # Public insert_key and request_key
 # Every client posts all of their input individually
-Inputs:
+inputs:
 {
-  MessagePublicKey: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other MessagePublicKey; ensure uniqueness
-  Address: "1abc..." # ensure uniqueness
-  ChangeAddress: "1abc" # Null if no change
-  ChangeTransactionOutputIdentifier: 67890 # A unique identifier to ensure my change output exists in the transaction
-  Verification: "123...abc" # Signature with (PrivateKey, CoinJoins#Identifier) to show ownership of address
+  message_public_key: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other message_public_key; ensure uniqueness
+  address: "1abc..." # ensure uniqueness
+  change_address: "1abc" # Null if no change
+  change_transaction_output_identifier: 67890 # A unique identifier to ensure my change output exists in the transaction
+  verification: "123...abc" # Signature with (private_key, coin_joins#identifier) to show ownership of address
 }
 
 # Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
 # Only accepted inputs are given message verification
-# MessageIdentifier is encrypted by a shared key to ensure that Director cannot link inputs to outputs by giving each input a different identifier. This shared key is encrypted uniquely for each Input using its Inputs#MessagePublicKey
+# message_identifier is encrypted by a shared key to ensure that Director cannot link inputs to outputs by giving each input a different identifier. This shared key is encrypted uniquely for each input using its inputs#message_public_key
 # Write-Once
-MessageVerification:
+message_verification:
 {
-  EncryptedMessageIdentifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
-  EncryptedSecretKeys: {
-    'Inputs#Addess': '123...abc', # secret key for #EncryptedMessageIdentifier encrypted PKI for each Inputs#MessagePublicKey that will be in transaction
+  encrypted_message_identifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
+  encrypted_secret_keys: {
+    'inputs#addess': '123...abc', # secret key for #encrypted_message_identifier encrypted PKI for each inputs#message_public_key that will be in transaction
     ...
   }
 }
 
 # Public insert_key and request_key
 # Every client posts all of their outputs individually
-# This scheme maintains no link between the Inputs and the Outputs and ensures that we only add outputs owned by an input.
+# This scheme maintains no link between the inputs and the outputs and ensures that we only add outputs owned by an input.
 #
-# MessageVerification is created by the following:
-# 1. Decrypt my MessageVerification#EncryptedSecretKeys for my Inputs#Address using private key of Inputs#MessagePublicKey to get secret key for MessageVerification#EncryptedMessageIdentifier.
-# 2. Decrypt MessageVerification#EncryptedMessageIdentifier with secret key to get MessageVerification#MessageIdentifier used for Outputs#MessageVerification.
-# 3. Ouputs#MessageVerifcation is the SHA256 Hash of ("output:${MessageVerification#MessageIdentifier}:${Outputs#Address}") to show knowledge of MessageVerification#MessageIdentifier.
+# message_verification is created by the following:
+# 1. Decrypt my message_verification#encrypted_secret_keys for my inputs#address using private key of inputs#message_public_key to get secret key for message_verification#encrypted_message_identifier.
+# 2. Decrypt message_verification#encrypted_message_identifier with secret key to get message_verification#message_identifier used for outputs#message_verification.
+# 3. outputs#message_verifcation is the SHA256 Hash of ("output:${message_verification#message_identifier}:${outputs#address}") to show knowledge of message_verification#message_identifier.
 #
-# Note: it is possible for a participant to create multiple Outputs with different addresses and the Outputs will have a valid MessageVerification since all Participants share the same MessageIdentifier. This will cause the Director to create a transaction that not all Participants will sign since the Participant will not see his output address in the proposed transaction.
-Outputs:
+# Note: it is possible for a participant to create multiple Outputs with different addresses and the outputs will have a valid message_verification since all Participants share the same message_identifier. This will cause the Director to create a transaction that not all Participants will sign since the Participant will not see his output address in the proposed transaction.
+outputs:
 {
-  Address: "1abc..."
-  MessageVerification: '123...abc'
-  TransactionOutputIdentifier: 12345 # A unique identifier to ensure my output exists in the transaction when multiple outputs going to the same address (https://bitcointalk.org/index.php?topic=279249.msg4577566#msg4577566)
+  address: "1abc..."
+  message_verification: '123...abc'
+  transaction_output_identifier: 12345 # A unique identifier to ensure my output exists in the transaction when multiple outputs going to the same address (https://bitcointalk.org/index.php?topic=279249.msg4577566#msg4577566)
 }
 
 # Readable by anyone, writeable only by Director
 # Director publishes only once a transaction that meets its criteria (correct number of inputs and verified outputs)
-# Participant only creates TransactionSignatures when has correct number of inputs/outputs and correctly contains all of his inputs and outputs
+# Participant only creates transaction_signatures when has correct number of inputs/outputs and correctly contains all of his inputs and outputs
 # Write-Once
-Transaction:
+transaction:
 {
-  Inputs: [
+  inputs: [
     {
-      TransactionId: "123...abc"
-      OutputIndex: 0
+      transaction_id: "123...abc"
+      output_index: 0
     },
     {
-      TransactionId: "789...xyz"
-      OutputIndex: 0
+      transaction_id: "789...xyz"
+      output_index: 0
     },
     ...
   ]
-  Outputs: [
+  outputs: [
     {
-      Address: "1abc..." # coin join addresses
-      Amount: 200000000
-      Identifier: 12345
+      address: "1abc..." # coin join addresses
+      amount: 200000000
+      identifier: 12345
     },
     {
-      Address: "1xyz..." # change addresses
-      Amount: 2345
-      Identifier: 67890
+      address: "1xyz..." # change addresses
+      amount: 2345
+      identifier: 67890
     },
     ...
   ]
@@ -103,11 +103,11 @@ Transaction:
 # Public insert_key and request_key
 # Signatures occur in order of inputs.
 # For each of my inputs, create full transaction, sign input, and publish here
-# Director creates transaction, polls for valid signatures, then sends transaction once received and validated, updating Status
-# TransactionSignatures#MessageVerifcation is the SHA256 Hash of ("transaction_signature:${MessageVerification#MessageIdentifier}:${TransactionSignatures#TransactionInputIndex}:${TransactionSignatures#ScriptSig}") to show knowledge of MessageVerification#MessageIdentifier.
-TransactionSignatures:
+# Director creates transaction, polls for valid signatures, then sends transaction once received and validated, updating status
+# transaction_signatures#message_verifcation is the SHA256 Hash of ("transaction_signature:${message_verification#message_identifier}:${transaction_signatures#transaction_input_index}:${transaction_signatures#script_sig}") to show knowledge of message_verification#message_identifier.
+transaction_signatures:
 {
-  TransactionInputIndex: 0
-  ScriptSig: '304604e3...==' # Base64 encoded
-  MessageVerification: '123...abc'
+  transaction_input_index: 0
+  script_sig: '304604e3...==' # Base64 encoded
+  message_verification: '123...abc'
 }
