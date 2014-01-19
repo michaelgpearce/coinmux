@@ -13,6 +13,7 @@ v0.2 - Functional Beta
 * Support multiple input addresses during CoinJoin (proper fee calculation required)
 
 v0.3 - Improve deterrence of bad actors
+* Ensure that all participants are active (signature of current Director status?)
 * Add proof of work for posting inputs / creating new CoinJoin (?)
 * Require minimum confirmations for input address (?)
 * Blacklist of "bad addresses" (probably not workable)
