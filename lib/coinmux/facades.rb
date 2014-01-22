@@ -31,6 +31,26 @@ module Coinmux::Facades
     def pki_facade
       Coinmux::PKI.instance
     end
+
+    def debug(*messages)
+      Coinmux::Logger.instance.debug(*messages)
+    end
+
+    def info(*messages)
+      Coinmux::Logger.instance.info(*messages)
+    end
+
+    def warn(*messages)
+      Coinmux::Logger.instance.warn(*messages)
+    end
+
+    def error(*messages)
+      Coinmux::Logger.instance.error(*messages)
+    end
+
+    def fatal(*messages)
+      Coinmux::Logger.instance.fatal(*messages)
+    end
   end
 
   def self.included(base)

@@ -24,6 +24,14 @@ module Coinmux
   end
   module StateMachine
   end
+
+  def self.root
+    @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
+  end
+
+  def self.env
+    ENV['COINMUX_ENV'] || 'development'
+  end
 end
 
 require 'lib/coinmux/version'
