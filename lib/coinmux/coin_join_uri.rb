@@ -1,5 +1,5 @@
 class Coinmux::CoinJoinUri
-  VALID_NETWORKS = %w(tomp2p memory file)
+  VALID_NETWORKS = %w(p2p filesystem test)
 
   attr_accessor :identifier, :application, :network
 

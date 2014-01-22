@@ -19,8 +19,9 @@ module Coinmux::Facades
     def data_store_facade
       return @data_store_facade if @data_store_facade
 
-      data_store_name = Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).network
-      @data_store_facade = Coinmux::DataStore.const_get(data_store_name.capitalize).instance
+      network = Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).network.to_sym
+      data_store = { p2p: 'Tomp2p', filesystem: 'File', test: 'Memory' }[network]
+      @data_store_facade = Coinmux::DataStore.const_get(data_store).instance
     end
 
     def digest_facade
