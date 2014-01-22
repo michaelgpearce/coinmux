@@ -17,10 +17,10 @@ module Coinmux::Facades
     end
 
     def data_store_facade
-      require 'spec/fake/base_data_store'
-      require 'spec/fake/file_data_store'
-      Coinmux::Fake::FileDataStore.instance
-      #Coinmux::DataStore.instance
+      return @data_store_facade if @data_store_facade
+
+      data_store_name = Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).network
+      @data_store_facade = Coinmux::DataStore.const_get(data_store_name.capitalize).instance
     end
 
     def digest_facade

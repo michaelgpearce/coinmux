@@ -1,6 +1,6 @@
 require 'active_support/cache'
 
-class Coinmux::Fake::FileDataStore < Coinmux::Fake::BaseDataStore
+class Coinmux::DataStore::File < Coinmux::DataStore::Base
   include Singleton
 
   def initialize
@@ -10,6 +10,8 @@ class Coinmux::Fake::FileDataStore < Coinmux::Fake::BaseDataStore
   def clear
     @data_store.clear
   end
+
+  protected
 
   def write(key, value)
     @data_store.write(key, value)

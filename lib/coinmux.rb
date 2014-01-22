@@ -20,10 +20,9 @@ class Hash
 end
 
 module Coinmux
-  module Message
-  end
-  module StateMachine
-  end
+  module Message; end
+  module StateMachine; end
+  module DataStore; end
 
   def self.root
     @root ||= File.expand_path(File.join(File.dirname(__FILE__), '..'))
@@ -45,7 +44,10 @@ require 'lib/coinmux/pki'
 require 'lib/coinmux/bitcoin_util'
 require 'lib/coinmux/bitcoin_crypto'
 require 'lib/coinmux/bitcoin_network'
-require 'lib/coinmux/data_store'
+require 'lib/coinmux/data_store/base'
+require 'lib/coinmux/data_store/tomp2p'
+require 'lib/coinmux/data_store/memory'
+require 'lib/coinmux/data_store/file'
 require 'lib/coinmux/event'
 require 'lib/coinmux/config'
 require 'lib/coinmux/logger'

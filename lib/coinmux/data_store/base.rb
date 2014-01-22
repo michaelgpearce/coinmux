@@ -1,6 +1,4 @@
-module Coinmux; module Fake; end; end
-
-class Coinmux::Fake::BaseDataStore
+class Coinmux::DataStore::Base
   include Coinmux::Facades
 
   def generate_identifier

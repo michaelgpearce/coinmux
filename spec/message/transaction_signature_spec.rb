@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe Coinmux::Message::Transaction do
-  before do
-    fake_data_store
-  end
-
   let(:template_message) { build(:transaction_signature_message) }
   let(:coin_join) { template_message.coin_join }
   let(:transaction_input_index) { template_message.transaction_input_index }

@@ -9,9 +9,6 @@ end
 
 require 'rspec'
 require 'spec/fake/application'
-require 'spec/fake/base_data_store'
-require 'spec/fake/memory_data_store'
-require 'spec/fake/file_data_store'
 require 'spec/fake/bitcoin_network'
 require 'factory_girl'
 require 'pry'
@@ -26,12 +23,10 @@ RSpec::Mocks::setup(Object.new)
 
 def fake_all
   fake_application
-  fake_data_store
   fake_bitcoin_network
 end
 
 def fake_all_network_connections
-  fake_data_store
   fake_bitcoin_network
 end
 
@@ -39,14 +34,6 @@ def fake_application
   @fake_application ||= (
     Coinmux::Fake::Application.new.tap do |application|
       Coinmux::Application.stub(:instance).and_return(application)
-    end
-  )
-end
-
-def fake_data_store
-  @fake_data_store ||= (
-    Coinmux::Fake::MemoryDataStore.instance.tap do |data_store|
-      Coinmux::DataStore.stub(:instance).and_return(data_store)
     end
   )
 end
@@ -124,7 +111,7 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before do
-    @fake_data_store.clear if @fake_data_store
+    data_store_facade.clear
     Helper.class_variable_set(:@@bitcoin_info_index, 0) # start over reading bitcoin infos for each spec
   end
 end

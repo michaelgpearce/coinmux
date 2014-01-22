@@ -1,4 +1,4 @@
-class Coinmux::Fake::MemoryDataStore < Coinmux::Fake::BaseDataStore
+class Coinmux::DataStore::Memory < Coinmux::DataStore::Base
   include Singleton
   
   def initialize
@@ -8,6 +8,8 @@ class Coinmux::Fake::MemoryDataStore < Coinmux::Fake::BaseDataStore
   def clear
     @data_store.clear
   end
+
+  protected
 
   def write(key, value)
     @data_store[key] = value

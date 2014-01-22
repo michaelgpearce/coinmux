@@ -1,4 +1,4 @@
-class Coinmux::DataStore
+class Coinmux::DataStore::Tomp2p
   include Singleton
   
   def generate_identifier
