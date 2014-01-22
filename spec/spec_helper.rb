@@ -45,7 +45,7 @@ end
 
 def fake_data_store
   @fake_data_store ||= (
-    Coinmux::Fake::MemoryDataStore.new.tap do |data_store|
+    Coinmux::Fake::MemoryDataStore.instance.tap do |data_store|
       Coinmux::DataStore.stub(:instance).and_return(data_store)
     end
   )

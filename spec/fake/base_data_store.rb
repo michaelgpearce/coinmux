@@ -1,4 +1,8 @@
+module Coinmux; module Fake; end; end
+
 class Coinmux::Fake::BaseDataStore
+  include Coinmux::Facades
+
   def generate_identifier
     { 'key' => rand.to_s, 'can_insert' => true, 'can_request' => true }.to_json
   end
@@ -21,9 +25,10 @@ class Coinmux::Fake::BaseDataStore
     raise "Cannot insert" unless hash['can_insert']
 
     array = read(key) || []
-    array << identifier
+    array << data
     write(key, array)
 
+    debug "DATASTORE INSERT #{identifier}: #{data}"
     yield(Coinmux::Event.new(:data => data))
   end
   
@@ -35,16 +40,23 @@ class Coinmux::Fake::BaseDataStore
     yield(Coinmux::Event.new(:data => fetch(identifier)))
   end
   
+  # items are in reverse inserted order
   def fetch_most_recent(identifier, max_items, &callback)
     return [] if max_items <= 0
-    yield(Coinmux::Event.new(:data => fetch(identifier)))[-1*max_items..-1]
+    data = fetch(identifier)
+    yield(Coinmux::Event.new(:data => (data[-1*max_items..-1] || data).reverse))
   end
   
+  private
+
   def fetch(identifier)
     hash = JSON.parse(identifier)
     key = hash['key']
     raise "Cannot request" unless hash['can_request']
 
-    (read(key) || []).clone
+    data = (read(key) || []).clone
+    debug "DATASTORE FETCH #{identifier}: #{data}"
+
+    data
   end
 end

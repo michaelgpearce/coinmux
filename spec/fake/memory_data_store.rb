@@ -1,4 +1,6 @@
 class Coinmux::Fake::MemoryDataStore < Coinmux::Fake::BaseDataStore
+  include Singleton
+  
   def initialize
     @data_store ||= Hash.new
   end

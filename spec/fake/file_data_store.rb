@@ -1,8 +1,10 @@
 require 'active_support/cache'
 
 class Coinmux::Fake::FileDataStore < Coinmux::Fake::BaseDataStore
+  include Singleton
+
   def initialize
-    @data_store ||= ActiveSupport::Cache::FileStore.new(File.join(File.dirname(__FILE__), '..', '..', 'data_store.bin'))
+    @data_store ||= ActiveSupport::Cache::FileStore.new(File.join(Coinmux.root, 'tmp', 'file_data_store'))
   end
 
   def clear

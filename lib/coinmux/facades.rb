@@ -17,7 +17,10 @@ module Coinmux::Facades
     end
 
     def data_store_facade
-      Coinmux::DataStore.instance
+      require 'spec/fake/base_data_store'
+      require 'spec/fake/file_data_store'
+      Coinmux::Fake::FileDataStore.instance
+      #Coinmux::DataStore.instance
     end
 
     def digest_facade
