@@ -31,6 +31,7 @@ class Coinmux::BitcoinNetwork
   # "height":281183,
   # "txIndexes":[108279892,108279900]
   #   }
+    return {block_height: 1234, nonce: 1234567} unless block_given?
     Thread.new do
       begin
         yield(Coinmux::Event.new(data: {block_height: 1234, nonce: 1234567}))
@@ -41,13 +42,27 @@ class Coinmux::BitcoinNetwork
   end
   
   def block_exists?(block_height, nonce, &callback)
-    raise "TODO"
+    return true unless block_given?
     # https://blockchain.info/block-height/279588?format=json
+    Thread.new do
+      begin
+        yield(Coinmux::Event.new(data: true))
+      rescue Exception => e
+        puts e, e.backtrace
+      end
+    end
   end
 
   # @return [Fixnum, nil] 0 returned if in transaction pool, 1+ if accepted into blockchain, nil returned if transaction not found
   def transaction_confirmations(transaction_id, &callback)
-    raise "TODO"
+    return 1 unless block_given?
+    Thread.new do
+      begin
+        yield(Coinmux::Event.new(data: 1))
+      rescue Exception => e
+        puts e, e.backtrace
+      end
+    end
   end
 
   # @address [String] Input address.

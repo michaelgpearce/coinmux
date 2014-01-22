@@ -54,10 +54,12 @@ class Coinmux::Message::Association < Coinmux::Message::Base
     @messages
   end
 
-  def insert(message)
+  def insert(message, &callback)
     @messages << message
 
-    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) {}
+    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do
+      yield if block_given?
+    end
 
     message
   end

@@ -61,6 +61,7 @@ require 'lib/coinmux/message/transaction'
 require 'lib/coinmux/message/transaction_signature'
 
 require 'lib/coinmux/state_machine/event'
+require 'lib/coinmux/state_machine/base'
 require 'lib/coinmux/state_machine/director'
 require 'lib/coinmux/state_machine/participant'
 

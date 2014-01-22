@@ -97,7 +97,7 @@ describe Coinmux::Message::Transaction do
     end
 
     describe "#has_correct_participant_inputs" do
-      let(:removed_input_tx) { template_message.send(:participant_input_transactions).first }
+      let(:removed_input_tx) { template_message.participant_input_transactions.first }
       let(:inputs) { template_message.inputs.select { |input| input['transaction_id'] != removed_input_tx[:id] } }
 
       it "is invalid with missing input" do
@@ -107,10 +107,10 @@ describe Coinmux::Message::Transaction do
     end
 
     describe "#has_correct_participant_outputs" do
-      let(:participant_output) { template_message.send(:participant_output) }
+      let(:participant_output) { template_message.participant_output }
       let(:participant_output_address) { participant_output.address }
       let(:participant_transaction_output_identifier) { participant_output.transaction_output_identifier }
-      let(:participant_input) { template_message.send(:participant_input) }
+      let(:participant_input) { template_message.participant_input }
       let(:participant_change_address) { participant_input.change_address }
       let(:participant_change_transaction_output_identifier) { participant_input.change_transaction_output_identifier }
       let(:participant_output_hash) { outputs.detect { |output| output['address'] == participant_output_address } }
@@ -146,7 +146,7 @@ describe Coinmux::Message::Transaction do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:outputs]).to include("has no change address for amount #{message.send(:participant_change_amount)}")
+          expect(message.errors[:outputs]).to include("has no change address for amount #{message.participant_change_amount}")
         end
       end
 
@@ -157,7 +157,7 @@ describe Coinmux::Message::Transaction do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:outputs]).to include("does not have output to #{message.send(:participant_input).change_address} for #{message.send(:participant_change_amount)}")
+          expect(message.errors[:outputs]).to include("does not have output to #{message.participant_input.change_address} for #{message.participant_change_amount}")
         end
       end
 
@@ -168,7 +168,7 @@ describe Coinmux::Message::Transaction do
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:outputs]).to include("does not have output to #{message.send(:participant_input).change_address} for #{message.send(:participant_change_amount)}")
+          expect(message.errors[:outputs]).to include("does not have output to #{message.participant_input.change_address} for #{message.participant_change_amount}")
         end
       end
     end
