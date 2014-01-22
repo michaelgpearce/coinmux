@@ -35,6 +35,3 @@ FUTURE FEATURES:
 * Acts as anonymous wallet (mix to new address, the send)
 * Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
 % Use stealth address for output address / change
-
-Error case:
-* Handle address with incoming/new transactions during coin join (only use inputs older than created_at block time)
