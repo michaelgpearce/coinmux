@@ -50,7 +50,7 @@ class Coinmux::Message::Status < Coinmux::Message::Base
   def updated_at_valid
     (errors[:updated_at] << "must be a hash" and return) unless updated_at.is_a?(Hash)
 
-    block_exists = Coinmux::BitcoinNetwork.instance.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
+    block_exists = bitcoin_network_facade.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
     errors[:updated_at] << "is not a valid block" unless block_exists
   end
 

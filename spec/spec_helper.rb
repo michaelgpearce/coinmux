@@ -94,10 +94,10 @@ module Helper
     if (bitcoin_info = @@bitcoin_infos[@@bitcoin_info_index]).nil?
       bitcoin_info = {}
       bitcoin_info[:private_key] = "%064x" % (@@bitcoin_info_index + 1)
-      bitcoin_info[:public_key] = Coinmux::BitcoinCrypto.instance.public_key_for_private_key!(bitcoin_info[:private_key])
-      bitcoin_info[:address] = Coinmux::BitcoinCrypto.instance.address_for_public_key!(bitcoin_info[:public_key])
+      bitcoin_info[:public_key] = bitcoin_crypto_facade.public_key_for_private_key!(bitcoin_info[:private_key])
+      bitcoin_info[:address] = bitcoin_crypto_facade.address_for_public_key!(bitcoin_info[:public_key])
       bitcoin_info[:identifier] = "valid-identifier-#{@@bitcoin_info_index + 1}"
-      bitcoin_info[:signature] = Coinmux::BitcoinCrypto.instance.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
+      bitcoin_info[:signature] = bitcoin_crypto_facade.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
 
       @@bitcoin_infos << bitcoin_info
     end
