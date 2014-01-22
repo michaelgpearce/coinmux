@@ -315,7 +315,7 @@ describe Coinmux::Message::CoinJoin do
       it "maps input transactions for address" do
         expect(subject).to eq(coin_join.inputs.value.inject([]) do |acc, input|
           acc += coin_join.minimum_unspent_transaction_inputs(input.address).collect do |tx_input|
-            { 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
+            { 'address' => input.address, 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
           end
 
           acc

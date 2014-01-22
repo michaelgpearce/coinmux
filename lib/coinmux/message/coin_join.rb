@@ -67,7 +67,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
 
     inputs.value.inject([]) do |acc, input|
       acc += minimum_unspent_transaction_inputs(input.address).collect do |tx_input|
-        { 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
+        { 'address' => input.address, 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
       end
 
       acc
