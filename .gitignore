@@ -1,7 +1,6 @@
 *.gem
 *.rbc
-freenet_hash.log
-freenet_hash.log.*
+log
 .bundle
 .config
 .yardoc
