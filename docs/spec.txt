@@ -76,12 +76,14 @@ transaction:
 {
   inputs: [
     {
+      address: "1abc..." # input addresses
       transaction_id: "123...abc"
       output_index: 0
     },
     {
+      address: "1abc..." # input addresses
       transaction_id: "789...xyz"
-      output_index: 0
+      output_index: 3
     },
     ...
   ]
