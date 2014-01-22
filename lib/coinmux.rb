@@ -48,6 +48,7 @@ require 'lib/coinmux/bitcoin_network'
 require 'lib/coinmux/data_store'
 require 'lib/coinmux/event'
 require 'lib/coinmux/config'
+require 'lib/coinmux/logger'
 
 require 'lib/coinmux/message/base'
 require 'lib/coinmux/message/association'
