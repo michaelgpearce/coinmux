@@ -52,7 +52,10 @@ class Coinmux::Message::Base < Hashie::Dash
         end
       end
 
-      return nil unless message.valid?
+      if !message.valid?
+        debug "Message #{self} is not valid: #{hash}, #{message.errors.full_messages}"
+        return nil
+      end
 
       message
     end
