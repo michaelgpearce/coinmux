@@ -34,8 +34,10 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
         return
       end
 
-      fetch_last_message(Coinmux::Message::Status, coin_join_message.status.data_store_identifier) do |status_message|
-        if status_message && status_message.status == 'waiting_for_inputs'
+      self.coin_join_message = coin_join_message
+
+      refresh_message(:status) do
+        if coin_join_message.status.value && coin_join_message.status.value.status == 'waiting_for_inputs'
           self.coin_join_message = coin_join_message
           start_inserting_input
         else
@@ -48,14 +50,14 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_inserting_input
     notify(:inserting_input)
 
-    coin_join_message.inputs.insert(Coinmux::Message::Input.build(coin_join_message, input_private_key, change_address)) do
+    insert_message(:inputs, Coinmux::Message::Input.build(coin_join_message, input_private_key, change_address)) do
       notify(:waiting_for_other_inputs)
       poll_until_status('waiting_for_outputs') do
-        fetch_last_message(Coinmux::Message::MessageVerification, coin_join_message.message_verification.data_store_identifier) do |message_verification_message|
-          if message_verification_message.nil?
+        refresh_message(:message_verification) do
+          if coin_join_message.message_verification.value.nil?
+            # unable to validate message, so we were not part of it
             failure(:input_not_selected)
           else
-            coin_join_message.inputs.insert(message_verification_message)
             start_inserting_output
           end
         end
@@ -66,14 +68,13 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_inserting_output
     notify(:inserting_output)
 
-    coin_join_message.outputs.insert(Coinmux::Message::Output.build(coin_join, output_address)) do
+    insert_message(:outputs, Coinmux::Message::Output.build(coin_join, output_address)) do
       notify(:waiting_for_other_outputs)
       poll_until_status('waiting_for_signatures') do
-        fetch_last_message(Coinmux::Message::Transaction, coin_join_message.transaction.data_store_identifier) do |transaction_message|
+        refresh_message(:transaction) do
           if transaction_message.nil?
             failure(:transaction_not_found)
           else
-            coin_join_message.transaction.insert(transaction_message)
             start_inserting_transaction_signatures
           end
         end
@@ -97,7 +98,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
 
     if transaction_input['address'] == input_address
       transaction_signature_message = Coinmux::Message::TransactionSignature.build(coin_join, transaction_input_index, input_private_key)
-      coin_join_message.transaction_signatures.value.insert(transaction_signature_message) do
+      insert_message(:transaction_signatures, transaction_signature_message) do
         insert_transaction_signature(transaction_input_index + 1, remaining_transaction_inputs)
       end
     else
@@ -123,8 +124,8 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
 
   def poll_until_status(status, &callback)
     event_queue.interval_exec(MESSAGE_POLL_INTERVAL) do |interval_id|
-      fetch_last_message(Coinmux::Message::Status, coin_join_message.status.data_store_identifier) do |status_message|
-        if status_message && status_message.status == status
+      refresh_message(:status) do
+        if coin_join_message.status.value && coin_join_message.status.value.status == status
           # we have the message we are waiting for, so quit polling and invoke the callback
           event_queue.clear_interval(interval_id)
           yield
@@ -133,7 +134,26 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     end
   end
 
-  def failure(error_identifier, error_message = nil)
-    notify(:failed, "#{error_identifier}#{": #{error_message}" if error_message}")
+  # Searches for a message in the reverse order of data added into data store.
+  # TODO: there needs to be a better implementation to guard against flooding.
+  #
+  # @equality_tester [Proc] Called with a message to test if it matches search criteria. Return truthy value if equivalent.
+  # @max_size [Fixnum] The maximum datasize to search before returning nil as the callback Event data.
+  # @callback [Proc] Invoked with Message. Mesage will be the matched data or nil if none could be found.
+  def search_for_most_recent_message(klass, data_store_identifier, equality_tester, max_size = 50, &callback)
+    data_store_facade.fetch_most_recent(data_store_identifier, max_size) do |event|
+      handle_event(event, :unable_to_search_for_most_recent_message) do
+        event.data.each do |json|
+          if message = json.nil? ? nil : klass.from_json(json, coin_join_message)
+            if equality_tester.call(message)
+              yield(message)
+              return
+            end
+          end
+        end
+
+        yield(nil) # unable to locate a match
+      end
+    end
   end
 end

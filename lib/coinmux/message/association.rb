@@ -59,11 +59,20 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   def insert(message, &callback)
     @messages << message
 
-    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do
-      yield if block_given?
+    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do |event|
+      yield(event) if block_given?
     end
+  end
 
-    message
+  def refresh(&callback)
+    args = {
+      list: [:fetch_all, :plural],
+      fixed: [:fetch_first, :singular],
+      variable: [:fetch_last, :singular]
+    }
+    fetch_messages(*args[type]) do |event|
+      yield(event) if block_given?
+    end
   end
 
   # Note: messages are not directly retrieved since this would require a callback/blocking
@@ -73,6 +82,27 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   end
 
   private
+
+  def fetch_messages(method, plurality, &callback)
+    data_store_facade.send(method, data_store_identifier) do |event|
+      if event.error
+        yield(event)
+      else
+        @messages = if event.data.nil?
+          []
+        elsif plurality == :plural
+          event.data.collect { |data| association_class.from_json(data, coin_join) }
+        elsif plurality == :singular
+          [association_class.from_json(event.data, coin_join)]
+        end
+
+        # ignore bad data returned by #from_json as nil with compact
+        @messages.compact!
+
+        yield(Coinmux::Event.new(data: plurality == :plural ? @messages : @messages.first))
+      end
+    end
+  end
 
   def data_store_identifier_has_correct_permissions
     can_insert = data_store_facade.identifier_can_insert?(data_store_identifier.to_s)
