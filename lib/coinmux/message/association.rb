@@ -1,3 +1,5 @@
+require 'active_support/inflector'
+
 class Coinmux::Message::Association < Coinmux::Message::Base
   attr_accessor :name, :type, :data_store_identifier_from_build, :data_store_identifier, :read_only
 
@@ -83,7 +85,7 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   end
 
   def association_class
-    Coinmux::Message.const_get(name.split('_').collect(&:capitalize).join.gsub(/e?s$/, ''))
+    Coinmux::Message.const_get(name.classify)
   end
 
   def build_message(json)
