@@ -30,6 +30,10 @@ class Coinmux::DataStore::Base
     yield(Coinmux::Event.new(:data => data))
   end
   
+  def fetch_first(identifier, &callback)
+    yield(Coinmux::Event.new(:data => fetch(identifier).first))
+  end
+  
   def fetch_last(identifier, &callback)
     yield(Coinmux::Event.new(:data => fetch(identifier).last))
   end
