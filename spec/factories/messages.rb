@@ -60,7 +60,7 @@ FactoryGirl.define do
     trait :with_transaction do
       after(:build) do |coin_join|
         inputs = coin_join.inputs.value.collect do |input|
-          { 'transaction_id' => "tx-#{input.address}", 'output_index' => rand(0..1) }
+          { 'address' => input.address, 'transaction_id' => "tx-#{input.address}", 'output_index' => rand(0..1) }
         end
 
         outputs = coin_join.outputs.value.each_with_index.collect do |output|

@@ -43,7 +43,7 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   private
   
   def inputs_is_array_of_hashes
-    array_of_hashes_is_valid(inputs, :inputs, 'transaction_id', 'output_index')
+    array_of_hashes_is_valid(inputs, :inputs, 'address', 'transaction_id', 'output_index')
   end
   
   def outputs_is_array_of_hashes
