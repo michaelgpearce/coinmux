@@ -1,16 +1,17 @@
 require 'httpclient'
 
 class Coinmux::Http
-  include Singleton
+  include Singleton, Coinmux::Facades
 
-  def get(host, path)
+  def get(host, path, options = {:disable_cache => false})
     begin
-      with_cache(host, path) do
-        response = client.get("#{host}#{path}")
-
-        raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
-
-        response.content
+      info "HTTP GET Request #{host}#{path}"
+      if options[:disable_cache]
+        do_get(host, path)
+      else
+        with_cache(host, path) do
+          do_get(host, path)
+        end
       end
     rescue Coinmux::Error => e
       raise e
@@ -24,6 +25,16 @@ class Coinmux::Http
 
   private
 
+  def do_get(host, path)
+    response = client.get("#{host}#{path}")
+
+    info "HTTP GET Response #{response.code}"
+    raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
+
+    debug "HTTP GET Response Content #{response.content}"
+    response.content
+  end
+
   def cache
     @cache ||= {}
   end
@@ -35,8 +46,12 @@ class Coinmux::Http
   def with_cache(host, path, &block)
     key = [host, path]
 
-    if (result = @cache[key]).nil?
-      result = @cache[key] = yield
+    result = cache[key]
+    
+    info "HTTP cached? #{!result.nil?}"
+
+    if result.nil?
+      result = cache[key] = yield
     end
 
     result
