@@ -24,7 +24,7 @@ v0.3 - Improve deterrence of bad actors
 v1.0 - Stable enough and feature rich enough for novice users
 * Installers for OSX, Windows, Linux
 * Improved UI/UX
-* User can use proxy server (i.e Tor)
+* User can use proxy server (i.e Tor) or use Tor library (http://www.subgraph.com/orchid.html)
 * Existing wallets can integrate CoinJoin protocol when sending transactions
 
 FUTURE FEATURES:
