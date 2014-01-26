@@ -17,42 +17,6 @@ class Coinmux::BitcoinNetwork
   import 'com.google.bitcoin.net.discovery.DnsDiscovery'
   import 'org.spongycastle.util.encoders.Hex'
 
-  # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
-  # @return [Coinmux::Event] Data is a hash `{block_height: 1234, nonce: 1234567}`. Only returns when no callback.
-  # @raise [Coinmux::Error] Only raises when no callback.
-  def current_block_height_and_nonce(&callback)
-    # TODO
-  # http://blockchain.info/latestblock
-  #   https://blockchain.info/latestblock
-  #   {
-  # "hash":"0000000000000001fae0eebbecfa1c4bd08654093e43389c6b90ec46425c5819",
-  # "time":1390071687,
-  # "block_index":461409,
-  # "height":281183,
-  # "txIndexes":[108279892,108279900]
-  #   }
-    return {block_height: 1234, nonce: 1234567} unless block_given?
-    Thread.new do
-      begin
-        yield(Coinmux::Event.new(data: {block_height: 1234, nonce: 1234567}))
-      rescue Exception => e
-        puts e, e.backtrace
-      end
-    end
-  end
-  
-  def block_exists?(block_height, nonce, &callback)
-    return true unless block_given?
-    # https://blockchain.info/block-height/279588?format=json
-    Thread.new do
-      begin
-        yield(Coinmux::Event.new(data: true))
-      rescue Exception => e
-        puts e, e.backtrace
-      end
-    end
-  end
-
   # @return [Fixnum, nil] 0 returned if in transaction pool, 1+ if accepted into blockchain, nil returned if transaction not found
   def transaction_confirmations(transaction_id, &callback)
     return 1 unless block_given?

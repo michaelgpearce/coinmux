@@ -120,13 +120,8 @@ FactoryGirl.define do
   end
 
   factory :status_message, :class => Coinmux::Message::Status do
-    ignore do
-      current_block_height_and_nonce { Coinmux::BitcoinNetwork.instance.current_block_height_and_nonce }
-    end
-
     status "completed"
     transaction_id { "valid_transaction_id:#{rand}" }
-    updated_at { { 'block_height' => current_block_height_and_nonce.first, 'nonce' => current_block_height_and_nonce.last } }
 
     association :coin_join, factory: :coin_join_message, strategy: :build
   end

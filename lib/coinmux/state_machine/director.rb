@@ -31,25 +31,15 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
 
   def insert_current_status_message(transaction_id = nil, &callback)
-    bitcoin_network_facade.current_block_height_and_nonce do |event|
-      handle_event(event, :unable_to_retrieve_block_height_and_nonce) do
-        status_message = coin_join_message.status.value
-        block_height = event.data[:block_height]
-        nonce = event.data[:nonce]
+    status_message = coin_join_message.status.value
 
-        status_changed = status_message.nil? ||
-          status != status_message.status ||
-          block_height != status_message['updated_at']['block_height'] ||
-          nonce != status_message['updated_at']['nonce']
-        if status_changed
-          new_status_message = Coinmux::Message::Status.build(coin_join_message, status, block_height, nonce, transaction_id)
-          insert_message(:status, new_status_message) do
-            yield if block_given?
-          end
-        else
-          yield if block_given?
-        end
+    if status_message.nil? || status != status_message.status
+      new_status_message = Coinmux::Message::Status.build(coin_join_message, status, transaction_id)
+      insert_message(:status, new_status_message) do
+        yield if block_given?
       end
+    else
+      yield if block_given?
     end
   end
 

@@ -3,23 +3,17 @@ class Coinmux::Message::Status < Coinmux::Message::Base
 
   property :status
   property :transaction_id
-  property :updated_at
   
-  validates :status, :updated_at, :presence => true
+  validates :status, :presence => true
   validate :transaction_id_presence
   validate :transaction_confirmed, :if => :is_completed?
   validate :status_valid
-  validate :updated_at_valid
 
   class << self
-    def build(coin_join, status, block_height, nonce, transaction_id = nil)
+    def build(coin_join, status, transaction_id = nil)
       message = super(coin_join)
       message.status = status
       message.transaction_id = transaction_id
-      message.updated_at = {
-        'block_height' => block_height,
-        'nonce' => nonce
-      }
 
       message
     end
@@ -45,13 +39,6 @@ class Coinmux::Message::Status < Coinmux::Message::Base
 
   def status_valid
     errors[:status] << "is not a valid status" unless Coinmux::StateMachine::Director::STATUSES.include?(status)
-  end
-
-  def updated_at_valid
-    (errors[:updated_at] << "must be a hash" and return) unless updated_at.is_a?(Hash)
-
-    block_exists = bitcoin_network_facade.block_exists?(updated_at['block_height'].to_i, updated_at['nonce'].to_i)
-    errors[:updated_at] << "is not a valid block" unless block_exists
   end
 
   def transaction_confirmed

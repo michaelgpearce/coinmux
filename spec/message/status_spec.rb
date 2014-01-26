@@ -15,18 +15,10 @@ describe Coinmux::Message::Status do
   let(:template_message) { build(:status_message) }
   let(:status) { template_message.status }
   let(:transaction_id) { template_message.transaction_id }
-  let(:current_block_height) { template_message.updated_at['block_height'] }
-  let(:current_nonce) { template_message.updated_at['nonce'] }
-  let(:updated_at) { template_message.updated_at }
   let(:coin_join) { template_message.coin_join }
 
   describe "validations" do
-    let(:message) do
-      build(:status_message,
-        status: status,
-        transaction_id: transaction_id,
-        updated_at: updated_at)
-    end
+    let(:message) { build(:status_message, status: status, transaction_id: transaction_id) }
 
     subject { message.valid? }
 
@@ -115,39 +107,10 @@ describe Coinmux::Message::Status do
         end
       end
     end
-
-    describe "#updated_at" do
-      context "with non-Hash" do
-        let(:updated_at) { nil }
-
-        it "is invalid" do
-          expect(subject).to be_false
-          expect(message.errors[:updated_at]).to include("must be a hash")
-        end
-      end
-
-      context "with non-existant block height" do
-        let(:updated_at) { { 'block_height' => current_block_height + 1, 'nonce' => current_nonce } }
-
-        it "is invalid" do
-          expect(subject).to be_false
-          expect(message.errors[:updated_at]).to include("is not a valid block")
-        end
-      end
-
-      context "with invalid nonce" do
-        let(:updated_at) { { 'block_height' => current_block_height, 'nonce' => "wrong nonce" } }
-
-        it "is invalid" do
-          expect(subject).to be_false
-          expect(message.errors[:updated_at]).to include("is not a valid block")
-        end
-      end
-    end
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Status.build(coin_join, status, current_block_height, current_nonce, transaction_id) }
+    subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
 
     it "builds valid status" do
       expect(subject.valid?).to be_true
@@ -160,7 +123,6 @@ describe Coinmux::Message::Status do
       {
         status: message.status,
         transaction_id: message.transaction_id,
-        updated_at: message.updated_at
       }.to_json
     end
 
@@ -173,7 +135,6 @@ describe Coinmux::Message::Status do
       expect(subject.valid?).to be_true
       expect(subject.status).to eq(message.status)
       expect(subject.transaction_id).to eq(message.transaction_id)
-      expect(subject.updated_at).to eq(message.updated_at)
     end
   end
   

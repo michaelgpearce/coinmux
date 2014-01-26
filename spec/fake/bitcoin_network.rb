@@ -6,16 +6,6 @@ class Coinmux::Fake::BitcoinNetwork
     test_confirm_block
   end
 
-  def current_block_height_and_nonce
-    [@blocks.size, @blocks.last[:nonce]]
-  end
-
-  def block_exists?(block_height, nonce)
-    block = @blocks[block_height - 1]
-
-    block && block[:nonce] == nonce
-  end
-
   # nil returned if transaction not found, 0 returned if in transaction pool, 1+ if accepted into blockchain
   def transaction_confirmations(transaction_id)
     if @transaction_pool.include?(transaction_id)
@@ -34,8 +24,6 @@ class Coinmux::Fake::BitcoinNetwork
   def test_confirm_block
     @blocks << {:nonce => rand(1..1_000_000), :transaction_ids => @transaction_pool.dup}
     @transaction_pool.clear
-
-    current_block_height_and_nonce
   end
 
   private
