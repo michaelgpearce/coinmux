@@ -53,7 +53,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     end
   end
 
-  def failure(error_identifier, error_message)
+  def failure(error_identifier, error_message = nil)
     if status != 'failed' # already failed so don't cause infinite loop
       update_status('failed', nil, "#{error_identifier}: #{error_message}")
     end
@@ -71,55 +71,63 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
   
   def start_waiting_for_inputs
-    update_status_and_poll('waiting_for_inputs') do
+    update_status_and_poll('waiting_for_inputs') do |&continue_poll|
       refresh_message(:inputs) do
-        if coin_join_message.inputs.size >= coin_join_message.participants
+        if coin_join_message.inputs.value.size >= coin_join_message.participants
           notify(:inserting_message_verification_message)
           insert_message(:message_verification, Coinmux::Message::MessageVerification.build(coin_join_message)) do
             start_waiting_for_outputs
           end
+        else
+          continue_poll.call
         end
       end
     end
   end
   
   def start_waiting_for_outputs
-    update_status_and_poll('waiting_for_outputs') do
+    update_status_and_poll('waiting_for_outputs') do |&continue_poll|
       refresh_message(:outputs) do
-        if coin_join_message.outputs.size == coin_join_message.inputs.value.size
+        if coin_join_message.outputs.value.size == coin_join_message.inputs.value.size
           inputs = coin_join_message.build_transaction_inputs
           outputs = coin_join_message.build_transaction_outputs
           notify(:inserting_transaction_message)
           insert_message(:transaction, Coinmux::Message::Transaction.build(coin_join_message, inputs, outputs)) do
             start_waiting_for_signatures
           end
+        else
+          continue_poll.call
         end
       end
     end
   end
   
   def start_waiting_for_signatures
-    update_status_and_poll('waiting_for_signatures') do
+    update_status_and_poll('waiting_for_signatures') do |&continue_poll|
       refresh_message(:transaction_signatures) do
         if coin_join_message.transaction_signatures.value.size == coin_join_message.transaction.value.inputs.size
           notify(:publishing_transaction)
-          publish_transaction(coin_join_message.transaction_object, transaction_signature_messages) do |transaction_id|
+          publish_transaction do |transaction_id|
             start_waiting_for_confirmation(transaction_id)
           end
+        else
+          continue_poll.call
         end
       end
     end
   end
 
   def start_waiting_for_confirmation(transaction_id)
-    update_status_and_poll('waiting_for_confirmation', transaction_id) do
-      bitcoin_network.transaction_confirmations(transaction_id) do |event|
+    update_status_and_poll('waiting_for_confirmation', transaction_id) do |&continue_poll|
+      bitcoin_network_facade.transaction_confirmations(transaction_id) do |event|
         handle_event(event, :unable_to_retrieve_transaction) do
           if event.data.nil?
             failure(:unable_to_locate_posted_transaction, "Unable to find transaction on Bitcoin network: #{transaction_id}")
           elsif event.data >= 1
             update_status('completed', transaction_id)
-          # else 0 confirmations so try again
+          else
+            # 0 confirmations so try again
+            continue_poll.call
           end
         end
       end
@@ -138,31 +146,38 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
 
   def update_status_and_poll(status, transaction_id = nil, &block)
     update_status(status, transaction_id) do
-      event_queue.interval_exec(MESSAGE_POLL_INTERVAL) do |interval_id|
-        debug "director waiting for status change: #{status}"
-        if self.status == status
-          debug "director status not changed"
-          yield
-        else
-          # we are at a different status, so no longer poll for this status
-          debug "director received status change: #{status}"
-          event_queue.clear_interval(interval_id)
+      poll_for_status(status, &block)
+    end
+  end
+
+  def poll_for_status(status, &block)
+    event_queue.future_exec(MESSAGE_POLL_INTERVAL) do
+      debug "director waiting for status change: #{status}"
+      if self.status == status
+        debug "director status not changed"
+        block.call do
+          # call again until status changes
+          poll_for_status(status, &block)
         end
+
       end
     end
   end
 
-  def publish_transaction(transaction, transaction_signature_messages, &callback)
-    transaction_signature_messages = transaction_signature_messages.sort do |a, b|
+  def publish_transaction(&callback)
+    transaction = coin_join_message.transaction_object
+    transaction_signatures = coin_join_message.transaction_signatures.value
+
+    transaction_signatures = transaction_signatures.sort do |a, b|
       a.transaction_input_index <=> b.transaction_input_index
     end
 
-    transaction_signature_messages.each_with_index do |transaction_signature_message, input_index|
-      script_sig = Base64.decode64(transaction_signature_message.script_sig)
-      bitcoin_network.sign_transaction_input(transaction, input_index, script_sig)
+    transaction_signatures.each_with_index do |transaction_signature, input_index|
+      script_sig = Base64.decode64(transaction_signature.script_sig)
+      bitcoin_network_facade.sign_transaction_input(transaction, input_index, script_sig)
     end
 
-    bitcoin_network.post_transaction(transaction) do |event|
+    bitcoin_network_facade.post_transaction(transaction) do |event|
       handle_event(event, :unable_to_post_transaction) do
         yield(event.data)
       end

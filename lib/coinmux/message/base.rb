@@ -1,11 +1,12 @@
 class Coinmux::Message::Base < Hashie::Dash
   include ActiveModel::Model, Coinmux::Facades
 
+  MAX_JSON_DATA_SIZE = 10_000 # not sure the best number for this, but all our messages should be small
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
 
   attr_accessor :coin_join, :created_with_build
 
-  validate :coin_join_valid, :if => :coin_join
+  validate :coin_join_valid, :if => :should_validate_coin_join
 
   class << self
     def build(coin_join = nil)
@@ -27,7 +28,7 @@ class Coinmux::Message::Base < Hashie::Dash
     def from_json(json, coin_join = nil)
       return nil if json.nil?
 
-      return nil if json.bytesize > 5_000 # not sure the best number for this, but all our messages should be small
+      return nil if json.bytesize > MAX_JSON_DATA_SIZE
 
       hash = JSON.parse(json) rescue nil
       return nil unless hash.is_a?(Hash)
@@ -39,6 +40,8 @@ class Coinmux::Message::Base < Hashie::Dash
       return nil unless self.properties.collect(&:to_s).sort == hash.keys.sort
 
       message = self.new
+      coin_join = message if self == Coinmux::Message::CoinJoin
+
       message.coin_join = coin_join
       hash.each do |property_name, value|
         property = property_name.to_sym
@@ -115,6 +118,10 @@ class Coinmux::Message::Base < Hashie::Dash
   end
 
   private
+
+  def should_validate_coin_join
+    !is_a?(Coinmux::Message::CoinJoin) && !is_a?(Coinmux::Message::Association)
+  end
 
   def coin_join_valid
     return if coin_join == self
