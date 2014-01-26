@@ -337,13 +337,13 @@ describe Coinmux::Message::CoinJoin do
       context "with change addresses on input" do
         it "maps output address and change address" do
           expected = coin_join.outputs.value.collect do |output|
-            { 'address' => output.address, 'amount' => coin_join.amount }
+            { 'address' => output.address, 'amount' => coin_join.amount, 'identifier' => output.transaction_output_identifier }
           end
 
           expected += coin_join.inputs.value.collect do |input|
             unspent_input_amount = bitcoin_network_facade.unspent_inputs_for_address(input.address).values.inject(&:+)
             change_amount = unspent_input_amount - coin_join.amount - coin_join.participant_transaction_fee
-            { 'address' => input.address, 'amount' => change_amount }
+            { 'address' => input.address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
           end
 
           expect(subject).to eq(expected)
@@ -359,7 +359,7 @@ describe Coinmux::Message::CoinJoin do
 
         it "maps output address with no change address" do
           expected = coin_join.outputs.value.collect do |output|
-            { 'address' => output.address, 'amount' => coin_join.amount }
+            { 'address' => output.address, 'amount' => coin_join.amount, 'identifier' => output.transaction_output_identifier }
           end
 
           expect(subject).to eq(expected)

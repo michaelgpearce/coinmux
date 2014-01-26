@@ -80,13 +80,13 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
 
     [].tap do |result|
       result.concat(outputs.value.collect do |output|
-        { 'address' => output.address, 'amount' => amount }
+        { 'address' => output.address, 'amount' => amount, 'identifier' => output.transaction_output_identifier }
       end)
 
       result.concat(inputs.value.select(&:change_address).collect do |input|
-        unspent_input_amount = bitcoin_network_facade.unspent_inputs_for_address(input.address).values.inject(&:+)
+        unspent_input_amount = minimum_unspent_transaction_inputs(input.address).collect { |hash| hash[:amount] }.inject(&:+)
         change_amount = unspent_input_amount - amount - participant_transaction_fee
-        { 'address' => input.address, 'amount' => change_amount }
+        { 'address' => input.address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
       end)
     end
   end
