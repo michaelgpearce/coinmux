@@ -111,7 +111,9 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     notify(:waiting_for_completed)
 
     wait_for_status('completed') do
-      notify(:completed)
+      refresh_message(:status) do
+        notify(:completed, "Transaction ID: #{coin_join_message.status.value.transaction_id}")
+      end
     end
   end
 
