@@ -1,4 +1,7 @@
-# public insert_key and request_key
+# The Director announce a CoinJoin to participants.
+# Participants read to find a CoinJoin that matches what they are trying to do.
+#
+# Message Creator: Director
 coin_joins:
 {
   version: 1
@@ -7,16 +10,18 @@ coin_joins:
   participants: 5 # number of inputs / outputs
   amount: 200000000 # in satoshi, n^2
   participant_transaction_fee: 10000 # each participant must pay this fee (for now 0.0005 / num participants)
-  inputs: "insert_and_request_key"
-  message_verification: "request_key"
-  outputs: "insert_and_request_key"
-  transaction: "request_key"
-  transaction_signatures: "insert_and_request_key"
-  status: "request_key"
+  inputs: "participant_read_write_key"
+  message_verification: "participant_readable_key"
+  outputs: "participant_read_write_key"
+  transaction: "participant_readable_key"
+  transaction_signatures: "participant_read_write_key"
+  status: "participant_readable_key"
 }
 
-# Updated with status information
-# Updatable
+# Director Updates with state information.
+# Participants use the status to determine where they are in the state machine.
+#
+# Message Creator: Director
 status:
 {
   status: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "waiting_for_confirmation" | "failed" | "completed"
@@ -27,8 +32,11 @@ status:
   }
 }
 
-# Public insert_key and request_key
-# Every client posts all of their input individually
+# Specify the input address and change address for the CoinJoin.
+# We do not reveal the output address here so it is not associated to the input.
+# The change address is revealed, but due to the nature of CoinJoin, this is easy to guess from the block chain transaction.
+#
+# Message Creator: Participants
 inputs:
 {
   message_public_key: '123...abc' # RSA 2048 PKI (PKCS1_PADDING); unique from other message_public_key; ensure uniqueness
@@ -38,10 +46,11 @@ inputs:
   verification: "123...abc" # Signature with (private_key, coin_joins#identifier) to show ownership of address
 }
 
-# Created after input list has enough inputs for mixing (inputs should be validated that they have enough BTC available)
-# Only accepted inputs are given message verification
-# message_identifier is encrypted by a shared key to ensure that Director cannot link inputs to outputs by giving each input a different identifier. This shared key is encrypted uniquely for each input using its inputs#message_public_key
-# Write-Once
+# Director creates after input list has enough valid inputs for mixing.
+# Only accepted inputs are given message verification and allowed to continue this CoinJoin.
+# A single message_identifier for all Participants is encrypted by a shared key to ensure that Director cannot link inputs to outputs by giving each input a different identifier. This shared key is encrypted uniquely for each input using its inputs#message_public_key
+#
+# Message Creator: Director
 message_verification:
 {
   encrypted_message_identifier: '123...abc' # a pseudo-random value encrypted with AES-256-CBC and a secret key
@@ -51,8 +60,7 @@ message_verification:
   }
 }
 
-# Public insert_key and request_key
-# Every client posts all of their outputs individually
+# Participants post each of their output addresses here.
 # This scheme maintains no link between the inputs and the outputs and ensures that we only add outputs owned by an input.
 #
 # message_verification is created by the following:
@@ -61,6 +69,8 @@ message_verification:
 # 3. outputs#message_verifcation is the SHA256 Hash of ("output:${message_verification#message_identifier}:${outputs#address}") to show knowledge of message_verification#message_identifier.
 #
 # Note: it is possible for a participant to create multiple Outputs with different addresses and the outputs will have a valid message_verification since all Participants share the same message_identifier. This will cause the Director to create a transaction that not all Participants will sign since the Participant will not see his output address in the proposed transaction.
+#
+# Message Creator: Participants
 outputs:
 {
   address: "1abc..."
@@ -68,10 +78,10 @@ outputs:
   transaction_output_identifier: 12345 # A unique identifier to ensure my output exists in the transaction when multiple outputs going to the same address (https://bitcointalk.org/index.php?topic=279249.msg4577566#msg4577566)
 }
 
-# Readable by anyone, writeable only by Director
-# Director publishes only once a transaction that meets its criteria (correct number of inputs and verified outputs)
+# Director publishes a transaction that meets the CoinJoin criteria (correct number of inputs and verified outputs) using the Participants specified inputs and outputs.
 # Participant only creates transaction_signatures when has correct number of inputs/outputs and correctly contains all of his inputs and outputs
-# Write-Once
+#
+# Message Creator: Director
 transaction:
 {
   inputs: [
@@ -102,11 +112,12 @@ transaction:
   ]
 }
 
-# Public insert_key and request_key
-# Signatures occur in order of inputs.
-# For each of my inputs, create full transaction, sign input, and publish here
-# Director creates transaction, polls for valid signatures, then sends transaction once received and validated, updating status
+# Participants create a transaction from the Director specified information and add transaction signatures for each input that belong to them.
+# The transaction must be created with all inputs and outputs specified by the Director's transaction message with all inputs and outputs occurring in the correct order.
+# Upon publication of all transaction signature messages, the Director creates a transaction, signs each of the inputs and then publish to the Bitcoin Network. The status message will be updated with the transaction identifier.
 # transaction_signatures#message_verifcation is the SHA256 Hash of ("transaction_signature:${message_verification#message_identifier}:${transaction_signatures#transaction_input_index}:${transaction_signatures#script_sig}") to show knowledge of message_verification#message_identifier.
+#
+# Message Creator: Participants
 transaction_signatures:
 {
   transaction_input_index: 0
