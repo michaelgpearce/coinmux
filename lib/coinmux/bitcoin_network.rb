@@ -1,5 +1,5 @@
 class Coinmux::BitcoinNetwork
-  include Singleton, Coinmux::BitcoinUtil
+  include Singleton, Coinmux::BitcoinUtil, Coinmux::Facades
 
   import 'com.google.bitcoin.core.Transaction'
   import 'java.math.BigInteger'
@@ -89,11 +89,11 @@ class Coinmux::BitcoinNetwork
           input_tx = fetch_transaction(tx_hash[:id])
           raise Coinmux::Error, "Output index does not exist" if tx_hash[:index].to_s.to_i < 0 || tx_hash[:index].to_s.to_i >= input_tx.getOutputs().size()
           tx_output = input_tx.getOutput(tx_hash[:index])
-          transaction.add_input(tx_output)
+          transaction.addInput(tx_output)
         end
 
         outputs.each do |hash|
-          transaction.add_output(BigInteger.new(hash[:amount].to_s), Address.new(network_params, hash[:address]))
+          transaction.addOutput(BigInteger.new(hash[:amount].to_s), Address.new(network_params, hash[:address]))
         end
       end
     end
@@ -134,9 +134,10 @@ class Coinmux::BitcoinNetwork
   # @return [true, false]
   def script_sig_valid?(transaction, input_index, script_sig)
     begin
-      set_transaction_script_sig(transaction, input_index, script_sig, true)
+      set_transaction_script_sig(clone_transaction(transaction), input_index, script_sig)
       true
     rescue Coinmux::Error
+      debug "Script Sig is not valid: #{$!}"
       false
     end
   end
@@ -146,7 +147,7 @@ class Coinmux::BitcoinNetwork
   # @script_sig [String] The script_sig used for signing this index.
   # @raise [Coinmux::Error]
   def sign_transaction_input(transaction, input_index, script_sig)
-    set_transaction_script_sig(transaction, input_index, script_sig, false)
+    set_transaction_script_sig(transaction, input_index, script_sig)
     nil
   end
 
@@ -169,17 +170,25 @@ class Coinmux::BitcoinNetwork
 
   private
 
-  def set_transaction_script_sig(transaction, input_index, script_sig, verify_only)
+  def clone_transaction(source)
+    inputs = source.getInputs().collect do |input|
+      out = input.getOutpoint()
+      { id: out.getHash().toString(), index: out.getIndex() }
+    end
+    outputs = source.getOutputs().collect do |output|
+      { address: output.getScriptPubKey().getToAddress(network_params).toString(), amount: output.getValue() }
+    end
+
+    build_unsigned_transaction(inputs, outputs)
+  end
+
+  def set_transaction_script_sig(transaction, input_index, script_sig)
     begin
       script_sig = Script.new(script_sig.unpack('c*').to_java(:byte))
 
       tx_input = get_unspent_tx_input(transaction, input_index)
       tx_input.setScriptSig(script_sig)
-      begin
-        tx_input.verify()
-      ensure
-        tx_input.setScriptSig(nil) if verify_only
-      end
+      tx_input.verify()
 
       tx_input
     rescue ScriptException => e
