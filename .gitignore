@@ -8,7 +8,7 @@ Gemfile.lock
 InstalledFiles
 _yardoc
 coverage
-doc/
+ignore/
 lib/bundler/man
 pkg
 rdoc
@@ -18,5 +18,3 @@ test/version_tmp
 tmp
 .DS_Store
 coinmux.jar
-docs/wallet.txt
-bin/transaction.rb
