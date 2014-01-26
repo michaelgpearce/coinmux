@@ -11,6 +11,7 @@ v0.2 - Functional Beta
 * Support WIF private keys
 * Transaction fee calculation use transaction size info.
 * Support multiple input addresses during CoinJoin (proper fee calculation required)
+* Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
 
 v0.3 - Improve deterrence of bad actors
 * Ensure that all participants are active (signature of current Director status?)
@@ -33,5 +34,4 @@ FUTURE FEATURES:
 * Embed Freenet (or move to P2P [TomP2P] or Bitmessage)
 * Automatic retries of failed transactions
 * Acts as anonymous wallet (mix to new address, the send)
-* Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
 % Use stealth address for output address / change
