@@ -16,7 +16,7 @@ class Cli::Application
   def start
     info "Starting CLI application"
 
-    if !(input_errors = validate_inputs).empty?
+    if (input_errors = validate_inputs).present?
       puts "Unable to perform CoinJoin due to the following:"
       puts input_errors.collect { |message| " * #{message}" }
       puts "Quitting..."
@@ -62,12 +62,12 @@ class Cli::Application
 
     input = Coinmux::Message::Input.build(coin_join, input_private_key, change_address)
     input.valid?
-    return input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].nil?
-    return input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].nil?
+    return input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
+    return input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
 
     output = Coinmux::Message::Output.build(coin_join, output_address)
     output.valid?
-    return output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].nil?
+    return output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].blank?
 
     []
   end
