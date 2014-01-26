@@ -3,9 +3,10 @@ require 'spec_helper'
 describe Coinmux::Message::Input do
   before do
     fake_all_network_connections
+    stub_bitcoin_network_for_coin_join(coin_join)
   end
 
-  let(:template_message) { build(:input_message) }
+  let(:template_message) { build(:coin_join_message, :with_inputs).inputs.value.detect(&:created_with_build) }
   let(:input_identifier) { template_message.input_identifier }
   let(:address) { template_message.address }
   let(:private_key) { template_message.private_key }
@@ -50,6 +51,20 @@ describe Coinmux::Message::Input do
         it "is invalid" do
           expect(subject).to be_false
           expect(message.errors[:change_address]).to include("is not a valid address")
+        end
+      end
+    end
+
+
+    describe "#input_has_enough_value" do
+      context "with not enough unspent value" do
+        before do
+          message.coin_join.should_receive(:input_has_enough_unspent_value?).with(address).and_return(false)
+        end
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:address]).to include("does not have enough unspent value")
         end
       end
     end

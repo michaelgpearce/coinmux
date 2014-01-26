@@ -47,26 +47,36 @@ end
 def stub_bitcoin_network_for_coin_join(coin_join)
   coin_join.stub(:transaction_object).and_return(double('transaction object double'))
 
-  coin_join.transaction.value.inputs.each do |hash|
-    address = hash['transaction_id'].split('-').last # we format the transaction id: "tx-address"
-    change_address = coin_join.inputs.value.detect { |input| input.address == address }.change_address
-    change_amount = coin_join.transaction.value.outputs.detect { |output| output['address'] == change_address }['amount']
-    tx_amount = coin_join.amount + change_amount + coin_join.participant_transaction_fee
+  if !coin_join.inputs.value.empty?
+    coin_join.inputs.value.each do |input|
+      Coinmux::BitcoinNetwork.instance.stub(:unspent_inputs_for_address).with(input.address).and_return({
+        { id: "tx-#{input.address}", index: 123 } => 1234 * SATOSHIS_PER_BITCOIN
+      })
+    end
+  end
 
-    result = {}.tap do |result|
-      key = {id: hash['transaction_id'], index: hash['output_index']}
-      result[key] = tx_amount
+  if coin_join.transaction.value
+    coin_join.transaction.value.inputs.each do |hash|
+      address = hash['transaction_id'].split('-').last # we format the transaction id: "tx-address"
+      change_address = coin_join.inputs.value.detect { |input| input.address == address }.change_address
+      change_amount = coin_join.transaction.value.outputs.detect { |output| output['address'] == change_address }['amount']
+      tx_amount = coin_join.amount + change_amount + coin_join.participant_transaction_fee
+
+      result = {}.tap do |result|
+        key = {id: hash['transaction_id'], index: hash['output_index']}
+        result[key] = tx_amount
+      end
+
+      Coinmux::BitcoinNetwork.instance.stub(:unspent_inputs_for_address).with(address).and_return(result)
     end
 
-    Coinmux::BitcoinNetwork.instance.stub(:unspent_inputs_for_address).with(address).and_return(result)
+    coin_join.transaction.value.inputs.each_with_index do |input_hash, transaction_input_index|
+      Coinmux::BitcoinNetwork.instance.stub(:build_transaction_input_script_sig).with(coin_join.transaction_object, transaction_input_index, "privkey-#{transaction_input_index}").and_return("scriptsig-#{transaction_input_index}")
+    end
   end
 
   Coinmux::BitcoinNetwork.instance.stub(:transaction_input_unspent?).and_return(true)
   Coinmux::BitcoinNetwork.instance.stub(:script_sig_valid?).and_return(true)
-
-  coin_join.transaction.value.inputs.each_with_index do |input_hash, transaction_input_index|
-    Coinmux::BitcoinNetwork.instance.stub(:build_transaction_input_script_sig).with(coin_join.transaction_object, transaction_input_index, "privkey-#{transaction_input_index}").and_return("scriptsig-#{transaction_input_index}")
-  end
 end
 
 def load_fixture(name)

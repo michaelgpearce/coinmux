@@ -45,6 +45,8 @@ class Coinmux::Message::Input < Coinmux::Message::Base
   end
   
   def input_has_enough_value
-    # TODO
+    unless coin_join.input_has_enough_unspent_value?(address)
+      errors[:address] << "does not have enough unspent value"
+    end
   end
 end

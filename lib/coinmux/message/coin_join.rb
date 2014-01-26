@@ -109,6 +109,15 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     )
   end
 
+  def input_has_enough_unspent_value?(address)
+    begin
+      minimum_unspent_transaction_inputs(address)
+      true
+    rescue Coinmux::Error => e
+      false
+    end
+  end
+
   # Retrieves the minimum number of inputs that can be used to satisfy the `coin_join#amount` requirement.
   # @address [String] Participant address.
   # @return [Array] Array of hashes with `:id` (transaction hash identifier), `:index` (the index of the transaction output that is unspent) and `:amount` (the unspent amount) sorted from largest amount to smallest amount.

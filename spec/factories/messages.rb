@@ -39,8 +39,21 @@ FactoryGirl.define do
 
     trait :with_inputs do
       after(:build) do |coin_join|
-        coin_join.inputs.insert(FactoryGirl.build(:input_message, :coin_join => coin_join, :created_with_build => true))
-        coin_join.inputs.insert(FactoryGirl.build(:input_message, :coin_join => coin_join, :created_with_build => false))
+        [true, false].each do |created_with_build|
+          bitcoin_info = Helper.next_bitcoin_info
+          message_keys = pki_facade.generate_keypair
+
+          coin_join.inputs.insert(FactoryGirl.build(:input_message,
+            address: bitcoin_info[:address],
+            private_key: bitcoin_info[:private_key],
+            signature: bitcoin_crypto_facade.sign_message!(coin_join.identifier, bitcoin_info[:private_key]),
+            change_address: Helper.next_bitcoin_info[:address],
+            change_transaction_output_identifier: rand.to_s,
+            message_private_key: message_keys.first,
+            message_public_key: message_keys.last,
+            created_with_build: created_with_build,
+            coin_join: coin_join))
+        end
       end
     end
 
@@ -60,7 +73,7 @@ FactoryGirl.define do
     trait :with_transaction do
       after(:build) do |coin_join|
         inputs = coin_join.inputs.value.collect do |input|
-          { 'address' => input.address, 'transaction_id' => "tx-#{input.address}", 'output_index' => rand(0..1) }
+          { 'address' => input.address, 'transaction_id' => "tx-#{input.address}", 'output_index' => 123 }
         end
 
         outputs = coin_join.outputs.value.each_with_index.collect do |output|
@@ -90,19 +103,17 @@ FactoryGirl.define do
 
   factory :input_message, :class => Coinmux::Message::Input do
     ignore do
-      bitcoin_info { Helper.next_bitcoin_info }
-      message_keys { pki_facade.generate_keypair }
+      template_message { FactoryGirl.build(:coin_join_message, :with_inputs).inputs.value.detect(&:created_with_build) }
     end
 
-    address { bitcoin_info[:address] }
-    private_key { bitcoin_info[:private_key] }
-    signature { bitcoin_info[:signature] }
-    change_address { Helper.next_bitcoin_info[:address] }
-    change_transaction_output_identifier { rand.to_s }
-    message_private_key { message_keys.first }
-    message_public_key { message_keys.last }
-
-    coin_join { association :coin_join_message, strategy: :build, identifier: bitcoin_info[:identifier] }
+    address { template_message.address }
+    private_key { template_message.private_key }
+    signature { template_message.signature }
+    change_address { template_message.change_address }
+    change_transaction_output_identifier { template_message.change_transaction_output_identifier }
+    message_private_key { template_message.message_private_key }
+    message_public_key { template_message.message_public_key }
+    coin_join { template_message.coin_join }
   end
 
   factory :output_message, :class => Coinmux::Message::Output do
