@@ -74,7 +74,9 @@ class Cli::EventQueue
         events_to_enqueue = []
         all_events = [event] + queue.size.times.collect { queue.pop }
         all_events.each do |event|
-          if cleared_interval_identifiers.include?(event.interval_identifier)
+          if event.nil? # nil in the event thread indicates to quit
+            break
+          elsif cleared_interval_identifiers.include?(event.interval_identifier)
             # remove interval so do not re-enqueue
             cleared_interval_identifiers.delete(event.interval_identifier)
           elsif event.invoke_at && Time.now < event.invoke_at
