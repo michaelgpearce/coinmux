@@ -17,9 +17,9 @@ class Cli::Application
     info "Starting CLI application"
 
     if (input_errors = validate_inputs).present?
-      puts "Unable to perform CoinJoin due to the following:"
-      puts input_errors.collect { |message| " * #{message}" }
-      puts "Quitting..."
+      message "Unable to perform CoinJoin due to the following:"
+      message input_errors.collect { |message| " * #{message}" }
+      message "Quitting..."
       return
     end
 
@@ -28,11 +28,11 @@ class Cli::Application
     self.notification_callback = Proc.new do |event|
       debug "event queue event received: #{event.inspect}"
       if event.type == :failed
-        puts "#{event.source.capitalize}: Error - #{event.message}"
-        puts "Quitting..."
+        message "Error - #{event.message}", event.source
+        message "Quitting..."
         self.director = self.participant = nil # end execution
       else
-        puts "[#{event.source.capitalize}]: #{event.type.to_s.gsub('_', ' ').capitalize}#{" : #{event.message}" if event.message}"
+        message "#{event.type.to_s.humanize.capitalize}#{" - #{event.message}" if event.message}", event.source
         if event.source == :participant
           handle_participant_event(event)
         elsif event.source == :director
@@ -55,6 +55,17 @@ class Cli::Application
   end
 
   private
+
+  def message(messages, event_type = nil)
+    messages = [messages] unless messages.is_a?(Array)
+    messages.each do |message|
+      if event_type
+        puts "%14s %s" % ['[' + event_type.to_s.capitalize + ']:', message]
+      else
+        puts message
+      end
+    end
+  end
 
   def validate_inputs
     coin_join = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
@@ -97,10 +108,10 @@ class Cli::Application
       # TODO: try again
     elsif event.type == :completed
       self.participant = nil # done
-      puts "Coin join successfully created!"
+      message "Coin join successfully created!"
     elsif event.type == :failed
       self.participant = nil # done
-      puts "Coin join failed!"
+      message "Coin join failed!"
     end
   end
 
