@@ -93,7 +93,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     transaction_input = remaining_transaction_inputs.shift
 
     if transaction_input.nil?
-      start_waiting_for_confirmation
+      start_waiting_for_completed
       return
     end
 
@@ -104,16 +104,6 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
       end
     else
       insert_transaction_signature(transaction_message_input_index + 1, remaining_transaction_inputs)
-    end
-  end
-
-  def start_waiting_for_confirmation
-    notify(:waiting_for_confirmation)
-
-    wait_for_status('waiting_for_confirmation') do
-      refresh_message(:transaction_signatures) do
-        start_waiting_for_completed
-      end
     end
   end
 

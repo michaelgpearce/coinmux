@@ -24,8 +24,8 @@ coin_joins:
 # Message Creator: Director
 status:
 {
-  status: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "waiting_for_confirmation" | "failed" | "completed"
-  transaction_id: null | "123...abc" # transaction id available during while waiting for confirmations or completed
+  status: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "failed" | "completed"
+  transaction_id: null | "123...abc" # transaction id available during when completed
 }
 
 # Specify the input address and change address for the CoinJoin.

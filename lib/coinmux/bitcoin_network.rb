@@ -17,18 +17,6 @@ class Coinmux::BitcoinNetwork
   import 'com.google.bitcoin.net.discovery.DnsDiscovery'
   import 'org.spongycastle.util.encoders.Hex'
 
-  # @return [Fixnum, nil] 0 returned if in transaction pool, 1+ if accepted into blockchain, nil returned if transaction not found
-  def transaction_confirmations(transaction_id, &callback)
-    return 1 unless block_given?
-    Thread.new do
-      begin
-        yield(Coinmux::Event.new(data: 1))
-      rescue Exception => e
-        puts e, e.backtrace
-      end
-    end
-  end
-
   # @address [String] Input address.
   # @callback [Proc, nil] Invoked with a Coinmux::Event with data or error set.
   # @return [Hash] Hash with keys being `{id: 'transaction hash identifier', index: 'unspent transaction output index'}` and the value being the unspent amount. Only returns when no callback.

@@ -1,5 +1,5 @@
 class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
-  STATUSES = %w(waiting_for_inputs waiting_for_outputs waiting_for_signatures waiting_for_confirmation failed completed)
+  STATUSES = %w(waiting_for_inputs waiting_for_outputs waiting_for_signatures failed completed)
   STATUS_UPDATE_INTERVAL = 60
   
   def initialize(event_queue, bitcoin_amount, participant_count)
@@ -98,27 +98,10 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
         if coin_join_message.transaction_signatures.value.size == coin_join_message.transaction.value.inputs.size
           notify(:publishing_transaction)
           publish_transaction do |transaction_id|
-            start_waiting_for_confirmation(transaction_id)
+            update_status('completed', transaction_id)
           end
         else
           continue_poll.call
-        end
-      end
-    end
-  end
-
-  def start_waiting_for_confirmation(transaction_id)
-    update_status_and_poll('waiting_for_confirmation', transaction_id) do |&continue_poll|
-      bitcoin_network_facade.transaction_confirmations(transaction_id) do |event|
-        handle_event(event, :unable_to_retrieve_transaction) do
-          if event.data.nil?
-            failure(:unable_to_locate_posted_transaction, "Unable to find transaction on Bitcoin network: #{transaction_id}")
-          elsif event.data >= 1
-            update_status('completed', transaction_id)
-          else
-            # 0 confirmations so try again
-            continue_poll.call
-          end
         end
       end
     end

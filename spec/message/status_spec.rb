@@ -5,13 +5,6 @@ describe Coinmux::Message::Status do
     fake_all_network_connections
   end
 
-  before do
-    if !transaction_id.nil?
-      Coinmux::BitcoinNetwork.instance.test_add_transaction_id_to_pool(transaction_id)
-      Coinmux::BitcoinNetwork.instance.test_confirm_block
-    end
-  end
-
   let(:template_message) { build(:status_message) }
   let(:status) { template_message.status }
   let(:transaction_id) { template_message.transaction_id }
@@ -28,17 +21,15 @@ describe Coinmux::Message::Status do
 
     describe "#transaction_id" do
       context "when present" do
-        Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
-          context "with #{test_status} status" do
-            let(:status) { test_status }
+        context "with completed status" do
+          let(:status) { 'completed' }
 
-            it "is valid" do
-              expect(subject).to be_true
-            end
+          it "is valid" do
+            expect(subject).to be_true
           end
         end
 
-        (Coinmux::StateMachine::Director::STATUSES - Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coinmux::StateMachine::Director::STATUSES - ['completed']).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
@@ -53,45 +44,22 @@ describe Coinmux::Message::Status do
       context "when nil" do
         let(:transaction_id) { nil }
 
-        Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID.each do |test_status|
-          context "with #{test_status} status" do
-            let(:status) { test_status }
+        context "with completed status" do
+          let(:status) { 'completed' }
 
-            it "is invalid" do
-              expect(subject).to be_false
-              expect(message.errors[:transaction_id]).to include("must be present for status #{test_status}")
-            end
+          it "is invalid" do
+            expect(subject).to be_false
+            expect(message.errors[:transaction_id]).to include("must be present for status completed")
           end
         end
 
-        (Coinmux::StateMachine::Director::STATUSES - Coinmux::Message::Status::STATUSES_REQUIRING_TRANSACTION_ID).each do |test_status|
+        (Coinmux::StateMachine::Director::STATUSES - ['completed']).each do |test_status|
           context "with #{test_status} status" do
             let(:status) { test_status }
 
             it "is valid" do
               expect(subject).to be_true
             end
-          end
-        end
-      end
-    end
-
-    describe "#transaction_confirmed" do
-      context "when in completed state" do
-        let(:status) { 'completed' }
-
-        context "with confirmed transaction" do
-          it "is valid" do
-            expect(subject).to be_true
-          end
-        end
-
-        context "with no confirmed transaction" do
-          let(:transaction_id) { nil }
-
-          it "is invalid" do
-            expect(subject).to be_false
-            expect(message.errors[:transaction_id]).to include("is not confirmed")
           end
         end
       end
