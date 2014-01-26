@@ -48,7 +48,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       secret_message_key,
       Base64.decode64(message_verification.value.encrypted_message_identifier))
 
-      digest_facade.hex_message_digest(prefix, message_identifier, *keys)
+    digest_facade.hex_message_digest(prefix, message_identifier, *keys)
   end
 
   def message_verification_valid?(prefix, message_verification, *keys)
