@@ -16,8 +16,11 @@ class Cli::Application
   def start
     info "Starting CLI application"
 
-    Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count).tap do |coin_join_message|
-      (puts coin_join_message.errors.full_messages; return) unless coin_join_message.valid?
+    if !(input_errors = validate_inputs).empty?
+      puts "Unable to perform CoinJoin due to the following:"
+      puts input_errors.collect { |message| " * #{message}" }
+      puts "Quitting..."
+      return
     end
 
     Cli::EventQueue.instance.start
@@ -52,6 +55,22 @@ class Cli::Application
   end
 
   private
+
+  def validate_inputs
+    coin_join = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
+    return coin_join.errors.full_messages unless coin_join.valid?
+
+    input = Coinmux::Message::Input.build(coin_join, input_private_key, change_address)
+    input.valid?
+    return input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].nil?
+    return input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].nil?
+
+    output = Coinmux::Message::Output.build(coin_join, output_address)
+    output.valid?
+    return output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].nil?
+
+    []
+  end
 
   def build_participant
     Coinmux::StateMachine::Participant.new(
