@@ -28,14 +28,20 @@ class Coinmux::Message::Association < Coinmux::Message::Base
       message.read_only = read_only
       message.data_store_identifier = data_store_identifier
 
-      return nil unless message.valid?
+      if !message.valid?
+        debug "Association message #{name} is not valid: #{message.errors.full_messages}"
+        return nil
+      end
 
       message
     end
   end
 
   def initialize
-    @messages = []
+    # Note: a set is ordered in Ruby, but there is no guarantee of ordering of the messages
+    # For :fixed and :variable associations, we rely on the datastore returning the correct first/last inserted message
+    @data_store_messages = Set.new
+    @inserted_messages = Set.new
   end
 
   def value
@@ -44,7 +50,7 @@ class Coinmux::Message::Association < Coinmux::Message::Base
     elsif type == :fixed
       messages.first
     elsif type == :variable
-      messages.last
+      messages.first # note: we do a "fetch_last" from data_store facade so there is only ever one message
     else
       raise "Unexpected type: #{type.inspect}"
     end
@@ -52,12 +58,20 @@ class Coinmux::Message::Association < Coinmux::Message::Base
     result
   end
 
+  # A combination of the inserted messages and the fetched data_store messages from invocations of refresh.
+  # The inserted messages are chosen over those from the data store since they may have additional data (keys, etc)
   def messages
-    @messages
+    result = if type == :list
+      @inserted_messages + @data_store_messages # Set arithmetic will choose inserted over data_store
+    elsif type == :fixed || type == :variable
+      @inserted_messages.empty? ? @data_store_messages : @inserted_messages # if we inserted it, use it
+    end
+
+    result.to_a
   end
 
   def insert(message, &callback)
-    @messages << message
+    @inserted_messages << message
 
     data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do |event|
       yield(event) if block_given?
@@ -65,41 +79,42 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   end
 
   def refresh(&callback)
-    args = {
-      list: [:fetch_all, :plural],
-      fixed: [:fetch_first, :singular],
-      variable: [:fetch_last, :singular]
+    methods = {
+      list: :fetch_all,
+      fixed: :fetch_first,
+      variable: :fetch_last
     }
-    fetch_messages(*args[type]) do |event|
-      yield(event) if block_given?
-    end
-  end
+    fetch_messages(methods[type]) do |event|
+      if event.error
+        yield(event)
+      else
+        @data_store_messages.clear
+        @data_store_messages += event.data
 
-  # Note: messages are not directly retrieved since this would require a callback/blocking
-  # Instead, there is another thread that updates the messages with this method
-  def update_message_jsons(jsons)
-    @messages = message_jsons.collect { |json| build_message(json) }.compact
+        yield(Coinmux::Event.new(data: messages))
+      end
+    end
   end
 
   private
 
-  def fetch_messages(method, plurality, &callback)
+  def fetch_messages(method, &callback)
     data_store_facade.send(method, data_store_identifier) do |event|
       if event.error
         yield(event)
       else
-        @messages = if event.data.nil?
+        messages = if event.data.nil?
           []
-        elsif plurality == :plural
+        elsif method == :fetch_all
           event.data.collect { |data| association_class.from_json(data, coin_join) }
-        elsif plurality == :singular
+        elsif method == :fetch_first || method == :fetch_last
           [association_class.from_json(event.data, coin_join)]
         end
 
         # ignore bad data returned by #from_json as nil with compact
-        @messages.compact!
+        messages.compact!
 
-        yield(Coinmux::Event.new(data: plurality == :plural ? @messages : @messages.first))
+        yield(Coinmux::Event.new(data: messages))
       end
     end
   end
