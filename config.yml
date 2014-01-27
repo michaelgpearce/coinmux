@@ -1,8 +1,8 @@
 ---
 development:
   bitcoin_network: 'testnet3'
-  # coin_join_uri: 'coinjoin://coinmux/filesystem?identifier={"key":"test-key","can_insert":true,"can_request":true}'
-  coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins'
+  coin_join_uri: 'coinjoin://coinmux/filesystem?identifier={"key":"test-key","can_insert":true,"can_request":true}'
+  # coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins'
   webbtc_host: 'http://test.webbtc.com'
 
 test:
