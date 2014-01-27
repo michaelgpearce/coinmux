@@ -28,17 +28,16 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     fetch_most_recent_coin_join_message do |coin_join_message|
       if coin_join_message.nil?
         notify(:no_available_coin_join)
-        return
-      end
+      else
+        self.coin_join_message = coin_join_message
 
-      self.coin_join_message = coin_join_message
-
-      refresh_message(:status) do
-        if coin_join_message.status.value && coin_join_message.status.value.status == 'waiting_for_inputs'
-          self.coin_join_message = coin_join_message
-          start_inserting_input
-        else
-          notify(:no_available_coin_join)
+        refresh_message(:status) do
+          if coin_join_message.status.value && coin_join_message.status.value.status == 'waiting_for_inputs'
+            self.coin_join_message = coin_join_message
+            start_inserting_input
+          else
+            notify(:no_available_coin_join)
+          end
         end
       end
     end
@@ -136,16 +135,16 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def fetch_most_recent_coin_join_message(&callback)
     data_store_facade.fetch_most_recent(coin_join_data_store_identifier, COIN_JOIN_MESSAGE_FETCH_SIZE) do |event|
       handle_event(event, :unable_to_search_for_most_recent_message) do
+        yield_message = nil
         event.data.each do |json|
           if coin_join_message = json.nil? ? nil : Coinmux::Message::CoinJoin.from_json(json, nil)
             if coin_join_message.amount == bitcoin_amount && coin_join_message.participants == participant_count
-              yield(coin_join_message)
-              return
+              yield_message = coin_join_message
             end
           end
         end
 
-        yield(nil) # unable to locate a match
+        yield(yield_message)
       end
     end
   end
