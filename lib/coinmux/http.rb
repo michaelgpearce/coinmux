@@ -31,7 +31,7 @@ class Coinmux::Http
     info "HTTP GET Response #{response.code}"
     raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
 
-    debug "HTTP GET Response Content #{response.content}"
+    # debug "HTTP GET Response Content #{response.content}"
     response.content
   end
 
