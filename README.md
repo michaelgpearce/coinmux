@@ -1,6 +1,8 @@
-# Coinmux - Coinmux - Decentralized, Trustless, Anonymous and Open Bitcoin Mixer
+## Coinmux
 
-# DO NOT USE WITH THE BITCOIN NETWORK! THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
+### Decentralized, Trustless, Anonymous and Open Bitcoin Mixer
+
+### DO NOT USE WITH THE BITCOIN NETWORK! THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
 
 
 ## Synopsis
