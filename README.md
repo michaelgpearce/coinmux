@@ -56,7 +56,7 @@ Now, start a second process with matching number of participants and Bitcoin amo
 ./bin/coinmux -p 2 -a 0.5 -o my-output-address-2 -c my-change-address-2 -k my-input-private-key-in-hex-2
 ```
 
-You will see output like this:
+You will see output like this for the first participant:
 ```
 [Participant]: Finding coin join message
 [Participant]: No available coin join
@@ -77,7 +77,22 @@ You will see output like this:
    [Director]: Publishing transaction
    [Director]: Completed
 [Participant]: Completed - Transaction ID: 3b1d7dc373ecf5abc8e2a18d61839a7d7d06a99f3c94fec5cbff17330596c8a6
+Coin join successfully created!
 ```
+
+And like this for the second:
+```
+[Participant]: Finding coin join message
+[Participant]: Inserting input
+[Participant]: Waiting for other inputs
+[Participant]: Inserting output
+[Participant]: Waiting for other outputs
+[Participant]: Inserting transaction signatures
+[Participant]: Waiting for completed
+[Participant]: Completed - Transaction ID: 3b1d7dc373ecf5abc8e2a18d61839a7d7d06a99f3c94fec5cbff17330596c8a6
+Coin join successfully created!
+```
+
 
 ## Graphical Interface
 
