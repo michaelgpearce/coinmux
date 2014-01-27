@@ -1,6 +1,14 @@
 class Coinmux::DataStore::Base
   include Coinmux::Facades
 
+  def startup(&callback)
+    yield(Coinmux::Event.new) if block_given?
+  end
+
+  def shutdown(&callback)
+    yield(Coinmux::Event.new) if block_given?
+  end
+
   def generate_identifier
     { 'key' => rand.to_s, 'can_insert' => true, 'can_request' => true }.to_json
   end

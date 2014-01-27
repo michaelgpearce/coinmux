@@ -23,8 +23,6 @@ class Cli::Application
       return
     end
 
-    Cli::EventQueue.instance.start
-
     self.notification_callback = Proc.new do |event|
       debug "event queue event received: #{event.inspect}"
       if event.type == :failed
@@ -48,10 +46,16 @@ class Cli::Application
       end
     end
 
+    data_store_facade.startup
+
+    Cli::EventQueue.instance.start
+
     self.participant = build_participant
     participant.start(&notification_callback)
 
     Cli::EventQueue.instance.wait
+
+    data_store_facade.shutdown
   end
 
   private
