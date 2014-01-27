@@ -56,7 +56,6 @@ class Coinmux::DataStore::Base
   
   # items are in reverse inserted order
   def fetch_most_recent(identifier, max_items, &callback)
-    return [] if max_items <= 0
     data = fetch(identifier)
     yield(Coinmux::Event.new(:data => (data[-1*max_items..-1] || data).reverse))
   end
