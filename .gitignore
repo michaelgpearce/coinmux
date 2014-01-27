@@ -4,6 +4,7 @@ log
 .bundle
 .config
 .yardoc
+.DS_Store
 Gemfile.lock
 InstalledFiles
 _yardoc
