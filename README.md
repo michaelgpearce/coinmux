@@ -46,12 +46,38 @@ Print options from the project directory
 ./bin/coinmux --help
 ```
 
-Start one participant in a CoinJoin between two participants for 0.5 BTC:
+To try it out, start one participant in a CoinJoin between two participants for 0.5 BTC:
 ```bash
 ./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address -k my-input-private-key-in-hex
 ```
 
-For a second participant to join, the number of participants and Bitcoin amount must match.
+Now, start a second process with matching number of participants and Bitcoin amount, but different input private key, output address and change address.
+```bash
+./bin/coinmux -p 2 -a 0.5 -o my-output-address-2 -c my-change-address-2 -k my-input-private-key-in-hex-2
+```
+
+You will see output like this:
+```
+[Participant]: Finding coin join message
+[Participant]: No available coin join
+   [Director]: Inserting coin join message
+   [Director]: Inserting status message
+   [Director]: Waiting for inputs
+[Participant]: Finding coin join message
+[Participant]: Inserting input
+[Participant]: Waiting for other inputs
+   [Director]: Inserting message verification message
+   [Director]: Waiting for outputs
+[Participant]: Inserting output
+[Participant]: Waiting for other outputs
+   [Director]: Inserting transaction message
+   [Director]: Waiting for signatures
+[Participant]: Inserting transaction signatures
+[Participant]: Waiting for completed
+   [Director]: Publishing transaction
+   [Director]: Completed
+[Participant]: Completed - Transaction ID: 3b1d7dc373ecf5abc8e2a18d61839a7d7d06a99f3c94fec5cbff17330596c8a6
+```
 
 ## Graphical Interface
 
