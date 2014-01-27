@@ -3,8 +3,10 @@ require 'active_support/cache'
 class Coinmux::DataStore::File < Coinmux::DataStore::Base
   include Singleton
 
+  CACHE_TTL = 1.minute
+
   def initialize
-    @data_store ||= ActiveSupport::Cache::FileStore.new(File.join(Coinmux.root, 'tmp', 'file_data_store'))
+    @data_store ||= ActiveSupport::Cache::FileStore.new(File.join(Coinmux.root, 'tmp', 'file_data_store'), expires_in: CACHE_TTL)
   end
 
   def clear
