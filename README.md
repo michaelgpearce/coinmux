@@ -10,7 +10,7 @@
 Coinmux is an implementation of [CoinJoin](https://bitcointalk.org/index.php?topic=279249).
 It is currently in early development and only suitable for use on Bitcoin's Testnet network.
 
-CoinJoin is intended increase your Bitcoin privacy and help bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same amount. The resulting transaction provides the all of the participants with the correct amount of bitcoin, but there no way to match the input addresses with these same value output addresses.
+CoinJoin is intended increase your Bitcoin privacy and help bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same amount. There no way to match the input addresses with these same value output addresses in the transaction stored in the Bitcoin block chain.
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
