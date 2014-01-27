@@ -15,6 +15,7 @@ CoinJoin is intended increase your Bitcoin privacy and help bitcoins remain [fun
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
 [Protocol Specification](docs/spec.md)
+
 [Roadmap](docs/roadmap.md)
 
 
