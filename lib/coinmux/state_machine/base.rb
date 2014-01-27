@@ -1,7 +1,7 @@
 class Coinmux::StateMachine::Base
   include Coinmux::Facades
   
-  MESSAGE_POLL_INTERVAL = 10
+  MESSAGE_POLL_INTERVAL = 5
 
   attr_accessor :event_queue, :coin_join_message, :notification_callback, :status, :bitcoin_amount, :participant_count
   
