@@ -20,7 +20,7 @@ class Coinmux::StateMachine::Base
   protected
 
   def coin_join_data_store_identifier
-    Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri).identifier
+    data_store_facade.get_identifier_from_coin_join_uri(Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri))
   end
 
   def source

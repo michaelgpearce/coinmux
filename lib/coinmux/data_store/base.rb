@@ -9,6 +9,10 @@ class Coinmux::DataStore::Base
     yield(Coinmux::Event.new) if block_given?
   end
 
+  def get_identifier_from_coin_join_uri(coin_join_uri)
+    coin_join_uri.params['identifier']
+  end
+
   def generate_identifier
     { 'key' => rand.to_s, 'can_insert' => true, 'can_request' => true }.to_json
   end

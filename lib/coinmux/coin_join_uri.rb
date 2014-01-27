@@ -1,7 +1,7 @@
 class Coinmux::CoinJoinUri
   VALID_NETWORKS = %w(p2p filesystem test)
 
-  attr_accessor :identifier, :application, :network
+  attr_accessor :params, :application, :network
 
   class << self
     def parse(uri)
@@ -21,7 +21,7 @@ class Coinmux::CoinJoinUri
         acc
       end
 
-      new(:application => application, :network => network, :identifier => query_params['identifier'])
+      new(:application => application, :network => network, :params => query_params)
     end
   end
 
