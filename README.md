@@ -2,15 +2,15 @@
 
 ### Decentralized, Trustless, Anonymous and Open Bitcoin Mixer
 
-### DO NOT USE WITH THE BITCOIN NETWORK! THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
+### DO NOT USE WITH THE MAIN BITCOIN NETWORK! THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
 
 
 ## Synopsis
 
-Coinmux is an implementation of [CoinJoin](https://bitcointalk.org/index.php?topic=279249) for the Bitcoin Network.
+Coinmux is an implementation of [CoinJoin](https://bitcointalk.org/index.php?topic=279249).
 It is currently in early development and only suitable for use on Bitcoin's Testnet network.
 
-CoinJoin is intended increase your Bitcoin privacy and help bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility).
+CoinJoin is intended increase your Bitcoin privacy and help bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same amount. The resulting transaction provides the all of the participants with the correct amount of bitcoin, but there no way to match the input addresses with these same value output addresses.
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
