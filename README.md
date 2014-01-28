@@ -35,7 +35,7 @@ git clone git@github.com:michaelgpearce/coinmux.git
 
 Install application dependencies from the project directory
 ```bash
-bundle
+gem install bundler && bundle
 ```
 
 
