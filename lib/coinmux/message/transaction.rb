@@ -10,11 +10,13 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   validate :has_correct_participant_outputs, :unless => :created_with_build?
 
   class << self
-    def build(coin_join, inputs, outputs)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: [:inputs, :outputs])
+
       message = super(coin_join)
 
-      message.inputs = inputs
-      message.outputs = outputs
+      message.inputs = options[:inputs]
+      message.outputs = options[:outputs]
 
       message
     end

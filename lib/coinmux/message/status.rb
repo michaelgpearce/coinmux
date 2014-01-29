@@ -7,10 +7,12 @@ class Coinmux::Message::Status < Coinmux::Message::Base
   validate :status_valid
 
   class << self
-    def build(coin_join, status, transaction_id = nil)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: :status, optional: :transaction_id)
+
       message = super(coin_join)
-      message.status = status
-      message.transaction_id = transaction_id
+      message.status = options[:status]
+      message.transaction_id = options[:transaction_id]
 
       message
     end

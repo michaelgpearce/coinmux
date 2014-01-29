@@ -78,7 +78,7 @@ describe Coinmux::Message::Status do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Status.build(coin_join, status, transaction_id) }
+    subject { Coinmux::Message::Status.build(coin_join, status: status, transaction_id: transaction_id) }
 
     it "builds valid status" do
       expect(subject.valid?).to be_true

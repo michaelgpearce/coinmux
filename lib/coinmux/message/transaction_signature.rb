@@ -7,13 +7,17 @@ class Coinmux::Message::TransactionSignature < Coinmux::Message::Base
   validate :script_sig_valid
 
   class << self
-    def build(coin_join, transaction_input_index, private_key_hex)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: [:transaction_input_index, :private_key])
+
       message = super(coin_join)
 
-      message.transaction_input_index = transaction_input_index
-      script_sig = Coinmux::BitcoinNetwork.instance.build_transaction_input_script_sig(coin_join.transaction_object, transaction_input_index, private_key_hex)
+      message.transaction_input_index = options[:transaction_input_index]
+      script_sig = Coinmux::BitcoinNetwork.instance.build_transaction_input_script_sig(
+        coin_join.transaction_object, options[:transaction_input_index], options[:private_key])
       message.script_sig = Base64.encode64(script_sig)
-      message.message_verification = coin_join.build_message_verification(:transaction_signature, transaction_input_index, script_sig)
+      message.message_verification = coin_join.build_message_verification(
+        :transaction_signature, options[:transaction_input_index], script_sig)
 
       message
     end

@@ -38,7 +38,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_inserting_input
     notify(:inserting_input)
 
-    insert_message(:inputs, Coinmux::Message::Input.build(coin_join_message, input_private_key, change_address)) do
+    insert_message(:inputs, Coinmux::Message::Input.build(coin_join_message, private_key: input_private_key, change_address: change_address)) do
       notify(:waiting_for_other_inputs)
       wait_for_status('waiting_for_outputs') do
         refresh_message(:inputs) do
@@ -58,7 +58,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_inserting_output
     notify(:inserting_output)
 
-    insert_message(:outputs, Coinmux::Message::Output.build(coin_join_message, output_address)) do
+    insert_message(:outputs, Coinmux::Message::Output.build(coin_join_message, address: output_address)) do
       notify(:waiting_for_other_outputs)
       wait_for_status('waiting_for_signatures') do
         refresh_message(:outputs) do
@@ -89,7 +89,8 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     end
 
     if transaction_input['address'] == input_address
-      transaction_signature_message = Coinmux::Message::TransactionSignature.build(coin_join_message, transaction_message_input_index, input_private_key)
+      transaction_signature_message = Coinmux::Message::TransactionSignature.build(
+        coin_join_message, transaction_input_index: transaction_message_input_index, private_key: input_private_key)
       insert_message(:transaction_signatures, transaction_signature_message) do
         insert_transaction_signature(transaction_message_input_index + 1, remaining_transaction_inputs)
       end

@@ -68,7 +68,7 @@ describe Coinmux::Message::Association do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Association.build(coin_join, name, type, read_only) }
+    subject { Coinmux::Message::Association.build(coin_join, name: name, type: type, read_only: read_only) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true

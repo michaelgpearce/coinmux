@@ -171,7 +171,7 @@ describe Coinmux::Message::Transaction do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Transaction.build(coin_join, inputs, outputs) }
+    subject { Coinmux::Message::Transaction.build(coin_join, inputs: inputs, outputs: outputs) }
 
     it "builds valid transaction" do
       expect(subject.valid?).to be_true

@@ -33,6 +33,7 @@ module Coinmux
   end
 end
 
+require 'lib/coinmux/assert_keys'
 require 'lib/coinmux/version'
 require 'lib/coinmux/facades'
 require 'lib/coinmux/http'

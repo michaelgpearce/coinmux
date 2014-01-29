@@ -2,6 +2,8 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   include Coinmux::BitcoinUtil
   
   VERSION = 1
+  DEFAULT_AMOUNT = 1 * SATOSHIS_PER_BITCOIN
+  DEFAULT_PARTICIPANTS = 5
   
   add_properties :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee
   add_association :inputs, :list, :read_only => false
@@ -21,15 +23,17 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
-    def build(amount = SATOSHIS_PER_BITCOIN, participants = 5, participant_transaction_fee = (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / participants).to_i)
+    def build(options = {})
+      options.assert_keys!(optional: [:amount, :participants, :participant_transaction_fee])
+
       message = super(nil)
 
       message.version = VERSION
       message.identifier = digest_facade.random_identifier
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
-      message.amount = amount
-      message.participants = participants
-      message.participant_transaction_fee = participant_transaction_fee
+      message.amount = options[:amount] || DEFAULT_AMOUNT
+      message.participants = options[:participants] || DEFAULT_PARTICIPANTS
+      message.participant_transaction_fee = options[:participant_transaction_fee] || (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / message.participants).to_i
 
       message
     end

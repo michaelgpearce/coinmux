@@ -178,7 +178,7 @@ describe Coinmux::Message::CoinJoin do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::CoinJoin.build(amount, participants) }
+    subject { Coinmux::Message::CoinJoin.build(amount: amount, participants: participants) }
 
     it "builds valid input" do
       input = subject

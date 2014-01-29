@@ -6,10 +6,12 @@ class Coinmux::Message::Output < Coinmux::Message::Base
   validate :address_valid, :if => :address
  
   class << self
-    def build(coin_join, address)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: :address)
+
       message = super(coin_join)
 
-      message.address = address
+      message.address = options[:address]
       message.transaction_output_identifier = digest_facade.random_identifier
       message.message_verification = message.build_message_verification
 

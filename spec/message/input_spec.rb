@@ -71,7 +71,7 @@ describe Coinmux::Message::Input do
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Input.build(coin_join, private_key, change_address) }
+    subject { Coinmux::Message::Input.build(coin_join, private_key: private_key, change_address: change_address) }
 
     it "builds valid input" do
       expect(subject.valid?).to be_true

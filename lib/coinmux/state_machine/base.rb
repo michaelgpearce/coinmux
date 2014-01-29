@@ -8,7 +8,7 @@ class Coinmux::StateMachine::Base
   def initialize(event_queue, bitcoin_amount, participant_count)
     super() # NOTE: This *must* be called, otherwise states won't get initialized
 
-    coin_join_message = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
+    coin_join_message = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
     raise ArgumentError, "Input params should have been validated! #{self.coin_join_message.errors.full_messages}" if !coin_join_message.valid?
 
     self.bitcoin_amount = bitcoin_amount

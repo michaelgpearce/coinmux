@@ -10,15 +10,17 @@ class Coinmux::Message::Input < Coinmux::Message::Base
   validate :input_has_enough_value
   
   class << self
-    def build(coin_join, private_key_hex, change_address = nil)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: :private_key, optional: :change_address)
+
       message = super(coin_join)
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
 
-      message.private_key = private_key_hex
-      message.address = bitcoin_crypto_facade.address_for_private_key!(private_key_hex)
-      message.signature = bitcoin_crypto_facade.sign_message!(coin_join.identifier, private_key_hex)
+      message.private_key = options[:private_key]
+      message.address = bitcoin_crypto_facade.address_for_private_key!(options[:private_key])
+      message.signature = bitcoin_crypto_facade.sign_message!(coin_join.identifier, options[:private_key])
 
-      message.change_address = change_address
+      message.change_address = options[:change_address]
       message.change_transaction_output_identifier = digest_facade.random_identifier
 
       message

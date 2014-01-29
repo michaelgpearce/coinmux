@@ -5,7 +5,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   def initialize(event_queue, bitcoin_amount, participant_count)
     super(event_queue, bitcoin_amount, participant_count)
 
-    self.coin_join_message = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
+    self.coin_join_message = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
     self.status = 'waiting_for_inputs'
   end
   
@@ -34,7 +34,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     status_message = coin_join_message.status.value
 
     if status_message.nil? || status != status_message.status
-      new_status_message = Coinmux::Message::Status.build(coin_join_message, status, transaction_id)
+      new_status_message = Coinmux::Message::Status.build(coin_join_message, status: status, transaction_id: transaction_id)
       insert_message(:status, new_status_message) do
         yield if block_given?
       end
@@ -82,7 +82,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
           inputs = coin_join_message.build_transaction_inputs
           outputs = coin_join_message.build_transaction_outputs
           notify(:inserting_transaction_message)
-          insert_message(:transaction, Coinmux::Message::Transaction.build(coin_join_message, inputs, outputs)) do
+          insert_message(:transaction, Coinmux::Message::Transaction.build(coin_join_message, inputs: inputs, outputs: outputs)) do
             start_waiting_for_signatures
           end
         else

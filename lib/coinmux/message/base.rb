@@ -15,7 +15,7 @@ class Coinmux::Message::Base < Hashie::Dash
       coin_join = message if self == Coinmux::Message::CoinJoin
 
       associations.each do |name, config|
-        message[name] = Coinmux::Message::Association.build(coin_join, name, config[:type], config[:read_only])
+        message[name] = Coinmux::Message::Association.build(coin_join, name: name, type: config[:type], read_only: config[:read_only])
       end
 
       message

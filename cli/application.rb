@@ -72,15 +72,15 @@ class Cli::Application
   end
 
   def validate_inputs
-    coin_join = Coinmux::Message::CoinJoin.build(bitcoin_amount, participant_count)
+    coin_join = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
     return coin_join.errors.full_messages unless coin_join.valid?
 
-    input = Coinmux::Message::Input.build(coin_join, input_private_key, change_address)
+    input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key, change_address: change_address)
     input.valid?
     return input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
     return input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
 
-    output = Coinmux::Message::Output.build(coin_join, output_address)
+    output = Coinmux::Message::Output.build(coin_join, address: output_address)
     output.valid?
     return output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].blank?
 

@@ -58,7 +58,7 @@ describe Coinmux::Message::Transaction do
     let(:private_key_hex) { Helper.next_bitcoin_info[:private_key] }
     let(:script_sig) { "scriptsig-#{rand}" }
 
-    subject { Coinmux::Message::TransactionSignature.build(coin_join, transaction_input_index, private_key_hex) }
+    subject { Coinmux::Message::TransactionSignature.build(coin_join, transaction_input_index: transaction_input_index, private_key: private_key_hex) }
 
     before do
       Coinmux::BitcoinNetwork.instance.stub(:build_transaction_input_script_sig).and_return(script_sig)

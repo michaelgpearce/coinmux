@@ -51,7 +51,7 @@ describe Coinmux::Message::Output do
   describe "#build" do
     let(:address) { message.address }
 
-    subject { Coinmux::Message::Output.build(coin_join, address) }
+    subject { Coinmux::Message::Output.build(coin_join, address: address) }
 
     it "builds valid output" do
       expect(subject.valid?).to be_true

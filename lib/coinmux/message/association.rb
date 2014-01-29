@@ -6,13 +6,15 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   validate :data_store_identifier_has_correct_permissions, :unless => :created_with_build?
 
   class << self
-    def build(coin_join, name, type, read_only)
+    def build(coin_join, options = {})
+      options.assert_keys!(required: [:name, :type, :read_only])
+
       message = build_without_associations(coin_join)
-      message.name = name.to_s
-      message.type = type
-      message.read_only = read_only
+      message.name = options[:name].to_s
+      message.type = options[:type]
+      message.read_only = options[:read_only]
       message.data_store_identifier_from_build = data_store_facade.generate_identifier
-      message.data_store_identifier = read_only ?
+      message.data_store_identifier = options[:read_only] ?
         data_store_facade.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
         message.data_store_identifier_from_build
 
