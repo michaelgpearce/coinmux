@@ -39,16 +39,16 @@ class Coinmux::StateMachine::Base
     raise NotImplementedError
   end
 
-  def insert_message(association, message, &callback)
-    coin_join_message.send(association).insert(message) do |event|
+  def insert_message(association, message, coin_join = coin_join_message, &callback)
+    coin_join.send(association).insert(message) do |event|
       handle_event(event, :"unable_to_insert_into_#{association}") do
         yield
       end
     end
   end
 
-  def refresh_message(association, &callback)
-    coin_join_message.send(association).refresh do |event|
+  def refresh_message(association, coin_join = coin_join_message, &callback)
+    coin_join.send(association).refresh do |event|
       handle_event(event, :"unable_to_refresh_#{association}") do
         yield
       end

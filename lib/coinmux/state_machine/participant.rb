@@ -25,20 +25,12 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_finding_coin_join
     notify(:finding_coin_join_message)
 
-    fetch_most_recent_coin_join_message do |coin_join_message|
+    fetch_available_coin_join_message do |coin_join_message|
       if coin_join_message.nil?
         notify(:no_available_coin_join)
       else
         self.coin_join_message = coin_join_message
-
-        refresh_message(:status) do
-          if coin_join_message.status.value && coin_join_message.status.value.status == 'waiting_for_inputs'
-            self.coin_join_message = coin_join_message
-            start_inserting_input
-          else
-            notify(:no_available_coin_join)
-          end
-        end
+        start_inserting_input
       end
     end
   end
@@ -132,19 +124,29 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   # TODO: there needs to be a better implementation to guard against flooding.
   #
   # @callback [Proc] Invoked with either a CoinJoin message or nil if none could be found.
-  def fetch_most_recent_coin_join_message(&callback)
+  def fetch_available_coin_join_message(&callback)
     data_store_facade.fetch_most_recent(coin_join_data_store_identifier, COIN_JOIN_MESSAGE_FETCH_SIZE) do |event|
       handle_event(event, :unable_to_search_for_most_recent_message) do
-        yield_message = nil
-        event.data.each do |json|
-          if coin_join_message = json.nil? ? nil : Coinmux::Message::CoinJoin.from_json(json, nil)
-            if coin_join_message.amount == bitcoin_amount && coin_join_message.participants == participant_count
-              yield_message = coin_join_message
-            end
+        coin_join_messages = event.data.collect { |json| Coinmux::Message::CoinJoin.from_json(json, nil) }.compact
+        fetch_available_coin_join_status_message(coin_join_messages, &callback)
+      end
+    end
+  end
+
+  def fetch_available_coin_join_status_message(coin_join_messages, &callback)
+    if (coin_join = coin_join_messages.pop).nil?
+      yield(nil) # none left, so no match
+    else
+      if coin_join.amount == bitcoin_amount && coin_join.participants == participant_count
+        refresh_message(:status, coin_join) do
+          if coin_join.status.value && coin_join.status.value.status == 'waiting_for_inputs'
+            yield(coin_join) # found it!
+          else
+            fetch_available_coin_join_status_message(coin_join_messages, &callback) # try next
           end
         end
-
-        yield(yield_message)
+      else
+        fetch_available_coin_join_status_message(coin_join_messages, &callback) # try next
       end
     end
   end
