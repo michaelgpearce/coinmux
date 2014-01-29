@@ -138,7 +138,7 @@ class Coinmux::DataStore::Tomp2p
       value: value
     }.to_json
 
-    exec(peer.add(Number160.createHash(key)).setData(Data.new(json)).setRefreshSeconds(5).setDirectReplication(), callback) do |future|
+    exec(peer.add(create_hash(key)).setData(Data.new(json).set_ttl_seconds(11)).setRefreshSeconds(5).setDirectReplication(), callback) do |future|
       if future.isSuccess()
         Coinmux::Event.new(data: nil)
       else
@@ -148,7 +148,7 @@ class Coinmux::DataStore::Tomp2p
   end
 
   def get_list(key, &callback)
-    exec(peer.get(Number160.createHash(key)).setAll(), callback) do |future|
+    exec(peer.get(create_hash(key)).setAll(), callback) do |future|
       if future.isSuccess()
         hashes = future.getDataMap().values().each_with_object([]) do |value, hashes|
           json = value.getObject().to_s
@@ -173,5 +173,9 @@ class Coinmux::DataStore::Tomp2p
       end
     end
     nil
+  end
+
+  def create_hash(name)
+    Number160.java_send(:createHash, [java.lang.String], name)
   end
 end
