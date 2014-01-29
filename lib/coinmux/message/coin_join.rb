@@ -86,7 +86,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       result.concat(inputs.value.select(&:change_address).collect do |input|
         unspent_input_amount = minimum_unspent_transaction_inputs(input.address).collect { |hash| hash[:amount] }.inject(&:+)
         change_amount = unspent_input_amount - amount - participant_transaction_fee
-        { 'address' => input.address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
+        { 'address' => input.change_address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
       end)
     end
   end

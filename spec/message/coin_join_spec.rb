@@ -343,7 +343,7 @@ describe Coinmux::Message::CoinJoin do
           expected += coin_join.inputs.value.collect do |input|
             unspent_input_amount = bitcoin_network_facade.unspent_inputs_for_address(input.address).values.inject(&:+)
             change_amount = unspent_input_amount - coin_join.amount - coin_join.participant_transaction_fee
-            { 'address' => input.address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
+            { 'address' => input.change_address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
           end
 
           expect(subject).to eq(expected)
