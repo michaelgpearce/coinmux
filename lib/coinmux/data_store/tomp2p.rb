@@ -88,7 +88,7 @@ class Coinmux::DataStore::Tomp2p
     get_list(identifier, &callback)
   end
   
-  # items are in reverse inserted order
+  # items should be in reverse inserted order, but data returned as an unordered set by Tomp2p
   def fetch_most_recent(identifier, max_items, &callback)
     get_list(identifier) do |event|
       event.data = (event.data[-1*max_items..-1] || event.data).reverse! if event.data
@@ -133,7 +133,21 @@ class Coinmux::DataStore::Tomp2p
     end
   end
 
+  def key_ttl
+    2.hours
+  end
+
+  def current_key(key)
+    "#{Time.now.to_i / key_ttl * key_ttl}:#{key}"
+  end
+
+  def previous_key(key)
+    "#{Time.now.to_i / key_ttl * key_ttl - key_ttl}:#{key}"
+  end
+
   def add_list(key, value, &callback)
+    key = current_key(key)
+
     json = {
       timestamp: Time.now.to_i, # TODO: need to come up with something better than timestamps here
       value: value
@@ -148,7 +162,23 @@ class Coinmux::DataStore::Tomp2p
     end
   end
 
+  # TODO: I don't know how to get items to expire in the set, so we'll use a new set every hour, to let the
+  # old set expire.  But we'll also look at the previous set. This should be fun for computers with incorrect time setup.
   def get_list(key, &callback)
+    do_get_list(current_key(key)) do |prev_event|
+      do_get_list(previous_key(key)) do |current_event|
+        result_event = Coinmux::Event.new
+        if prev_event.data || current_event.data
+          result_event.data = (prev_event.data || []) + (current_event.data || [])
+        else
+          result_event.error = prev_event.error || current_event.error
+        end
+        yield(result_event)
+      end
+    end
+  end
+
+  def do_get_list(key, &callback)
     exec(peer.get(create_hash(key)).setAll(), callback) do |future|
       if future.isSuccess()
         hashes = future.getDataMap().values().each_with_object([]) do |value, hashes|
