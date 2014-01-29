@@ -5,6 +5,7 @@ class Coinmux::DataStore::Tomp2p
 
   BOOTSTRAP_HOST = "coinjoin.coinmux.com"
   P2P_PORT = 14141
+  DATA_TIME_TO_LIVE = 1 * 60
   
   import 'java.io.IOException'
   import 'java.net.InetAddress'
@@ -153,11 +154,15 @@ class Coinmux::DataStore::Tomp2p
         hashes = future.getDataMap().values().each_with_object([]) do |value, hashes|
           json = value.getObject().to_s
           if (hash = JSON.parse(json) rescue nil)
-            hashes << hash 
+            if (timestamp = Time.at(hash['timestamp'].to_i).to_i rescue nil)
+              if Time.now.to_i - timestamp < DATA_TIME_TO_LIVE
+                hashes << hash
+              end
+            end
           end
         end.sort do |left, right|
           left_timestamp, right_timestamp = [left, right].collect do |hash|
-            Time.at(hash['timestamp'].to_i) rescue Time.at(0)
+            Time.at(hash['timestamp'].to_i)
           end
 
           left_timestamp <=> right_timestamp
