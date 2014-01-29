@@ -99,7 +99,7 @@ Coin join successfully created!
 
 ### Usage on a single computer
 
-If you want to try Coinmux out on a single computer, you can modify ```config.yml``` to use the filesystem ```coin_join_uri``` instead of the ```p2p``` URI. When communicating via the filesystem, no external connections are made to find peers - only your computer's filesystem.
+If you want to try Coinmux out on a single computer, you can modify ```config.yml``` to use the filesystem ```coin_join_uri``` instead of the p2p URI. When communicating via the filesystem, no external connections are made to find peers - only your computer's filesystem.
 
 ## Graphical Interface
 
