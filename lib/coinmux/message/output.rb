@@ -9,7 +9,7 @@ class Coinmux::Message::Output < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: :address)
 
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
 
       message.address = options[:address]
       message.transaction_output_identifier = digest_facade.random_identifier

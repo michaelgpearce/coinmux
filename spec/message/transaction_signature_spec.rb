@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Coinmux::Message::Transaction do
+describe Coinmux::Message::TransactionSignature do
   let(:template_message) { build(:transaction_signature_message) }
   let(:coin_join) { template_message.coin_join }
   let(:transaction_input_index) { template_message.transaction_input_index }
@@ -95,7 +95,7 @@ describe Coinmux::Message::Transaction do
     end
 
     subject do
-      Coinmux::Message::TransactionSignature.from_json(json, coin_join)
+      Coinmux::Message::TransactionSignature.from_json(json, data_store, coin_join)
     end
 
     it "creates a valid transaction_signature" do

@@ -37,7 +37,7 @@ describe Coinmux::Message::Association do
 
       context "when data_store_identifier does not allow requests" do
         before do
-          data_store_facade.stub(:identifier_can_request?).and_return(false)
+          Helper.data_store.stub(:identifier_can_request?).and_return(false)
         end
 
         it "is invalid" do
@@ -48,7 +48,7 @@ describe Coinmux::Message::Association do
 
       context "when not read only and data_store_identifier cannot insert" do
         let(:read_only) { false }
-        before { data_store_facade.stub(:identifier_can_insert?).and_return(false) }
+        before { Helper.data_store.stub(:identifier_can_insert?).and_return(false) }
 
         it "is invalid" do
           expect(subject).to be_false
@@ -58,7 +58,7 @@ describe Coinmux::Message::Association do
 
       context "when not read only and data_store_identifier can insert" do
         let(:read_only) { false }
-        before { data_store_facade.stub(:identifier_can_insert?).and_return(true) }
+        before { Helper.data_store.stub(:identifier_can_insert?).and_return(true) }
 
         it "is valid" do
           expect(subject).to be_true
@@ -75,16 +75,16 @@ describe Coinmux::Message::Association do
     end
 
     it "has a data_store_identifier_from_build that can insert and request" do
-      expect(data_store_facade.identifier_can_insert?(subject.data_store_identifier_from_build)).to be_true
-      expect(data_store_facade.identifier_can_request?(subject.data_store_identifier_from_build)).to be_true
+      expect(Helper.data_store.identifier_can_insert?(subject.data_store_identifier_from_build)).to be_true
+      expect(Helper.data_store.identifier_can_request?(subject.data_store_identifier_from_build)).to be_true
     end
 
     context "when read-only" do
       let(:read_only) { true }
 
       it "has a data_store_identifier that can only request" do
-        expect(data_store_facade.identifier_can_insert?(subject.data_store_identifier)).to be_false
-        expect(data_store_facade.identifier_can_request?(subject.data_store_identifier)).to be_true
+        expect(Helper.data_store.identifier_can_insert?(subject.data_store_identifier)).to be_false
+        expect(Helper.data_store.identifier_can_request?(subject.data_store_identifier)).to be_true
       end
     end
 
@@ -92,8 +92,8 @@ describe Coinmux::Message::Association do
       let(:read_only) { false }
 
       it "has a data_store_identifier that can insert and request" do
-        expect(data_store_facade.identifier_can_insert?(subject.data_store_identifier)).to be_true
-        expect(data_store_facade.identifier_can_request?(subject.data_store_identifier)).to be_true
+        expect(Helper.data_store.identifier_can_insert?(subject.data_store_identifier)).to be_true
+        expect(Helper.data_store.identifier_can_request?(subject.data_store_identifier)).to be_true
       end
 
       it "has same data_store_identifier_from_build and data_store_identifier" do

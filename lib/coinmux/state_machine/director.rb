@@ -2,10 +2,12 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   STATUSES = %w(waiting_for_inputs waiting_for_outputs waiting_for_signatures failed completed)
   STATUS_UPDATE_INTERVAL = 60
   
-  def initialize(event_queue, bitcoin_amount, participant_count)
-    super(event_queue, bitcoin_amount, participant_count)
+  def initialize(options = {})
+    assert_initialize_params!(options)
 
-    self.coin_join_message = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
+    super(options)
+
+    self.coin_join_message = Coinmux::Message::CoinJoin.build(data_store, amount: options[:amount], participants: options[:participants])
     self.status = 'waiting_for_inputs'
   end
   
@@ -158,7 +160,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
 
   def insert_coin_join_message(message, &callback)
-    data_store_facade.insert(coin_join_data_store_identifier, message.to_json) do |event|
+    data_store.insert(data_store.coin_join_identifier, message.to_json) do |event|
       handle_event(event, :unable_to_insert_message) do
         yield
       end

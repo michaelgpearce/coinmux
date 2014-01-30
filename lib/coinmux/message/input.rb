@@ -13,7 +13,7 @@ class Coinmux::Message::Input < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: :private_key, optional: :change_address)
 
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
 
       message.private_key = options[:private_key]

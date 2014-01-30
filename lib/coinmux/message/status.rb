@@ -10,7 +10,7 @@ class Coinmux::Message::Status < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: :status, optional: :transaction_id)
 
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
       message.status = options[:status]
       message.transaction_id = options[:transaction_id]
 

@@ -13,7 +13,7 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: [:inputs, :outputs])
 
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
 
       message.inputs = options[:inputs]
       message.outputs = options[:outputs]

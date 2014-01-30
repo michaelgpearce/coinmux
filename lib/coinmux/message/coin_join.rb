@@ -23,10 +23,10 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
-    def build(options = {})
+    def build(data_store, options = {})
       options.assert_keys!(optional: [:amount, :participants, :participant_transaction_fee])
 
-      message = super(nil)
+      message = super(data_store, nil)
 
       message.version = VERSION
       message.identifier = digest_facade.random_identifier

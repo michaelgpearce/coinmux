@@ -10,7 +10,7 @@ class Coinmux::Message::TransactionSignature < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: [:transaction_input_index, :private_key])
 
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
 
       message.transaction_input_index = options[:transaction_input_index]
       script_sig = Coinmux::BitcoinNetwork.instance.build_transaction_input_script_sig(

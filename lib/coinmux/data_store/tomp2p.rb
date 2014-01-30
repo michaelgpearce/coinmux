@@ -1,10 +1,12 @@
 require 'java'
 
 class Coinmux::DataStore::Tomp2p
-  include Singleton, Coinmux::Facades
+  include Coinmux::Facades
 
-  BOOTSTRAP_HOST = "coinjoin.coinmux.com"
-  P2P_PORT = 14141
+  attr_accessor :coin_join_uri
+
+  DEFAULT_BOOTSTRAP_HOST = "coinjoin.coinmux.com"
+  DEFAULT_P2P_PORT = 14141
   DATA_TIME_TO_LIVE = 1 * 60
   
   import 'java.io.IOException'
@@ -22,10 +24,30 @@ class Coinmux::DataStore::Tomp2p
   import 'net.tomp2p.peers.PeerAddress'
   import 'net.tomp2p.storage.Data'
 
+  def initialize(coin_join_uri)
+    self.coin_join_uri = coin_join_uri
+  end
+
+  def coin_join_identifier
+    @coin_join_identifier ||= (coin_join_uri.params["identifier"] || "coinjoins-#{Coinmux.env}")
+  end
+
+  def bootstrap_host
+    @bootstrap_host ||= (coin_join_uri.params["bootstrap"] || DEFAULT_BOOTSTRAP_HOST).gsub(/:.*/, "")
+  end
+
+  def bootstrap_port
+    @bootstrap_port ||= (
+      port = (coin_join_uri.params["bootstrap"] || "").gsub(/.*:/, "").to_i
+      port = DEFAULT_P2P_PORT if port == 0
+      port
+    )
+  end
+
   def startup(&callback)
-    address = Inet4Address.getByName(BOOTSTRAP_HOST)
-    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(P2P_PORT).makeAndListen()
-    peer_address = PeerAddress.new(Number160::ZERO, address, P2P_PORT, P2P_PORT)
+    address = Inet4Address.getByName(bootstrap_host)
+    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(bootstrap_port).makeAndListen()
+    peer_address = PeerAddress.new(Number160::ZERO, address, bootstrap_port, bootstrap_port)
     @peer.getConfiguration().setBehindFirewall(true)
     exec(@peer.discover().setPeerAddress(peer_address), callback) do |future|
       if future.isSuccess()
@@ -41,10 +63,6 @@ class Coinmux::DataStore::Tomp2p
 
   def shutdown(&callback)
     @peer.shutdown
-  end
-
-  def get_identifier_from_coin_join_uri(coin_join_uri)
-    coin_join_uri.params['identifier']
   end
 
   def generate_identifier

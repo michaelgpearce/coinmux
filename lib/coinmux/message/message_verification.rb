@@ -12,7 +12,7 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
 
   class << self
     def build(coin_join)
-      message = super(coin_join)
+      message = super(coin_join.data_store, coin_join)
 
       message.message_identifier = digest_facade.random_identifier
       message.secret_key = digest_facade.random_identifier

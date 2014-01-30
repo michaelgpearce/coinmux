@@ -4,13 +4,13 @@ class Coinmux::Message::Base < Hashie::Dash
   MAX_JSON_DATA_SIZE = 10_000 # not sure the best number for this, but all our messages should be small
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
 
-  attr_accessor :coin_join, :created_with_build
+  attr_accessor :coin_join, :created_with_build, :data_store
 
   validate :coin_join_valid, :if => :should_validate_coin_join
 
   class << self
-    def build(coin_join = nil)
-      message = build_without_associations(coin_join)
+    def build(data_store, coin_join = nil)
+      message = build_without_associations(data_store, coin_join)
 
       coin_join = message if self == Coinmux::Message::CoinJoin
 
@@ -25,7 +25,7 @@ class Coinmux::Message::Base < Hashie::Dash
       properties.each { |prop| property(prop) }
     end
 
-    def from_json(json, coin_join = nil)
+    def from_json(json, data_store, coin_join = nil)
       return nil if json.nil?
 
       return nil if json.bytesize > MAX_JSON_DATA_SIZE
@@ -33,13 +33,14 @@ class Coinmux::Message::Base < Hashie::Dash
       hash = JSON.parse(json) rescue nil
       return nil unless hash.is_a?(Hash)
 
-      from_hash(hash, coin_join)
+      from_hash(hash, data_store, coin_join)
     end
 
-    def from_hash(hash, coin_join = nil)
+    def from_hash(hash, data_store, coin_join = nil)
       return nil unless self.properties.collect(&:to_s).sort == hash.keys.sort
 
       message = self.new
+      message.data_store = data_store
       coin_join = message if self == Coinmux::Message::CoinJoin
 
       message.coin_join = coin_join
@@ -77,8 +78,9 @@ class Coinmux::Message::Base < Hashie::Dash
     
     protected
 
-    def build_without_associations(coin_join)
+    def build_without_associations(data_store, coin_join)
       message = new
+      message.data_store = data_store
       message.coin_join = coin_join
       message.created_with_build = true
 

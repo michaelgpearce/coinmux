@@ -9,13 +9,13 @@ class Coinmux::Message::Association < Coinmux::Message::Base
     def build(coin_join, options = {})
       options.assert_keys!(required: [:name, :type, :read_only])
 
-      message = build_without_associations(coin_join)
+      message = build_without_associations(coin_join.data_store, coin_join)
       message.name = options[:name].to_s
       message.type = options[:type]
       message.read_only = options[:read_only]
-      message.data_store_identifier_from_build = data_store_facade.generate_identifier
+      message.data_store_identifier_from_build = coin_join.data_store.generate_identifier
       message.data_store_identifier = options[:read_only] ?
-        data_store_facade.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
+        coin_join.data_store.convert_to_request_only_identifier(message.data_store_identifier_from_build) :
         message.data_store_identifier_from_build
 
       message
@@ -23,6 +23,7 @@ class Coinmux::Message::Association < Coinmux::Message::Base
 
     def from_data_store_identifier(data_store_identifier, coin_join, name, type, read_only)
       message = new
+      message.data_store = coin_join.data_store
       message.coin_join = coin_join
 
       message.name = name.to_s
@@ -75,7 +76,7 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   def insert(message, &callback)
     @inserted_messages << message
 
-    data_store_facade.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do |event|
+    data_store.insert(data_store_identifier_from_build || data_store_identifier, message.to_json) do |event|
       yield(event) if block_given?
     end
   end
@@ -101,16 +102,16 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   private
 
   def fetch_messages(method, &callback)
-    data_store_facade.send(method, data_store_identifier) do |event|
+    data_store.send(method, data_store_identifier) do |event|
       if event.error
         yield(event)
       else
         messages = if event.data.nil?
           []
         elsif method == :fetch_all
-          event.data.collect { |data| association_class.from_json(data, coin_join) }
+          event.data.collect { |data| association_class.from_json(data, data_store, coin_join) }
         elsif method == :fetch_first || method == :fetch_last
-          [association_class.from_json(event.data, coin_join)]
+          [association_class.from_json(event.data, data_store, coin_join)]
         end
 
         # ignore bad data returned by #from_json as nil with compact
@@ -122,8 +123,8 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   end
 
   def data_store_identifier_has_correct_permissions
-    can_insert = data_store_facade.identifier_can_insert?(data_store_identifier.to_s)
-    can_request = data_store_facade.identifier_can_request?(data_store_identifier.to_s)
+    can_insert = data_store.identifier_can_insert?(data_store_identifier.to_s)
+    can_request = data_store.identifier_can_request?(data_store_identifier.to_s)
 
     errors[:data_store_identifier] << "must allow requests" unless can_request
     if !read_only
@@ -136,6 +137,6 @@ class Coinmux::Message::Association < Coinmux::Message::Base
   end
 
   def build_message(json)
-    association_class.from_json(json, coin_join)
+    association_class.from_json(json, data_store, coin_join)
   end
 end

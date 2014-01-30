@@ -1,7 +1,7 @@
 class Coinmux::DataStore::Memory < Coinmux::DataStore::Base
-  include Singleton
-  
-  def initialize
+  def initialize(coin_join_uri)
+    super(coin_join_uri)
+    
     @data_store ||= Hash.new
   end
 

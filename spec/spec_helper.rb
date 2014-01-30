@@ -79,6 +79,10 @@ def stub_bitcoin_network_for_coin_join(coin_join)
   Coinmux::BitcoinNetwork.instance.stub(:script_sig_valid?).and_return(true)
 end
 
+def data_store
+  Helper.data_store
+end
+
 def load_fixture(name)
   open(File.join(File.dirname(__FILE__), 'fixtures', name)) { |f| f.read }
 end
@@ -106,6 +110,13 @@ module Helper
   def self.bitcoin_info_for_address(address)
     @@bitcoin_infos.detect { |bitcoin_info| bitcoin_info[:address] == address }
   end
+
+  def self.data_store
+    @data_store ||= (
+      coin_join_uri = Coinmux::CoinJoinUri.parse(Coinmux::Config.instance.coin_join_uri)
+      Coinmux::DataStore::Factory.build(coin_join_uri)
+    )
+  end
 end
 
 RSpec.configure do |config|
@@ -121,7 +132,7 @@ RSpec.configure do |config|
   config.order = 'random'
 
   config.before do
-    data_store_facade.clear
+    Helper.data_store.clear
     Helper.class_variable_set(:@@bitcoin_info_index, 0) # start over reading bitcoin infos for each spec
   end
 end

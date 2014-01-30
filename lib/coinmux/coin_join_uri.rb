@@ -5,14 +5,14 @@ class Coinmux::CoinJoinUri
 
   class << self
     def parse(uri)
-      match = uri.to_s.match(/coinjoin:\/\/([^\/]+)\/([^?]+)\?(.*)/)
-      raise ArgumentError, "Could not parse URI" if match.nil?
+      match = uri.to_s.match(/coinjoin:\/\/([^\/]+)\/([^?]+)\??(.*)/)
+      raise Coinmux::Error, "Could not parse URI" if match.nil?
 
       application = match[1]
-      raise ArgumentError, "Invalid application #{application}. Must be coinmux" if application != 'coinmux'
+      raise Coinmux::Error, "Invalid application #{application}. Must be coinmux" if application != 'coinmux'
 
       network = match[2]
-      raise ArgumentError, "Invalid network #{network}. Must be one of #{VALID_NETWORKS.join(', ')}" unless VALID_NETWORKS.include?(network)
+      raise Coinmux::Error, "Invalid network #{network}. Must be one of #{VALID_NETWORKS.join(', ')}" unless VALID_NETWORKS.include?(network)
 
       query = match[3]
       query_params = query.split('&').inject({}) do |acc, key_and_value|

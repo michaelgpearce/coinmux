@@ -1,16 +1,22 @@
 class Coinmux::DataStore::Base
   include Coinmux::Facades
 
+  attr_accessor :coin_join_uri
+
+  def initialize(coin_join_uri)
+    self.coin_join_uri = coin_join_uri
+  end
+
+  def coin_join_identifier
+    coin_join_uri.params["identifier"] || '{"key":"test-key","can_insert":true,"can_request":true}'
+  end
+
   def startup(&callback)
     yield(Coinmux::Event.new) if block_given?
   end
 
   def shutdown(&callback)
     yield(Coinmux::Event.new) if block_given?
-  end
-
-  def get_identifier_from_coin_join_uri(coin_join_uri)
-    coin_join_uri.params['identifier']
   end
 
   def generate_identifier
@@ -59,7 +65,7 @@ class Coinmux::DataStore::Base
     data = fetch(identifier)
     yield(Coinmux::Event.new(:data => (data[-1*max_items..-1] || data).reverse))
   end
-  
+
   private
 
   def fetch(identifier)

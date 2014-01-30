@@ -3,19 +3,20 @@ FactoryGirl.define do
     sequence(:name) { |n| "association-#{n}" }
     type :list
     read_only false
-    data_store_identifier_from_build { data_store_facade.generate_identifier }
+    data_store_identifier_from_build { Helper.data_store.generate_identifier }
     data_store_identifier do
       if read_only
-        data_store_facade.convert_to_request_only_identifier(data_store_identifier_from_build)
+        data_store.convert_to_request_only_identifier(data_store_identifier_from_build)
       else
         data_store_identifier_from_build
       end
     end
+    data_store { Helper.data_store }
   end
 
   factory :coin_join_message, :class => Coinmux::Message::CoinJoin do
     ignore do
-      template_message { Coinmux::Message::CoinJoin.build }
+      template_message { Coinmux::Message::CoinJoin.build(Helper.data_store) }
     end
 
     version { template_message.version }
@@ -25,13 +26,14 @@ FactoryGirl.define do
     amount { 100_000_000 }
     participants { 2 }
     participant_transaction_fee { template_message.participant_transaction_fee }
+    data_store { Helper.data_store }
 
-    inputs { association :association_message, strategy: :build, name: 'input', type: :list, read_only: false, created_with_build: true }
-    outputs { association :association_message, strategy: :build, name: 'output', type: :list, read_only: false, created_with_build: true }
-    message_verification { association :association_message, strategy: :build, name: 'message_verification', type: :fixed, read_only: true, created_with_build: true }
-    transaction { association :association_message, strategy: :build, name: 'transaction', type: :fixed, read_only: true, created_with_build: true }
-    transaction_signatures { association :association_message, strategy: :build, name: 'transaction_signature', type: :list, read_only: false, created_with_build: true }
-    status { association :association_message, strategy: :build, name: 'status', type: :variable, read_only: true, created_with_build: true }
+    inputs { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'input', type: :list, read_only: false, created_with_build: true }
+    outputs { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'output', type: :list, read_only: false, created_with_build: true }
+    message_verification { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'message_verification', type: :fixed, read_only: true, created_with_build: true }
+    transaction { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'transaction', type: :fixed, read_only: true, created_with_build: true }
+    transaction_signatures { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'transaction_signature', type: :list, read_only: false, created_with_build: true }
+    status { association :association_message, strategy: :build, data_store: Helper.data_store, name: 'status', type: :variable, read_only: true, created_with_build: true }
 
     #
     # NOTE: traits ordering is important and should probably be loaded in the order defined below
@@ -139,7 +141,7 @@ FactoryGirl.define do
 
   factory :message_verification_message, :class => Coinmux::Message::MessageVerification do
     ignore do
-      template_message { Coinmux::Message::MessageVerification.build(Coinmux::Message::CoinJoin.build) }
+      template_message { Coinmux::Message::MessageVerification.build(Coinmux::Message::CoinJoin.build(Helper.data_store)) }
     end
 
     message_identifier { template_message.message_identifier }

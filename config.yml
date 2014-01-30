@@ -1,16 +1,16 @@
 ---
 development:
   bitcoin_network: 'testnet3'
-  # coin_join_uri: 'coinjoin://coinmux/filesystem?identifier={"key":"test-key","can_insert":true,"can_request":true}'
-  coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins'
+  # coin_join_uri: 'coinjoin://coinmux/filesystem'
+  coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=coinjoin.coinmux.com:14141'
   webbtc_host: 'http://test.webbtc.com'
 
 test:
   bitcoin_network: 'testnet3'
-  coin_join_uri: 'coinjoin://coinmux/test?identifier={"key":"test-key","can_insert":true,"can_request":true}'
+  coin_join_uri: 'coinjoin://coinmux/test'
   webbtc_host: 'http://webbtc.example.com'
 
 production:
   bitcoin_network: 'mainnet'
-  coin_join_uri: 'coinjoin://coinmux/p2p?request_key=TODO&insert_key=TODO'
+  coin_join_uri: 'coinjoin://coinmux/p2p'
   webbtc_host: 'http://webbtc.com'

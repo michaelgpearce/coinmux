@@ -188,7 +188,7 @@ describe Coinmux::Message::Transaction do
     end
 
     subject do
-      Coinmux::Message::Transaction.from_json(json, coin_join)
+      Coinmux::Message::Transaction.from_json(json, data_store, coin_join)
     end
 
     it "creates a valid transaction" do

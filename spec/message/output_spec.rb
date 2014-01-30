@@ -80,7 +80,7 @@ describe Coinmux::Message::Output do
     end
 
     subject do
-      Coinmux::Message::Output.from_json(json, coin_join)
+      Coinmux::Message::Output.from_json(json, data_store, coin_join)
     end
 
     it "creates a valid output" do

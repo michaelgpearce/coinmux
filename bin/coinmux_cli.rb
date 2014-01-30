@@ -22,6 +22,7 @@ TEXT
   on :k, :"private-key=", 'Input private key in hex format'
   on :o, :"output-address=", 'Output address (in BTC)'
   on :p, :participants=, 'Number of participants'
+  on :u, :"coin-join-uri=", 'Connection CoinJoin URI'
   on :v, :version, 'Display the version'
 end
 
@@ -36,5 +37,12 @@ else
   require 'cli/event_queue'
   require 'cli/application'
 
-  Cli::Application.new(opts[:amount], opts[:participants], opts[:"private-key"], opts[:"output-address"], opts[:"change-address"]).start
+  Cli::Application.new(
+    amount: opts[:amount],
+    participants: opts[:participants],
+    input_private_key: opts[:"private-key"],
+    output_address: opts[:"output-address"],
+    change_address: opts[:"change-address"],
+    coin_join_uri: opts[:"coin-join-uri"]
+  ).start
 end

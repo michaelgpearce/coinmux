@@ -3,25 +3,29 @@ class Coinmux::StateMachine::Base
   
   MESSAGE_POLL_INTERVAL = 5
 
-  attr_accessor :event_queue, :coin_join_message, :notification_callback, :status, :bitcoin_amount, :participant_count
+  attr_accessor :event_queue, :coin_join_message, :notification_callback, :status, :amount, :participants, :data_store
   
-  def initialize(event_queue, bitcoin_amount, participant_count)
+  def initialize(options = {})
     super() # NOTE: This *must* be called, otherwise states won't get initialized
 
-    coin_join_message = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
+    self.event_queue = options[:event_queue]
+    self.data_store = options[:data_store]
+
+    coin_join_message = Coinmux::Message::CoinJoin.build(options[:data_store], amount: options[:amount], participants: options[:participants])
     raise ArgumentError, "Input params should have been validated! #{self.coin_join_message.errors.full_messages}" if !coin_join_message.valid?
 
-    self.bitcoin_amount = bitcoin_amount
-    self.participant_count = participant_count
-
-    self.event_queue = event_queue
+    self.amount = options[:amount]
+    self.participants = options[:participants]
   end
 
   protected
 
-  def coin_join_data_store_identifier
-    data_store_facade.get_identifier_from_coin_join_uri(Coinmux::CoinJoinUri.parse(config_facade.coin_join_uri))
+  def assert_initialize_params!(params, options = {})
+    params.assert_keys!(
+      required: [:event_queue, :amount, :participants, :data_store] + (options[:required] || []),
+      optional: options[:optional])
   end
+
 
   def source
     self.class.name.gsub(/.*::/, '').downcase.to_sym

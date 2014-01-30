@@ -115,7 +115,7 @@ describe Coinmux::Message::MessageVerification do
     end
 
     subject do
-      Coinmux::Message::MessageVerification.from_json(json, coin_join)
+      Coinmux::Message::MessageVerification.from_json(json, data_store, coin_join)
     end
 
     it "creates a valid message verification" do

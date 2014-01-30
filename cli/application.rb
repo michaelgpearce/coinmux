@@ -2,15 +2,18 @@ class Cli::Application
   include Coinmux::BitcoinUtil, Coinmux::Facades
 
   attr_accessor :participant, :director, :notification_callback
-  attr_accessor :bitcoin_amount, :participant_count, :input_private_key, :output_address, :change_address
+  attr_accessor :amount, :participants, :input_private_key, :output_address, :change_address, :coin_join_uri
 
 
-  def initialize(bitcoin_amount, participant_count, input_private_key, output_address, change_address)
-    self.bitcoin_amount = (bitcoin_amount.to_f * SATOSHIS_PER_BITCOIN).to_i
-    self.participant_count = participant_count.to_i
-    self.input_private_key = input_private_key
-    self.output_address = output_address
-    self.change_address = change_address
+  def initialize(options = {})
+    options.assert_keys!(required: [:amount, :participants, :input_private_key, :output_address, :change_address], optional: [:coin_join_uri])
+
+    self.amount = (options[:amount].to_f * SATOSHIS_PER_BITCOIN).to_i
+    self.participants = options[:participants].to_i
+    self.input_private_key = options[:input_private_key]
+    self.output_address = options[:output_address]
+    self.change_address = options[:change_address]
+    self.coin_join_uri = options[:coin_join_uri] || Coinmux::Config.instance.coin_join_uri
   end
 
   def start
@@ -46,7 +49,7 @@ class Cli::Application
       end
     end
 
-    data_store_facade.startup
+    data_store.startup
 
     Cli::EventQueue.instance.start
 
@@ -55,7 +58,7 @@ class Cli::Application
 
     Cli::EventQueue.instance.wait
 
-    data_store_facade.shutdown
+    data_store.shutdown
   end
 
   private
@@ -72,33 +75,50 @@ class Cli::Application
   end
 
   def validate_inputs
-    coin_join = Coinmux::Message::CoinJoin.build(amount: bitcoin_amount, participants: participant_count)
-    return coin_join.errors.full_messages unless coin_join.valid?
+    errors = []
+
+    begin
+      Coinmux::CoinJoinUri.parse(coin_join_uri)
+    rescue Coinmux::Error => e
+      errors << "CoinJoin URI is invalid"
+    end
+
+    coin_join = Coinmux::Message::CoinJoin.build(data_store, amount: amount, participants: participants)
+    errors += coin_join.errors.full_messages unless coin_join.valid?
 
     input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key, change_address: change_address)
     input.valid?
-    return input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
-    return input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
+    errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
+    errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
 
     output = Coinmux::Message::Output.build(coin_join, address: output_address)
     output.valid?
-    return output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].blank?
+    errors += output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].blank?
 
-    []
+    errors
+  end
+
+  def data_store
+    @data_store ||= Coinmux::DataStore::Factory.build(Coinmux::CoinJoinUri.parse(coin_join_uri))
   end
 
   def build_participant
     Coinmux::StateMachine::Participant.new(
-      Cli::EventQueue.instance,
-      bitcoin_amount,
-      participant_count,
-      input_private_key,
-      output_address,
-      change_address)
+      event_queue: Cli::EventQueue.instance,
+      data_store: data_store,
+      amount: amount,
+      participants: participants,
+      input_private_key: input_private_key,
+      output_address: output_address,
+      change_address: change_address)
   end
 
   def build_director
-    Coinmux::StateMachine::Director.new(Cli::EventQueue.instance, bitcoin_amount, participant_count)
+    Coinmux::StateMachine::Director.new(
+      event_queue: Cli::EventQueue.instance,
+      data_store: data_store,
+      amount: amount,
+      participants: participants)
   end
 
   def handle_participant_event(event)

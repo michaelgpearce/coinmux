@@ -109,7 +109,7 @@ describe Coinmux::Message::Input do
     end
 
     subject do
-      Coinmux::Message::Input.from_json(json, coin_join)
+      Coinmux::Message::Input.from_json(json, data_store, coin_join)
     end
 
     it "creates a valid input" do
