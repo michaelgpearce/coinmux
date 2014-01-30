@@ -30,7 +30,7 @@ Install RVM and JRuby
 
 Clone the git repository to your computer
 ```bash
-git clone git@github.com:michaelgpearce/coinmux.git
+git clone https://github.com/michaelgpearce/coinmux.git
 ```
 
 Install application dependencies from the project directory
