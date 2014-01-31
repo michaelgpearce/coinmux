@@ -202,7 +202,7 @@ class Coinmux::DataStore::Tomp2p
           json = value.getObject().to_s
           if (hash = JSON.parse(json) rescue nil)
             if (timestamp = Time.at(hash['timestamp'].to_i).to_i rescue nil)
-              if Time.now.to_i - timestamp < DATA_TIME_TO_LIVE
+              if Time.now.to_i - timestamp < Coinmux::DataStore::Base::DATA_TIME_TO_LIVE
                 hashes << hash
               end
             end
