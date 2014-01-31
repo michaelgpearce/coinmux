@@ -4,7 +4,7 @@
 
 ### DO NOT USE WITH THE MAIN BITCOIN NETWORK!<br>THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
 
-<sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full client.
+<sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full copy of the blockchain.
 
 <sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transactions output is difficult to trace in the blockchain.
 
