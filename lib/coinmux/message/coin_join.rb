@@ -15,7 +15,6 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   
   attr_accessor :message_private_key
   
-  validates :coin_join, :presence => false
   validates :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee, :presence => true
   validate :participants_numericality, :if => :participants
   validate :participant_transaction_fee_numericality, :if => :participant_transaction_fee
