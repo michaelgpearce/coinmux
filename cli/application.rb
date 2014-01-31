@@ -62,7 +62,7 @@ class Cli::Application
         else
           puts("%10s  %12s" % ["BTC Amount", "Participants"])
           puts "#{'=' * 10}  #{'=' * 12}"
-          available_coin_joins.each do |hash|
+          available_coin_joins.sort { |l, r| l[:amount] <=> r[:amount] }.each do |hash|
             puts "%-10s  %-12s" % [hash[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{hash[:waiting_participants]} of #{hash[:total_participants]}"]
           end
         end
