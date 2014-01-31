@@ -17,6 +17,11 @@ class Cli::Application
   end
 
   def start
+    if self.input_private_key.blank?
+      puts "Enter your private key (HEX format):"
+      self.input_private_key = $stdin.readline.strip
+    end
+
     info "Starting CLI application"
 
     if (input_errors = validate_inputs).present?

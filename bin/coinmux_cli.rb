@@ -19,7 +19,7 @@ TEXT
   on :c, :"change-address=", 'Change address (in BTC); optional'
   on :d, :debug, 'Debug mode'
   on :h, :help, 'Display this help message'
-  on :k, :"private-key=", 'Input private key in hex format'
+  on :k, :"private-key=", 'Input private key in hex format (typed in if not present)'
   on :o, :"output-address=", 'Output address (in BTC)'
   on :p, :participants=, 'Number of participants'
   on :u, :"coin-join-uri=", 'Connection CoinJoin URI'
