@@ -1,5 +1,5 @@
 class Coinmux::Message::Base < Hashie::Dash
-  include ActiveModel::Model, Coinmux::Facades
+  include Coinmux::ValidationModel, Coinmux::Facades
 
   MAX_JSON_DATA_SIZE = 10_000 # not sure the best number for this, but all our messages should be small
   ASSOCIATION_TYPES = [:list, :fixed, :variable]

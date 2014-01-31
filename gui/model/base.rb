@@ -1,5 +1,5 @@
 class Gui::Model::Base
-  include ActiveModel::Model
+  include Coinmux::ValidationModel
   
   class << self
     def attribute_keys

@@ -1,6 +1,5 @@
 $:.unshift(File.expand_path("../..", __FILE__))
 
-require 'active_model'
 require 'json'
 require 'hashie'
 require 'singleton'
@@ -32,6 +31,9 @@ module Coinmux
 end
 
 require 'lib/coinmux/assert_keys'
+require 'lib/coinmux/blank_and_present'
+require 'lib/coinmux/inflections'
+require 'lib/coinmux/validation_model'
 require 'lib/coinmux/version'
 require 'lib/coinmux/facades'
 require 'lib/coinmux/http'

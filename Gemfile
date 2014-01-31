@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'activemodel', '4.0.1'
-gem 'activesupport', '4.0.1'
 gem 'hashie', '2.0.5'
 gem 'httpclient', '2.3.4.1'
 
