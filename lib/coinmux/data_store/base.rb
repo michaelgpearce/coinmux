@@ -8,7 +8,7 @@ class Coinmux::DataStore::Base
   end
 
   def coin_join_identifier
-    coin_join_uri.params["identifier"] || '{"key":"test-key","can_insert":true,"can_request":true}'
+    "#{coin_join_uri.params["identifier"] || "default"}-rw"
   end
 
   def startup(&callback)
@@ -20,25 +20,25 @@ class Coinmux::DataStore::Base
   end
 
   def generate_identifier
-    { 'key' => rand.to_s, 'can_insert' => true, 'can_request' => true }.to_json
+    "#{digest_facade.random_identifier}-rw"
   end
 
   def convert_to_request_only_identifier(identifier)
-    JSON.parse(identifier).merge('can_insert' => false).to_json
+    identifier.gsub(/-rw$/, '-ro')
   end
 
   def identifier_can_insert?(identifier)
-    JSON.parse(identifier)['can_insert'] rescue false
+    !!(identifier =~ /-rw$/)
   end
 
   def identifier_can_request?(identifier)
-    JSON.parse(identifier)['can_request'] rescue false
+    true
   end
 
   def insert(identifier, data, &callback)
-    hash = JSON.parse(identifier)
-    key = hash['key']
-    raise "Cannot insert" unless hash['can_insert']
+    raise "Cannot insert" unless identifier_can_insert?(identifier)
+
+    key = key_from_identifier(identifier)
 
     array = read(key) || []
     array << data
@@ -68,10 +68,12 @@ class Coinmux::DataStore::Base
 
   private
 
+  def key_from_identifier(identifier)
+    identifier.gsub(/-r.$/, '')
+  end
+
   def fetch(identifier)
-    hash = JSON.parse(identifier)
-    key = hash['key']
-    raise "Cannot request" unless hash['can_request']
+    key = key_from_identifier(identifier)
 
     data = (read(key) || []).clone
     debug "DATASTORE FETCH #{identifier}: #{data}"
