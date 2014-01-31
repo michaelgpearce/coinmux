@@ -4,9 +4,8 @@ class Cli::Application
   attr_accessor :participant, :director, :notification_callback
   attr_accessor :amount, :participants, :input_private_key, :output_address, :change_address, :coin_join_uri
 
-
   def initialize(options = {})
-    options.assert_keys!(required: [:amount, :participants, :input_private_key, :output_address, :change_address], optional: [:coin_join_uri])
+    options.assert_keys!(required: [:amount, :participants, :input_private_key, :output_address, :change_address], optional: [:coin_join_uri, :list])
 
     self.amount = (options[:amount].to_f * SATOSHIS_PER_BITCOIN).to_i
     self.participants = options[:participants].to_i
@@ -14,6 +13,63 @@ class Cli::Application
     self.output_address = options[:output_address]
     self.change_address = options[:change_address]
     self.coin_join_uri = options[:coin_join_uri] || Coinmux::Config.instance.coin_join_uri
+  end
+
+  def list_coin_joins
+    data_store.startup
+
+    data_store.fetch_most_recent(data_store.coin_join_identifier, Coinmux::StateMachine::Participant::COIN_JOIN_MESSAGE_FETCH_SIZE) do |event|
+      if event.error
+        raise event.error
+      else
+        coin_join_messages = event.data.collect { |json| Coinmux::Message::CoinJoin.from_json(json, data_store, nil) }.compact
+
+        available_coin_joins = []
+        if !coin_join_messages.empty?
+          waiting_for = coin_join_messages.size
+          coin_join_messages.each do |coin_join_message|
+            coin_join_message.status.refresh do |event|
+              if event.error
+                raise event.error
+              else
+                if coin_join_message.status.value.status != 'waiting_for_inputs'
+                  waiting_for -= 1
+                else
+                  coin_join_message.inputs.refresh do |event|
+                    if event.error
+                      raise event.error
+                    else
+                      available_coin_joins << {
+                        amount: coin_join_message.amount,
+                        total_participants: coin_join_message.participants,
+                        waiting_participants: coin_join_message.inputs.value.size
+                      }
+                      waiting_for -= 1
+                    end
+                  end
+                end
+              end
+            end
+          end
+
+          while waiting_for > 0
+            sleep(0.1)
+          end
+        end
+
+        if available_coin_joins.empty?
+          puts "No available CoinJoins"
+        else
+          puts("%10s  %12s" % ["BTC Amount", "Participants"])
+          puts "#{'=' * 10}  #{'=' * 12}"
+          available_coin_joins.each do |hash|
+            puts "%-10s  %-12s" % [hash[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{hash[:waiting_participants]} of #{hash[:total_participants]}"]
+          end
+        end
+      end
+    end
+
+    data_store.shutdown
   end
 
   def start

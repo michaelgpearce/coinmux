@@ -20,6 +20,7 @@ TEXT
   on :d, :debug, 'Debug mode'
   on :h, :help, 'Display this help message'
   on :k, :"private-key=", 'Input private key in hex format (typed in if not present)'
+  on :l, :"list", 'List CoinJoins waiting for inputs'
   on :o, :"output-address=", 'Output address (in BTC)'
   on :p, :participants=, 'Number of participants'
   on :u, :"coin-join-uri=", 'Connection CoinJoin URI'
@@ -37,12 +38,18 @@ else
   require 'cli/event_queue'
   require 'cli/application'
 
-  Cli::Application.new(
+  app = Cli::Application.new(
     amount: opts[:amount],
     participants: opts[:participants],
     input_private_key: opts[:"private-key"],
     output_address: opts[:"output-address"],
     change_address: opts[:"change-address"],
-    coin_join_uri: opts[:"coin-join-uri"]
-  ).start
+    coin_join_uri: opts[:"coin-join-uri"],
+    list: opts[:list]
+  )
+  if opts[:list]
+    app.list_coin_joins
+  else
+    app.start
+  end
 end

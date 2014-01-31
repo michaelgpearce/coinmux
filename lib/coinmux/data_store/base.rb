@@ -1,5 +1,6 @@
 class Coinmux::DataStore::Base
   include Coinmux::Facades
+  DATA_TIME_TO_LIVE = 10 * 60
 
   attr_accessor :coin_join_uri
 

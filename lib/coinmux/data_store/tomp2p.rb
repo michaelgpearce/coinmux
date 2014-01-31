@@ -7,7 +7,6 @@ class Coinmux::DataStore::Tomp2p
 
   DEFAULT_BOOTSTRAP_HOST = "coinjoin.coinmux.com"
   DEFAULT_P2P_PORT = 14141
-  DATA_TIME_TO_LIVE = 1 * 60
   
   import 'java.io.IOException'
   import 'java.net.InetAddress'
