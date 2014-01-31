@@ -1,4 +1,4 @@
-## Coinmux
+## Coinmux - Bitcoin Mixer
 
 ### Decentralized<sup>1</sup>, Trustless, Anonymous<sup>2</sup> and Open Bitcoin Mixer
 
