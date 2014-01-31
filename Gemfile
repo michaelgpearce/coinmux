@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'bouncy-castle-java', '1.5.0147'
-gem 'jruby-openssl', '0.9.4'
 gem 'activemodel', '4.0.1'
 gem 'activesupport', '4.0.1'
 gem 'hashie', '2.0.5'

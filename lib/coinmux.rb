@@ -4,7 +4,6 @@ require 'active_model'
 require 'json'
 require 'hashie'
 require 'singleton'
-require 'openssl'
 require 'base64'
 require 'set'
 
