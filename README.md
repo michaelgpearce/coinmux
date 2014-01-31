@@ -102,16 +102,18 @@ And like this for the second:
 Coin join successfully created!
 ```
 
-To see the available CoinJoins to participate in, type:
+You can get a list of available CoinJoins that are waiting for participants:
 ```bash
 ./bin/coinmux -l
 ```
 
-To see:
+It outputs something like this:
 ```
 BTC Amount  Participants
 ==========  ============
-0.05        1 of 2      
+0.5         1 of 2      
+1.0         3 of 5      
+0.0625      1 of 5      
 ```
 
 If there no CoinJoin availble, your computer will direct the CoinJoin for other participants when you run the program.
