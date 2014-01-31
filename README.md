@@ -124,7 +124,7 @@ Using the filesystem will look something like this:
 ./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address
 ```
 
-There may be some interesting things to try combining a filesystem coinjoin with services like Dropbox or using FTP or [SSHFS](http://fuse.sourceforge.net/sshfs.html).
+There may be some interesting things to try combining a filesystem CoinJoin with services like Dropbox or using FTP or [SSHFS](http://fuse.sourceforge.net/sshfs.html).
 
 
 ## Graphical Interface
