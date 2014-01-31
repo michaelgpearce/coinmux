@@ -193,10 +193,10 @@ class Cli::Application
       # TODO: try again
     elsif event.type == :completed
       self.participant = nil # done
-      message "Coin join successfully created!"
+      message "CoinJoin successfully created!"
     elsif event.type == :failed
       self.participant = nil # done
-      message "Coin join failed!"
+      message "CoinJoin failed!"
     end
   end
 

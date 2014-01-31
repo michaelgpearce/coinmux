@@ -86,7 +86,7 @@ You will see output like this for the first participant:
    [Director]: Publishing transaction
    [Director]: Completed
 [Participant]: Completed - Transaction ID: 3b1d7dc373ecf5abc8e2a18d61839a7d7d06a99f3c94fec5cbff17330596c8a6
-Coin join successfully created!
+CoinJoin successfully created!
 ```
 
 And like this for the second:
@@ -99,7 +99,7 @@ And like this for the second:
 [Participant]: Inserting transaction signatures
 [Participant]: Waiting for completed
 [Participant]: Completed - Transaction ID: 3b1d7dc373ecf5abc8e2a18d61839a7d7d06a99f3c94fec5cbff17330596c8a6
-Coin join successfully created!
+CoinJoin successfully created!
 ```
 
 You can get a list of available CoinJoins that are waiting for participants:
