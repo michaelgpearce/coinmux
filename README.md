@@ -1,9 +1,12 @@
 ## Coinmux
 
-### Decentralized, Trustless, Anonymous and Open Bitcoin Mixer
+### Decentralized<sup>1</sup>, Trustless, Anonymous<sup>2</sup> and Open Bitcoin Mixer
 
 ### DO NOT USE WITH THE MAIN BITCOIN NETWORK!<br>THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
 
+<sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full client.
+
+<sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transactions output is difficult to trace in the blockchain.
 
 ## Synopsis
 
@@ -50,14 +53,14 @@ Print options from the project directory
 
 Coinmux in P2P mode requires external access to ports 14141 TCP and UDP. If you are behind a firewall and your router supports UPNP, these ports will be opened for you automatically, otherwise you must manually allow access to these ports.
 
-To begin, start one participant in a CoinJoin between 2 participants for 0.5 BTC.
+To begin, start one participant in a CoinJoin between 2 participants for 0.5 BTC. You will be prompted to enter the private key of your input Bitcoin address.
 ```bash
-./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address -k my-input-private-key-in-hex
+./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address
 ```
 
-Now, on a second computer (or Virtual Machine), start a second process with matching number of participants and Bitcoin amount, but different input private key, output address and change address.
+Now, on a second computer (or Virtual Machine), start a second process with matching number of participants and Bitcoin amount, but using a different input private key, output address and change address.
 ```bash
-./bin/coinmux -p 2 -a 0.5 -o my-output-address-2 -c my-change-address-2 -k my-input-private-key-in-hex-2
+./bin/coinmux -p 2 -a 0.5 -o my-output-address-2 -c my-change-address-2
 ```
 
 You will see output like this for the first participant:
@@ -97,9 +100,30 @@ And like this for the second:
 Coin join successfully created!
 ```
 
+To see the available CoinJoins to participate in, type:
+```bash
+./bin/coinmux -l
+```
+
+To see:
+```
+BTC Amount  Participants
+==========  ============
+0.05        1 of 2      
+```
+
+If there no CoinJoin availble, your computer will direct the CoinJoin for other participants when you run the program.
+
+
 ### Usage on a single computer
 
-If you want to try Coinmux out on a single computer, you can modify ```config.yml``` to use the filesystem ```coin_join_uri``` instead of the p2p URI. When communicating via the filesystem, no external connections are made to find peers - only your computer's filesystem.
+If you want to try Coinmux out on a single computer, you use a filesystem ```coin_join_uri``` instead of the p2p URI. When communicating via the filesystem, no external connections are made to find peers - only your computer's filesystem.
+
+Using the filesystem will look something like this:
+```bash
+./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address
+```
+
 
 ## Graphical Interface
 
