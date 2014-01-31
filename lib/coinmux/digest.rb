@@ -1,3 +1,6 @@
+require 'securerandom'
+require 'digest/sha2'
+
 class Coinmux::Digest
   include Singleton
   
@@ -15,6 +18,6 @@ class Coinmux::Digest
   end
   
   def random_identifier
-    hex_digest(rand.to_s)
+    SecureRandom.urlsafe_base64
   end
 end

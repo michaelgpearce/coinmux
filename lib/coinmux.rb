@@ -5,7 +5,6 @@ require 'json'
 require 'hashie'
 require 'singleton'
 require 'openssl'
-require 'digest/sha2'
 require 'base64'
 require 'set'
 
