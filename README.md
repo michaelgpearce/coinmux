@@ -1,4 +1,4 @@
-## Coinmux
+## Coinmux - Bitcoin Mixer
 
 ### Decentralized<sup>1</sup>, Trustless, Anonymous<sup>2</sup> and Open Bitcoin Mixer
 
@@ -14,6 +14,8 @@ Coinmux is an implementation of [CoinJoin](https://bitcointalk.org/index.php?top
 It is currently in early development and only suitable for use on Bitcoin's Testnet network.
 
 CoinJoin increases your Bitcoin privacy and helps bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same Bitcoin amount. These same amount output addresses are indistinguishable from one another and there is no way to match them to a specific input addresses.
+
+CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, because Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
@@ -100,16 +102,18 @@ And like this for the second:
 Coin join successfully created!
 ```
 
-To see the available CoinJoins to participate in, type:
+You can get a list of available CoinJoins that are waiting for participants:
 ```bash
 ./bin/coinmux -l
 ```
 
-To see:
+It outputs something like this:
 ```
 BTC Amount  Participants
 ==========  ============
-0.05        1 of 2      
+0.5         1 of 2      
+1.0         3 of 5      
+0.0625      1 of 5      
 ```
 
 If there no CoinJoin availble, your computer will direct the CoinJoin for other participants when you run the program.
