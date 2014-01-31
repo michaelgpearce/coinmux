@@ -121,11 +121,11 @@ If there no CoinJoin availble, your computer will direct the CoinJoin for other 
 
 ### Usage on a single computer
 
-If you want to try Coinmux out on a single computer, you use a filesystem ```coin_join_uri``` instead of the p2p URI. When communicating via the filesystem, no external connections are made to find peers - only your computer's filesystem.
+If you want to try Coinmux out on a single computer, you use a filesystem CoinJoin URI instead of the p2p URI. When communicating via the filesystem, no external connections are made to find participants - only your computer's filesystem.
 
 Using the filesystem will look something like this:
 ```bash
-./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address
+./bin/coinmux -p 2 -a 0.5 -o my-output-address -c my-change-address -u coinjoin://coinmux/filesystem
 ```
 
 There may be some interesting things to try combining a filesystem CoinJoin with services like Dropbox or using FTP or [SSHFS](http://fuse.sourceforge.net/sshfs.html).
