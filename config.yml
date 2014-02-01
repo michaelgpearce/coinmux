@@ -1,8 +1,9 @@
 ---
 development:
   bitcoin_network: 'testnet3'
-  # coin_join_uri: 'coinjoin://coinmux/filesystem'
-  coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=coinjoin.coinmux.com:14141'
+  # coin_join_uri: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
+  # coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=coinjoin.coinmux.com:14141&port=14141'
+  coin_join_uri: 'coinjoin://coinmux/p2p'
   webbtc_host: 'http://test.webbtc.com'
 
 test:

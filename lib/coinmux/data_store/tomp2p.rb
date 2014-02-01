@@ -43,9 +43,13 @@ class Coinmux::DataStore::Tomp2p
     )
   end
 
+  def local_port
+    @local_port ||= (coin_join_uri.params["port"] || DEFAULT_P2P_PORT).to_i
+  end
+
   def startup(&callback)
     address = Inet4Address.getByName(bootstrap_host)
-    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(bootstrap_port).makeAndListen()
+    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(local_port).makeAndListen()
     peer_address = PeerAddress.new(Number160::ZERO, address, bootstrap_port, bootstrap_port)
     @peer.getConfiguration().setBehindFirewall(true)
     exec(@peer.discover().setPeerAddress(peer_address), callback) do |future|

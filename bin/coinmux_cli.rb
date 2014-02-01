@@ -14,17 +14,16 @@ opts = Slop.parse(help: true) do
 
 Usage: coinmux [options]
 TEXT
-  on :a, :amount=, 'CoinJoin transaction amount (in BTC); must be a power of 2'
-  on :b, :bootstrap, 'Run as P2P bootstrap server'
-  on :c, :"change-address=", 'Change address (in BTC); optional'
-  on :d, :debug, 'Debug mode'
-  on :h, :help, 'Display this help message'
-  on :k, :"private-key=", 'Input private key in hex format (typed in if not present)'
-  on :l, :"list", 'List CoinJoins waiting for inputs'
-  on :o, :"output-address=", 'Output address (in BTC)'
-  on :p, :participants=, 'Number of participants'
-  on :u, :"coin-join-uri=", 'Connection CoinJoin URI'
   on :v, :version, 'Display the version'
+  on :h, :help, 'Display this help message'
+  on :l, :"list", 'List CoinJoins waiting for inputs'
+  on :a, :amount=, 'CoinJoin transaction amount (in BTC); must be a power of 2'
+  on :p, :participants=, 'Number of participants'
+  on :o, :"output-address=", 'Output address (in BTC)'
+  on :c, :"change-address=", 'Change address (in BTC); optional'
+  on :k, :"private-key=", 'Input private key in hex format *NOT SECURE*'
+  on :d, :"data-store=", 'Data store to use: (p2p <default> | filesystem)'
+  on :b, :bootstrap, 'Run as P2P bootstrap server'
 end
 
 if opts.version?
@@ -44,7 +43,7 @@ else
     input_private_key: opts[:"private-key"],
     output_address: opts[:"output-address"],
     change_address: opts[:"change-address"],
-    coin_join_uri: opts[:"coin-join-uri"],
+    data_store: opts[:"data-store"],
     list: opts[:list]
   )
   if opts[:list]

@@ -5,14 +5,18 @@ class Cli::Application
   attr_accessor :amount, :participants, :input_private_key, :output_address, :change_address, :coin_join_uri
 
   def initialize(options = {})
-    options.assert_keys!(required: [:amount, :participants, :input_private_key, :output_address, :change_address], optional: [:coin_join_uri, :list])
+    options.assert_keys!(required: [:amount, :participants, :input_private_key, :output_address, :change_address], optional: [:data_store, :list])
 
     self.amount = (options[:amount].to_f * SATOSHIS_PER_BITCOIN).to_i
     self.participants = options[:participants].to_i
     self.input_private_key = options[:input_private_key]
     self.output_address = options[:output_address]
     self.change_address = options[:change_address]
-    self.coin_join_uri = options[:coin_join_uri] || Coinmux::Config.instance.coin_join_uri
+    self.coin_join_uri = if options[:data_store]
+      "coinjoin://coinmux/#{options[:data_store]}"
+    else
+      Coinmux::Config.instance.coin_join_uri
+    end
   end
 
   def list_coin_joins
