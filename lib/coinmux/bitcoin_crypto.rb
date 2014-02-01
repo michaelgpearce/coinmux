@@ -38,7 +38,7 @@ class Coinmux::BitcoinCrypto
   def public_key_for_private_key!(private_key_hex)
     Hex.encode(build_ec_key(private_key_hex).getPubKey()).to_s.upcase
   rescue => e
-    raise Coinmux::Error, "Cannot get public key from private key: #{e}"
+    raise Coinmux::Error, "Cannot get public key from private key" # do not show private key
   end
   def_no_raise_method(:public_key_for_private_key, nil)
   

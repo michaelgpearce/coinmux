@@ -75,7 +75,7 @@ class Cli::Application
   def start
     if self.input_private_key.blank?
       puts "Enter your private key (HEX format):"
-      self.input_private_key = $stdin.readline.strip
+      self.input_private_key = input_password
     end
 
     info "Starting CLI application"
@@ -208,5 +208,16 @@ class Cli::Application
     elsif event.type == :failed || event.type == :completed
       self.director = nil # done
     end
+  end
+
+  def input_password
+    line = if PLATFORM == 'java'
+      import 'jline.console.ConsoleReader'
+      Java::jlineConsole::ConsoleReader.new().readLine(Java::JavaLang::Character.new('*'.bytes.first))
+    else
+      STDIN.noecho(&:gets)
+    end
+
+    line.strip
   end
 end
