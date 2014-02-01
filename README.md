@@ -6,7 +6,7 @@
 
 <sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full copy of the blockchain.
 
-<sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transactions output is difficult to trace in the blockchain.
+<sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transaction's output is difficult to trace once added to the Bitcoin blockchain.
 
 ## Synopsis
 
@@ -15,7 +15,7 @@ It is currently in early development and only suitable for use on Bitcoin's Test
 
 CoinJoin increases your Bitcoin privacy and helps bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same Bitcoin amount. These same amount output addresses are indistinguishable from one another and there is no way to match them to a specific input addresses.
 
-CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, because Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
+CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
@@ -123,11 +123,11 @@ CoinJoin successfully created!
 
 ### Usage on a single computer over the filesystem
 
-If you want to try Coinmux out on a single computer, you use the filesystem ```data-store``` instead of ```p2p```. When communicating via the filesystem, no external connections are made to find peers. This is useful for mixing your own wallet.
+If you want to try Coinmux out on a single computer, use the ```filesystem``` data-store instead of ```p2p```. When communicating via the filesystem, no external connections are made to find peers. This is useful for mixing your own wallet.
 
-Using the filesystem will look something like this:
+Using the filesystem looks like this:
 ```bash
-./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address
+./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address --data-store filesystem
 ```
 
 There may be some interesting things to try combining a filesystem CoinJoin with services like Dropbox or using FTP or [SSHFS](http://fuse.sourceforge.net/sshfs.html).
