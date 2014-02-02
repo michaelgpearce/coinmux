@@ -55,7 +55,7 @@ Print options from the project directory
 
 Coinmux in P2P mode requires external access to ports 14141 TCP and UDP. If you are behind a firewall and your router supports UPNP, these ports will be opened for you automatically, otherwise you must manually allow access to these ports.
 
-To begin, check to see if there are available CoinJoins already on the network. If not, Coinmux will create one automatically.
+To begin, check to see if there are available CoinJoins already on the network. If not, Coinmux will create one automatically when you start a CoinJon.
 
 ```
 ./bin/coinmux --list
@@ -66,6 +66,7 @@ You will see something like this:
 BTC Amount  Participants
 ==========  ============
 0.0625      2 of 5
+0.125       1 of 2
 1.0         3 of 5
 ```
 
