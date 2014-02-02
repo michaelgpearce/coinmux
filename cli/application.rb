@@ -37,8 +37,6 @@ class Cli::Application
       self.input_private_key = input_password
     end
 
-    info "Starting CLI application"
-
     if (input_errors = validate_inputs).present?
       message "Unable to perform CoinJoin due to the following:"
       message input_errors.collect { |message| " * #{message}" }
@@ -71,6 +69,8 @@ class Cli::Application
         Cli::EventQueue.instance.stop
       end
     end
+
+    message "Starting..."
 
     data_store.startup
 
@@ -163,11 +163,9 @@ class Cli::Application
   def message(messages, event_type = nil)
     messages = [messages] unless messages.is_a?(Array)
     messages.each do |message|
-      if event_type
-        puts "%14s %s" % ['[' + event_type.to_s.capitalize + ']:', message]
-      else
-        puts message
-      end
+      message = "%14s %s" % ['[' + event_type.to_s.capitalize + ']:', message] if event_type
+      puts message
+      info message
     end
   end
 
