@@ -22,9 +22,25 @@ class Cli::Application
   def list_coin_joins
     data_store.startup
 
+    Cli::EventQueue.instance.start
+
+    run_list_coin_joins
+
+    Cli::EventQueue.instance.wait
+
+    data_store.shutdown
+  end
+
+  def error_for_run_list_coin_joins(message)
+    Cli::EventQueue.instance.stop
+    puts "Error: #{message}"
+    raise message # this will terminate the thread called from
+  end
+
+  def run_list_coin_joins
     data_store.fetch_most_recent(data_store.coin_join_identifier, Coinmux::StateMachine::Participant::COIN_JOIN_MESSAGE_FETCH_SIZE) do |event|
       if event.error
-        raise event.error
+        error_for_run_list_coin_joins(event.error)
       else
         coin_join_messages = event.data.collect { |json| Coinmux::Message::CoinJoin.from_json(json, data_store, nil) }.compact
 
@@ -34,14 +50,14 @@ class Cli::Application
           coin_join_messages.each do |coin_join_message|
             coin_join_message.status.refresh do |event|
               if event.error
-                raise event.error
+                error_for_run_list_coin_joins(event.error)
               else
                 if coin_join_message.status.value.status != 'waiting_for_inputs'
                   waiting_for -= 1
                 else
                   coin_join_message.inputs.refresh do |event|
                     if event.error
-                      raise event.error
+                      error_for_run_list_coin_joins(event.error)
                     else
                       available_coin_joins << {
                         amount: coin_join_message.amount,
@@ -64,16 +80,16 @@ class Cli::Application
         if available_coin_joins.empty?
           puts "No available CoinJoins"
         else
-          puts("%10s  %12s" % ["BTC Amount", "Participants"])
+          puts "%10s  %12s" % ["BTC Amount", "Participants"]
           puts "#{'=' * 10}  #{'=' * 12}"
           available_coin_joins.sort { |l, r| l[:amount] <=> r[:amount] }.each do |hash|
             puts "%-10s  %-12s" % [hash[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{hash[:waiting_participants]} of #{hash[:total_participants]}"]
           end
         end
+
+        Cli::EventQueue.instance.stop
       end
     end
-
-    data_store.shutdown
   end
 
   def start
