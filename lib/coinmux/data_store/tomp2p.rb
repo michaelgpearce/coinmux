@@ -155,7 +155,7 @@ class Coinmux::DataStore::Tomp2p
   end
 
   def key_ttl
-    2.hours
+    2 * 60 * 60
   end
 
   def current_key(key)
