@@ -31,6 +31,58 @@ class Cli::Application
     data_store.shutdown
   end
 
+  def start
+    if self.input_private_key.blank?
+      puts "Enter your private key (HEX format):"
+      self.input_private_key = input_password
+    end
+
+    info "Starting CLI application"
+
+    if (input_errors = validate_inputs).present?
+      message "Unable to perform CoinJoin due to the following:"
+      message input_errors.collect { |message| " * #{message}" }
+      message "Quitting..."
+      return
+    end
+
+    self.notification_callback = Proc.new do |event|
+      debug "event queue event received: #{event.inspect}"
+      if event.type == :failed
+        message "Error - #{event.message}", event.source
+        message "Quitting..."
+        self.director = self.participant = nil # end execution
+      else
+        message "#{event.type.to_s.humanize.capitalize}#{" - #{event.message}" if event.message}", event.source
+        if event.source == :participant
+          handle_participant_event(event)
+        elsif event.source == :director
+          handle_director_event(event)
+        else
+          raise "Unknown event source: #{event.source}"
+        end
+      end
+
+      if participant.nil? && director.nil?
+        # we are done, so notify the event queue to complete
+        Cli::EventQueue.instance.stop
+      end
+    end
+
+    data_store.startup
+
+    Cli::EventQueue.instance.start
+
+    self.participant = build_participant
+    participant.start(&notification_callback)
+
+    Cli::EventQueue.instance.wait
+
+    data_store.shutdown
+  end
+
+  private
+
   def error_for_run_list_coin_joins(message)
     Cli::EventQueue.instance.stop
     puts "Error: #{message}"
@@ -91,58 +143,6 @@ class Cli::Application
       end
     end
   end
-
-  def start
-    if self.input_private_key.blank?
-      puts "Enter your private key (HEX format):"
-      self.input_private_key = input_password
-    end
-
-    info "Starting CLI application"
-
-    if (input_errors = validate_inputs).present?
-      message "Unable to perform CoinJoin due to the following:"
-      message input_errors.collect { |message| " * #{message}" }
-      message "Quitting..."
-      return
-    end
-
-    self.notification_callback = Proc.new do |event|
-      debug "event queue event received: #{event.inspect}"
-      if event.type == :failed
-        message "Error - #{event.message}", event.source
-        message "Quitting..."
-        self.director = self.participant = nil # end execution
-      else
-        message "#{event.type.to_s.humanize.capitalize}#{" - #{event.message}" if event.message}", event.source
-        if event.source == :participant
-          handle_participant_event(event)
-        elsif event.source == :director
-          handle_director_event(event)
-        else
-          raise "Unknown event source: #{event.source}"
-        end
-      end
-
-      if participant.nil? && director.nil?
-        # we are done, so notify the event queue to complete
-        Cli::EventQueue.instance.stop
-      end
-    end
-
-    data_store.startup
-
-    Cli::EventQueue.instance.start
-
-    self.participant = build_participant
-    participant.start(&notification_callback)
-
-    Cli::EventQueue.instance.wait
-
-    data_store.shutdown
-  end
-
-  private
 
   def message(messages, event_type = nil)
     messages = [messages] unless messages.is_a?(Array)
