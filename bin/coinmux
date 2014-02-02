@@ -31,13 +31,15 @@ env = {
   'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'development' # TODO: This should be production by default
 }
 
-args = %w(exec ruby) + args
-if ARGV.length == 0
-  args << './bin/coinmux_gui.rb'
-  system(env, "bundle", *args)
-else
-  args << './bin/coinmux_cli.rb'
-  args += ARGV
-  system(env, "bundle", *args)
+Dir.chdir File.join(File.dirname(__FILE__), '..') do
+  args = %w(exec ruby) + args
+  if ARGV.length == 0
+    args << './bin/coinmux_gui.rb'
+    system(env, "bundle", *args)
+  else
+    args << './bin/coinmux_cli.rb'
+    args += ARGV
+    system(env, "bundle", *args)
+  end
 end
 
