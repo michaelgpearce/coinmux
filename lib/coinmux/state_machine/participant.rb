@@ -1,7 +1,7 @@
 class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   attr_accessor :input_private_key, :input_address, :output_address, :change_address
   
-  STATUSES = %w(finding_available_coin_join failed completed)
+  STATE = %w(finding_available_coin_join failed completed)
   COIN_JOIN_MESSAGE_FETCH_SIZE = 50
 
   def initialize(options = {})
@@ -13,7 +13,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     self.input_address = bitcoin_crypto_facade.address_for_private_key!(options[:input_private_key])
     self.output_address = options[:output_address]
     self.change_address = options[:change_address]
-    self.status = 'finding_coin_join'
+    self.state = 'finding_coin_join'
   end
   
   def start(&notification_callback)
@@ -42,7 +42,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
 
     insert_message(:inputs, Coinmux::Message::Input.build(coin_join_message, private_key: input_private_key, change_address: change_address)) do
       notify(:waiting_for_other_inputs)
-      wait_for_status('waiting_for_outputs') do
+      wait_for_state('waiting_for_outputs') do
         refresh_message(:inputs) do
           refresh_message(:message_verification) do
             if coin_join_message.message_verification.value.nil?
@@ -62,7 +62,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
 
     insert_message(:outputs, Coinmux::Message::Output.build(coin_join_message, address: output_address)) do
       notify(:waiting_for_other_outputs)
-      wait_for_status('waiting_for_signatures') do
+      wait_for_state('waiting_for_signatures') do
         refresh_message(:outputs) do
           refresh_message(:transaction) do
             if coin_join_message.transaction.value.nil?
@@ -104,20 +104,20 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def start_waiting_for_completed
     notify(:waiting_for_completed)
 
-    wait_for_status('completed') do
+    wait_for_state('completed') do
       refresh_message(:status) do
         notify(:completed, "Transaction ID: #{coin_join_message.status.value.transaction_id}")
       end
     end
   end
 
-  def wait_for_status(status, &callback)
+  def wait_for_state(state, &callback)
     event_queue.future_exec(MESSAGE_POLL_INTERVAL) do
       refresh_message(:status) do
-        if coin_join_message.status.value && coin_join_message.status.value.status == status
+        if coin_join_message.status.value && coin_join_message.status.value.state == state
           yield
         else
-          wait_for_status(status, &callback) # try again
+          wait_for_state(state, &callback) # try again
         end
       end
     end
@@ -142,7 +142,7 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
     else
       if coin_join.amount == amount && coin_join.participants == participants
         refresh_message(:status, coin_join) do
-          if coin_join.status.value && coin_join.status.value.status == 'waiting_for_inputs'
+          if coin_join.status.value && coin_join.status.value.state == 'waiting_for_inputs'
             refresh_message(:inputs, coin_join) do
               if coin_join.inputs.value.size < participants
                 yield(coin_join) # found it!

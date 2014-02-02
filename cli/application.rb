@@ -88,10 +88,8 @@ class Cli::Application
 
   def clean_up_coin_join
     puts "Quitting..."
-    if !%w(failed completed).include?(director.try(:coin_join_message).try(:status).try(:value).try(:status))
-      status_message = director.coin_join_message.status.value
-      status_message.status = 'failed'
-      director.coin_join_message.status.insert(status_message) do
+    if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
+      director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
         Cli::EventQueue.instance.stop
       end
     else
@@ -120,7 +118,7 @@ class Cli::Application
               if event.error
                 error_for_run_list_coin_joins(event.error)
               else
-                if coin_join_message.status.value.status != 'waiting_for_inputs'
+                if coin_join_message.status.value.state != 'waiting_for_inputs'
                   waiting_for -= 1
                 else
                   coin_join_message.inputs.refresh do |event|

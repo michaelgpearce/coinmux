@@ -6,12 +6,12 @@ describe Coinmux::Message::Status do
   end
 
   let(:template_message) { build(:status_message) }
-  let(:status) { template_message.status }
+  let(:state) { template_message.state }
   let(:transaction_id) { template_message.transaction_id }
   let(:coin_join) { template_message.coin_join }
 
   describe "validations" do
-    let(:message) { build(:status_message, status: status, transaction_id: transaction_id) }
+    let(:message) { build(:status_message, state: state, transaction_id: transaction_id) }
 
     subject { message.valid? }
 
@@ -21,21 +21,21 @@ describe Coinmux::Message::Status do
 
     describe "#transaction_id" do
       context "when present" do
-        context "with completed status" do
-          let(:status) { 'completed' }
+        context "with completed state" do
+          let(:state) { 'completed' }
 
           it "is valid" do
             expect(subject).to be_true
           end
         end
 
-        (Coinmux::StateMachine::Director::STATUSES - ['completed']).each do |test_status|
-          context "with #{test_status} status" do
-            let(:status) { test_status }
+        (Coinmux::StateMachine::Director::STATES - ['completed']).each do |test_state|
+          context "with #{test_state} state" do
+            let(:state) { test_state }
 
             it "is invalid" do
               expect(subject).to be_false
-              expect(message.errors[:transaction_id]).to include("must not be present for status #{test_status}")
+              expect(message.errors[:transaction_id]).to include("must not be present for state #{test_state}")
             end
           end
         end
@@ -44,18 +44,18 @@ describe Coinmux::Message::Status do
       context "when nil" do
         let(:transaction_id) { nil }
 
-        context "with completed status" do
-          let(:status) { 'completed' }
+        context "with completed state" do
+          let(:state) { 'completed' }
 
           it "is invalid" do
             expect(subject).to be_false
-            expect(message.errors[:transaction_id]).to include("must be present for status completed")
+            expect(message.errors[:transaction_id]).to include("must be present for state completed")
           end
         end
 
-        (Coinmux::StateMachine::Director::STATUSES - ['completed']).each do |test_status|
-          context "with #{test_status} status" do
-            let(:status) { test_status }
+        (Coinmux::StateMachine::Director::STATES - ['completed']).each do |test_state|
+          context "with #{test_state} state" do
+            let(:state) { test_state }
 
             it "is valid" do
               expect(subject).to be_true
@@ -65,20 +65,20 @@ describe Coinmux::Message::Status do
       end
     end
 
-    describe "#status_valid" do
-      context "when status is invalid" do
-        let(:status) { 'InvalidStatus' }
+    describe "#state_valid" do
+      context "when state is invalid" do
+        let(:state) { 'InvalidState' }
 
         it "is invalid" do
           expect(subject).to be_false
-          expect(message.errors[:status]).to include("is not a valid status")
+          expect(message.errors[:state]).to include("is not a valid state")
         end
       end
     end
   end
 
   describe "#build" do
-    subject { Coinmux::Message::Status.build(coin_join, status: status, transaction_id: transaction_id) }
+    subject { Coinmux::Message::Status.build(coin_join, state: state, transaction_id: transaction_id) }
 
     it "builds valid status" do
       expect(subject.valid?).to be_true
@@ -89,7 +89,7 @@ describe Coinmux::Message::Status do
     let(:message) { template_message }
     let(:json) do
       {
-        status: message.status,
+        state: message.state,
         transaction_id: message.transaction_id,
       }.to_json
     end
@@ -101,7 +101,7 @@ describe Coinmux::Message::Status do
     it "creates a valid status" do
       expect(subject).to_not be_nil
       expect(subject.valid?).to be_true
-      expect(subject.status).to eq(message.status)
+      expect(subject.state).to eq(message.state)
       expect(subject.transaction_id).to eq(message.transaction_id)
     end
   end

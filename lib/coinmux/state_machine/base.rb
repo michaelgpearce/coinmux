@@ -3,7 +3,7 @@ class Coinmux::StateMachine::Base
   
   MESSAGE_POLL_INTERVAL = 5
 
-  attr_accessor :event_queue, :coin_join_message, :notification_callback, :status, :amount, :participants, :data_store
+  attr_accessor :event_queue, :coin_join_message, :notification_callback, :state, :amount, :participants, :data_store
   
   def initialize(options = {})
     super() # NOTE: This *must* be called, otherwise states won't get initialized

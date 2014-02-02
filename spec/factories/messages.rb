@@ -133,7 +133,7 @@ FactoryGirl.define do
   end
 
   factory :status_message, :class => Coinmux::Message::Status do
-    status "completed"
+    state "completed"
     transaction_id { "valid_transaction_id:#{rand}" }
 
     association :coin_join, factory: :coin_join_message, strategy: :build

@@ -1,5 +1,5 @@
 class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
-  STATUSES = %w(waiting_for_inputs waiting_for_outputs waiting_for_signatures failed completed)
+  STATES = %w(waiting_for_inputs waiting_for_outputs waiting_for_signatures failed completed)
   STATUS_UPDATE_INTERVAL = 60
   
   def initialize(options = {})
@@ -8,7 +8,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     super(options)
 
     self.coin_join_message = Coinmux::Message::CoinJoin.build(data_store, amount: options[:amount], participants: options[:participants])
-    self.status = 'waiting_for_inputs'
+    self.state = 'waiting_for_inputs'
   end
   
   def start(&notification_callback)
@@ -23,7 +23,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     event_queue.interval_exec(STATUS_UPDATE_INTERVAL) do |interval_id|
       info("director doing status update")
 
-      if %w(failed completed).include?(status)
+      if %w(failed completed).include?(state)
         event_queue.clear_interval(interval_id)
       else
         status_message = coin_join_message.status.value
@@ -35,8 +35,8 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   def insert_current_status_message(transaction_id = nil, &callback)
     status_message = coin_join_message.status.value
 
-    if status_message.nil? || status != status_message.status
-      new_status_message = Coinmux::Message::Status.build(coin_join_message, status: status, transaction_id: transaction_id)
+    if status_message.nil? || state != status_message.state
+      new_status_message = Coinmux::Message::Status.build(coin_join_message, state: state, transaction_id: transaction_id)
       insert_message(:status, new_status_message) do
         yield if block_given?
       end
@@ -46,8 +46,8 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
 
   def failure(error_identifier, error_message = nil)
-    if status != 'failed' # already failed so don't cause infinite loop
-      update_status('failed', nil, "#{error_identifier}: #{error_message}")
+    if state != 'failed' # already failed so don't cause infinite loop
+      update_state('failed', nil, "#{error_identifier}: #{error_message}")
     end
   end
   
@@ -63,7 +63,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
   
   def start_waiting_for_inputs
-    update_status_and_poll('waiting_for_inputs') do |&continue_poll|
+    update_state_and_poll('waiting_for_inputs') do |&continue_poll|
       refresh_message(:inputs) do
         if coin_join_message.inputs.value.size >= coin_join_message.participants
           notify(:inserting_message_verification_message)
@@ -78,7 +78,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
   
   def start_waiting_for_outputs
-    update_status_and_poll('waiting_for_outputs') do |&continue_poll|
+    update_state_and_poll('waiting_for_outputs') do |&continue_poll|
       refresh_message(:outputs) do
         if coin_join_message.outputs.value.size == coin_join_message.inputs.value.size
           inputs = coin_join_message.build_transaction_inputs
@@ -95,12 +95,12 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   end
   
   def start_waiting_for_signatures
-    update_status_and_poll('waiting_for_signatures') do |&continue_poll|
+    update_state_and_poll('waiting_for_signatures') do |&continue_poll|
       refresh_message(:transaction_signatures) do
         if coin_join_message.transaction_signatures.value.size == coin_join_message.transaction.value.inputs.size
           notify(:publishing_transaction)
           publish_transaction do |transaction_id|
-            update_status('completed', transaction_id)
+            update_state('completed', transaction_id)
           end
         else
           continue_poll.call
@@ -109,30 +109,30 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     end
   end
 
-  def update_status(status, transaction_id = nil, message = nil, &block)
-    info("director updating status to #{status}")
+  def update_state(state, transaction_id = nil, message = nil, &block)
+    info("director updating state to #{state}")
 
-    self.status = status
+    self.state = state
     insert_current_status_message(transaction_id) do
-      notify(status.to_sym, message)
+      notify(state.to_sym, message)
       yield if block_given?
     end
   end
 
-  def update_status_and_poll(status, transaction_id = nil, &block)
-    update_status(status, transaction_id) do
-      poll_for_status(status, &block)
+  def update_state_and_poll(state, transaction_id = nil, &block)
+    update_state(state, transaction_id) do
+      poll_for_state(state, &block)
     end
   end
 
-  def poll_for_status(status, &block)
+  def poll_for_state(state, &block)
     event_queue.future_exec(MESSAGE_POLL_INTERVAL) do
-      debug "director waiting for status change: #{status}"
-      if self.status == status
-        debug "director status not changed"
+      debug "director waiting for state change: #{state}"
+      if self.state == state
+        debug "director state not changed"
         block.call do
-          # call again until status changes
-          poll_for_status(status, &block)
+          # call again until state changes
+          poll_for_state(state, &block)
         end
 
       end

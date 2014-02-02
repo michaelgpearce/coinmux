@@ -1,17 +1,17 @@
 class Coinmux::Message::Status < Coinmux::Message::Base
-  property :status
+  property :state
   property :transaction_id
   
-  validates :status, :presence => true
+  validates :state, :presence => true
   validate :transaction_id_presence
-  validate :status_valid
+  validate :state_valid
 
   class << self
     def build(coin_join, options = {})
-      options.assert_keys!(required: :status, optional: :transaction_id)
+      options.assert_keys!(required: :state, optional: :transaction_id)
 
       message = super(coin_join.data_store, coin_join)
-      message.status = options[:status]
+      message.state = options[:state]
       message.transaction_id = options[:transaction_id]
 
       message
@@ -21,18 +21,18 @@ class Coinmux::Message::Status < Coinmux::Message::Base
   private
 
   def transaction_id_presence
-    if status == 'completed'
-      errors[:transaction_id] << "must be present for status #{status}" if transaction_id.nil?
+    if state == 'completed'
+      errors[:transaction_id] << "must be present for state #{state}" if transaction_id.nil?
     else
-      errors[:transaction_id] << "must not be present for status #{status}" unless transaction_id.nil?
+      errors[:transaction_id] << "must not be present for state #{state}" unless transaction_id.nil?
     end
   end
 
   def is_completed?
-    status == 'completed'
+    state == 'completed'
   end
 
-  def status_valid
-    errors[:status] << "is not a valid status" unless Coinmux::StateMachine::Director::STATUSES.include?(status)
+  def state_valid
+    errors[:state] << "is not a valid state" unless Coinmux::StateMachine::Director::STATES.include?(state)
   end
 end

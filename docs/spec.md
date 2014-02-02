@@ -38,13 +38,13 @@ coin_joins:
 ### Status Message
 
 Director Updates with state information.
-Participants use the status to determine where they are in the state machine.
+Participants use the status message to determine where they are in the state machine.
 
 Message Creator: Director
 ```
 status:
 {
-  status: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "failed" | "completed"
+  state: "initializing" | "waiting_for_inputs" | "waiting_for_outputs" | "waiting_for_signatures" | "failed" | "completed"
   transaction_id: null | "123...abc" # transaction id available during when completed
 }
 ```
