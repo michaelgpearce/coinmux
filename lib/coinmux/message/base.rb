@@ -65,7 +65,7 @@ class Coinmux::Message::Base < Hashie::Dash
     end
 
     def add_association(name, type, options)
-      options.assert_required_keys!(:read_only)
+      options.assert_keys!(required: :read_only)
       raise ArgumentError, "Invalid association type: #{type}" unless ASSOCIATION_TYPES.include?(type)
 
       property(name)

@@ -8,14 +8,6 @@ require 'set'
 
 Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 
-class Hash
-  include Hashie::Extensions::KeyConversion
-
-  def assert_required_keys!(*keys)
-    raise "There are invalid keys #{self.keys}, expected #{keys}" if self.keys.sort != keys.sort
-  end
-end
-
 module Coinmux
   module Message; end
   module StateMachine; end
