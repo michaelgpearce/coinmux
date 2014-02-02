@@ -143,7 +143,13 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
       if coin_join.amount == amount && coin_join.participants == participants
         refresh_message(:status, coin_join) do
           if coin_join.status.value && coin_join.status.value.status == 'waiting_for_inputs'
-            yield(coin_join) # found it!
+            refresh_message(:inputs, coin_join) do
+              if coin_join.inputs.value.size < participants
+                yield(coin_join) # found it!
+              else
+                fetch_available_coin_join_status_message(coin_join_messages, &callback) # try next
+              end
+            end
           else
             fetch_available_coin_join_status_message(coin_join_messages, &callback) # try next
           end

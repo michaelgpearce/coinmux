@@ -127,11 +127,13 @@ class Cli::Application
                     if event.error
                       error_for_run_list_coin_joins(event.error)
                     else
-                      available_coin_joins << {
-                        amount: coin_join_message.amount,
-                        total_participants: coin_join_message.participants,
-                        waiting_participants: coin_join_message.inputs.value.size
-                      }
+                      if coin_join_message.inputs.value.size < coin_join_message.participants
+                        available_coin_joins << {
+                          amount: coin_join_message.amount,
+                          total_participants: coin_join_message.participants,
+                          waiting_participants: coin_join_message.inputs.value.size
+                        }
+                      end
                       waiting_for -= 1
                     end
                   end
