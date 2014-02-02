@@ -150,6 +150,11 @@ Run tests with the following command
 bundle exec rake
 ```
 
+## Donation
+
+If you find this software useful and want to contribute to the continued development of Coinmux to enhance Bitcoin privacy and fungibility, donations can be sent to:
+
+16f6gUFDFafjLPkWB55nvDjE3YkA6uPvoG
 
 ## License
 
