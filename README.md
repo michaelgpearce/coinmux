@@ -17,6 +17,8 @@ CoinJoin increases your Bitcoin privacy and helps bitcoins remain [fungible](htt
 
 CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
 
+And CoinJoin is very inexpensive. The only fees involved are those used to pay Bitcoin miners their normal transaction fee. And that low fee is split between all participants!
+
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
 [Protocol Specification](docs/spec.md)
