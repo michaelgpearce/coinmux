@@ -1,5 +1,5 @@
 class Coinmux::Message::Transaction < Coinmux::Message::Base
-  add_properties :inputs, :outputs
+  property :inputs, :outputs
 
   validate :inputs_is_array_of_hashes
   validate :outputs_is_array_of_hashes

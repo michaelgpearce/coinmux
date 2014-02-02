@@ -1,5 +1,5 @@
 class Coinmux::Message::Input < Coinmux::Message::Base
-  add_properties :message_public_key, :address, :change_address, :change_transaction_output_identifier, :signature
+  property :message_public_key, :address, :change_address, :change_transaction_output_identifier, :signature
   
   attr_accessor :message_private_key, :private_key
   

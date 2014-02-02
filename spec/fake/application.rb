@@ -1,9 +1,8 @@
 class Coinmux::Fake::Application
-  class Invocation < Hashie::Dash
-    property :block
-    property :time
-    property :seconds
-    property :interval_identifier
+  class Invocation
+    include Coinmux::Proper
+
+    property :block, :time, :seconds, :interval_identifier
 
     def <=>(other)
       self.time <=> other.time

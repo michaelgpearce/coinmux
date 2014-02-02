@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'hashie', '2.0.5'
 gem 'httpclient', '2.3.4.1'
 
 group :gui do

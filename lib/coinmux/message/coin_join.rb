@@ -5,7 +5,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   DEFAULT_AMOUNT = 1 * SATOSHIS_PER_BITCOIN
   DEFAULT_PARTICIPANTS = 5
   
-  add_properties :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee
+  property :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee
   add_association :inputs, :list, :read_only => false
   add_association :outputs, :list, :read_only => false
   add_association :message_verification, :fixed, :read_only => true

@@ -1,5 +1,5 @@
 class Coinmux::Message::TransactionSignature < Coinmux::Message::Base
-  add_properties :transaction_input_index, :script_sig, :message_verification
+  property :transaction_input_index, :script_sig, :message_verification
 
   validates :transaction_input_index, :script_sig, :message_verification, :presence => true
   validate :message_verification_correct, :if => :director?

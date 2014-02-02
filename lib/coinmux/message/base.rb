@@ -1,5 +1,5 @@
-class Coinmux::Message::Base < Hashie::Dash
-  include Coinmux::ValidationModel, Coinmux::Facades
+class Coinmux::Message::Base
+  include Coinmux::ValidationModel, Coinmux::Facades, Coinmux::Proper
 
   MAX_JSON_DATA_SIZE = 10_000 # not sure the best number for this, but all our messages should be small
   ASSOCIATION_TYPES = [:list, :fixed, :variable]
@@ -19,10 +19,6 @@ class Coinmux::Message::Base < Hashie::Dash
       end
 
       message
-    end
-
-    def add_properties(*properties)
-      properties.each { |prop| property(prop) }
     end
 
     def from_json(json, data_store, coin_join = nil)

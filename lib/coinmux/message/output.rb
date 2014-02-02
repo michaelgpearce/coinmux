@@ -1,5 +1,5 @@
 class Coinmux::Message::Output < Coinmux::Message::Base
-  add_properties :address, :message_verification, :transaction_output_identifier
+  property :address, :message_verification, :transaction_output_identifier
   
   validates :address, :message_verification, :transaction_output_identifier, :presence => true
   validate :message_verification_correct, :if => :message_verification

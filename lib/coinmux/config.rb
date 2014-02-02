@@ -1,12 +1,10 @@
 require 'yaml'
 require 'erb'
 
-class Coinmux::Config < Hashie::Dash
-  include Singleton
+class Coinmux::Config
+  include Coinmux::Proper, Singleton
 
-  property :bitcoin_network
-  property :coin_join_uri
-  property :webbtc_host
+  property :bitcoin_network, :coin_join_uri, :webbtc_host
   
   def initialize
     config_path = File.join(Coinmux.root, 'config.yml')
