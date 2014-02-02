@@ -30,6 +30,7 @@ module Coinmux
   end
 end
 
+require 'lib/coinmux/try'
 require 'lib/coinmux/assert_keys'
 require 'lib/coinmux/blank_and_present'
 require 'lib/coinmux/inflections'

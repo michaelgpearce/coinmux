@@ -46,6 +46,9 @@ class Cli::Application
       return
     end
 
+    Kernel.trap('SIGINT') { clean_up_coin_join }
+    Kernel.trap('SIGTERM') { clean_up_coin_join }
+
     self.notification_callback = Proc.new do |event|
       debug "event queue event received: #{event.inspect}"
       if event.type == :failed
@@ -82,6 +85,19 @@ class Cli::Application
   end
 
   private
+
+  def clean_up_coin_join
+    puts "Quitting..."
+    if !%w(failed completed).include?(director.try(:coin_join_message).try(:status).try(:value).try(:status))
+      status_message = director.coin_join_message.status.value
+      status_message.status = 'failed'
+      director.coin_join_message.status.insert(status_message) do
+        Cli::EventQueue.instance.stop
+      end
+    else
+      Cli::EventQueue.instance.stop
+    end
+  end
 
   def error_for_run_list_coin_joins(message)
     Cli::EventQueue.instance.stop
