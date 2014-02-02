@@ -9,24 +9,24 @@ describe Coinmux::Http do
     let(:http) { Coinmux::Http.instance }
     let(:host) { 'http://valid-host.example.com' }
     let(:path) { '/valid/path.html' }
-    let(:code) { 200 }
-    let(:content) { 'some content' }
-    let(:response) { double(code: code, content: content) }
+    let(:code) { '200' }
+    let(:body) { 'some content' }
+    let(:response) { double(code: code, body: body) }
 
     before do
-      http.send(:client).stub(:get).with("#{host}#{path}").and_return(response)
+      Net::HTTP.stub(:get_response).with(URI("#{host}#{path}")).and_return(response)
     end
 
     subject { http.get(host, path) }
 
     context "with 200 response code" do
-      it "returns content" do
-        expect(subject).to eq(content)
+      it "returns body" do
+        expect(subject).to eq(body)
       end
     end
 
     context "with non-200 response code" do
-      let(:code) { 404 }
+      let(:code) { '404' }
 
       it "raises error" do
         expect { subject }.to raise_error(Coinmux::Error)
@@ -39,7 +39,7 @@ describe Coinmux::Http do
       end
 
       it "return cached value" do
-        http.send(:client).should_receive(:get).with("#{host}#{path}").never
+        Net::HTTP.stub(:get_response).with(URI("#{host}#{path}")).never
         subject
       end
     end

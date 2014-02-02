@@ -1,4 +1,4 @@
-require 'httpclient'
+require 'net/http'
 
 class Coinmux::Http
   include Singleton, Coinmux::Facades
@@ -26,13 +26,14 @@ class Coinmux::Http
   private
 
   def do_get(host, path)
-    response = client.get("#{host}#{path}")
+    uri = URI("#{host}#{path}")
+    response = Net::HTTP.get_response(uri)
 
     info "HTTP GET Response #{response.code}"
     raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
 
-    # debug "HTTP GET Response Content #{response.content}"
-    response.content
+    # debug "HTTP GET Response Content #{response.body}"
+    response.body
   end
 
   def cache
@@ -55,9 +56,5 @@ class Coinmux::Http
     end
 
     result
-  end
-
-  def client
-    @client ||= HTTPClient.new
   end
 end

@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'httpclient', '2.3.4.1'
-
 group :gui do
   gem 'swt', '0.18'
   gem 'glimmer', '0.1.3'
