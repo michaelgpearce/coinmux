@@ -222,7 +222,7 @@ class Coinmux::DataStore::Tomp2p
         data = hashes.collect { |hash| hash['value'].to_s }
 
         Coinmux::Event.new(data: data)
-      elsif future.getFailedReason().to_s =~ /Expected >0 result, but got 0/
+      elsif future.getFailedReason().to_s.include?("Expected >0 result, but got 0")
         Coinmux::Event.new(data: [])
       else
         Coinmux::Event.new(error: future.getFailedReason())
