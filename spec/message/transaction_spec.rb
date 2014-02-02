@@ -84,11 +84,23 @@ describe Coinmux::Message::Transaction do
     end
 
     describe "#has_no_duplicate_outputs" do
-      let(:outputs) { template_message.outputs + [template_message.outputs.first] }
+      context "with duplicate outputs" do
+        let(:outputs) { template_message.outputs + [template_message.outputs.first.dup] }
 
-      it "is invalid with duplicate outputs" do
-        expect(subject).to be_false
-        expect(message.errors[:outputs]).to include("has a duplicate output")
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:outputs]).to include("has a duplicate output")
+        end
+
+        context "with different identifiers" do
+          before do
+            outputs.last['identifier'] = "A different identifier: #{rand.to_s}"
+          end
+
+          it "is valid" do
+            expect(subject).to be_true
+          end
+        end
       end
     end
 

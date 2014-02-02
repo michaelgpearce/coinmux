@@ -80,7 +80,7 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   def has_no_duplicate_outputs
     return unless errors[:outputs].empty?
 
-    if outputs.collect { |output| output['address'] }.uniq.size != outputs.size
+    if outputs.collect { |output| [output['address'], output['identifier']] }.uniq.size != outputs.size
       errors[:outputs] << "has a duplicate output"
     end
   end
