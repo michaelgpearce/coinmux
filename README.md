@@ -56,11 +56,11 @@ gem install bundler && bundle
 
 ## Command Line Interface
 
-All commands can be run with either ```java -jar coinmux-SNAPSHOT.jar [options]``` from the directory of the jar file or ```./bin/coinmux [options]``` from your Coinmux project directory. If you are using the Java command, replace the start of the commands below.
+All commands can be run with either ```java -jar coinmux-SNAPSHOT.jar [options]``` from the directory of the jar file or ```./bin/coinmux [options]``` from your Coinmux project directory. The remainder of this document assumes you are using the Jar file. If you are using the ```./bin/coinmux``` command, simply replace the start of the commands below.
 
 Print options from the project directory
 ```bash
-./bin/coinmux --help
+java -jar coinmux-SNAPSHOT.jar --help
 ```
 
 ### Trying it out P2P over the Internet
@@ -70,7 +70,7 @@ Coinmux in P2P mode requires external access to ports 14141 TCP and UDP. If you 
 To begin, check to see if there are available CoinJoins already on the network. If not, Coinmux will create one automatically when you start a CoinJon.
 
 ```
-./bin/coinmux --list
+java -jar coinmux-SNAPSHOT.jar --list
 ```
 
 You will see something like this:
@@ -86,14 +86,14 @@ Notice that the bitcoin amount must be a power of 2 number of bitcoins: 1, 2, 4,
 
 Now execute Coinmux in a CoinJoin between 2 participants for 0.5 BTC. You will be prompted to enter the private key of your input Bitcoin address.
 ```bash
-./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address
+java -jar coinmux-SNAPSHOT.jar --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address
 ```
 
 Coinmux will wait for more participants to arrive until there are the correct number you specified to begin the CoinJoin.
 
 To join the CoinJoin with another of your input addresses, start a second process with a matching number of participants and Bitcoin amount, but using a different input private key, output address and change address. If you run this on the same computer, you will also need to tell Coinmux to use a different port for connecting to the P2P network.
 ```bash
-./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address-2 --change-address my-change-address-2 --data-store p2p?port=14142
+java -jar coinmux-SNAPSHOT.jar --participants 2 --amount 0.5 --output-address my-output-address-2 --change-address my-change-address-2 --data-store p2p?port=14142
 ```
 
 If you are the only two partipants in the CoinJoin, you will see output like this for the first participant:
@@ -140,7 +140,7 @@ If you want to try Coinmux out on a single computer, use the ```filesystem``` da
 
 Using the filesystem looks like this:
 ```bash
-./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address --data-store filesystem
+java -jar coinmux-SNAPSHOT.jar --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address --data-store filesystem
 ```
 
 There may be some interesting things to try combining a filesystem CoinJoin with services like Dropbox or using FTP or [SSHFS](http://fuse.sourceforge.net/sshfs.html).
