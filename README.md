@@ -63,7 +63,7 @@ Print options from the project directory
 ./bin/coinmux --help
 ```
 
-### Trying it out over the Internet P2P
+### Trying it out P2P over the Internet
 
 Coinmux in P2P mode requires external access to ports 14141 TCP and UDP. If you are behind a firewall and your router supports UPNP, these ports will be opened for you automatically, otherwise you must manually allow access to these ports.
 
