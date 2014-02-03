@@ -56,7 +56,7 @@ gem install bundler && bundle
 
 ## Command Line Interface
 
-All commands can be run with either ```java -jar coinmux-SNAPSHOT.jar [options]``` from your downloads directory or ```./bin/coinmux [options]``` from your project directory. If you are using the Java command, replace the start of the commands below.
+All commands can be run with either ```java -jar coinmux-SNAPSHOT.jar [options]``` from the directory of the jar file or ```./bin/coinmux [options]``` from your Coinmux project directory. If you are using the Java command, replace the start of the commands below.
 
 Print options from the project directory
 ```bash
