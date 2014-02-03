@@ -89,7 +89,7 @@ Now execute Coinmux in a CoinJoin between 2 participants for 0.5 BTC. You will b
 ./bin/coinmux --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address
 ```
 
-If there were no participants currently waiting for number of participants and the amount you want, Coinmux will wait for another participant to arrive.
+Coinmux will wait for more participants to arrive until there are the correct number you specified to begin the CoinJoin.
 
 To join the CoinJoin with another of your input addresses, start a second process with a matching number of participants and Bitcoin amount, but using a different input private key, output address and change address. If you run this on the same computer, you will also need to tell Coinmux to use a different port for connecting to the P2P network.
 ```bash
