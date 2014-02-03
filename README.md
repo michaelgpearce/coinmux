@@ -28,13 +28,13 @@ You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1j
 
 ## Installation
 
-### Runnable Java Jar file
+### Runnable Java Jar File Installation
 
 Download the Java Jar file:
 
 [http://coinmux.com/releases/coinmux-SNAPSHOT.jar](http://coinmux.com/releases/coinmux-SNAPSHOT.jar)
 
-### Developer installation
+### Ruby Developer Installation
 
 Note that Coinmux is currently only for development purposes.  You should already have Java installed on your computer.
 
