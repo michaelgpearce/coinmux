@@ -28,6 +28,14 @@ You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1j
 
 ## Installation
 
+### Runnable Java Jar file
+
+Download the Java Jar file:
+
+[http://coinmux.com/releases/coinmux-SNAPSHOT.jar](http://coinmux.com/releases/coinmux-SNAPSHOT.jar)
+
+### Developer installation
+
 Note that Coinmux is currently only for development purposes.  You should already have Java installed on your computer.
 
 Install RVM and JRuby
@@ -47,6 +55,8 @@ gem install bundler && bundle
 
 
 ## Command Line Interface
+
+All commands can be run with either ```java -jar coinmux-SNAPSHOT.jar [options]``` from your downloads directory or ```./bin/coinmux [options]``` from your project directory. If you are using the Java command, replace the start of the commands below.
 
 Print options from the project directory
 ```bash
