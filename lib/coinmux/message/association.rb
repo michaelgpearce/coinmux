@@ -1,5 +1,3 @@
-require 'active_support/inflector'
-
 class Coinmux::Message::Association < Coinmux::Message::Base
   attr_accessor :name, :type, :data_store_identifier_from_build, :data_store_identifier, :read_only
 
