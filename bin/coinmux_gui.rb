@@ -1,5 +1,5 @@
 raise "COINMUX_ENV not set" if ENV['COINMUX_ENV'].nil?
-Bundler.require(:default, ENV['COINMUX_ENV'], :gui)
+Bundler.require(:default, ENV['COINMUX_ENV'], :gui) unless ENV['COINMUX_JAR'] == 'true'
 
 require File.expand_path("../../lib/coinmux", __FILE__)
 
