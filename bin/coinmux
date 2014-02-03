@@ -31,15 +31,19 @@ env = {
   'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'development' # TODO: This should be production by default
 }
 
-Dir.chdir File.join(File.dirname(__FILE__), '..') do
-  args = %w(exec ruby) + args
-  if ARGV.length == 0
-    args << './bin/coinmux_gui.rb'
-    system(env, "bundle", *args)
-  else
-    args << './bin/coinmux_cli.rb'
-    args += ARGV
+script = ARGV.length == 0 ? 'bin/coinmux_gui.rb' : 'bin/coinmux_cli.rb'
+
+if File.exists?("./config/coinmux.yml")
+  # assume running from project directory
+  Dir.chdir File.join(File.dirname(__FILE__), '..') do
+    args = %w(exec ruby) + args + [script] + ARGV
     system(env, "bundle", *args)
   end
+else
+  # assume running from jar file
+  $:.unshift(File.expand_path("../..", __FILE__))
+  ENV['COINMUX_ENV'] = env['COINMUX_ENV']
+  ENV['COINMUX_JAR'] = 'true'
+  load script
 end
 

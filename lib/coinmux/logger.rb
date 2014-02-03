@@ -1,4 +1,5 @@
 require 'logger'
+require 'fileutils'
 
 class Coinmux::Logger
   include Singleton
@@ -34,7 +35,15 @@ class Coinmux::Logger
   def logger
     return @logger if @logger
 
-    file = File.open(File.join(Coinmux.root, 'log', "coinmux-#{Coinmux.env}.log"), 'a')
+    begin
+      path = File.join(Coinmux.root, 'log')
+      FileUtils.mkdir_p(path)
+    rescue
+      path = File.join('.', 'log')
+      FileUtils.mkdir_p(path)
+    end
+
+    file = File.open(File.join(path, "coinmux-#{Coinmux.env}.log"), 'a')
     file.sync = true
     @logger = ::Logger.new(file, 1)
   end

@@ -17,4 +17,4 @@ test/tmp
 test/version_tmp
 tmp
 .DS_Store
-coinmux.jar
+coinmux*.jar
