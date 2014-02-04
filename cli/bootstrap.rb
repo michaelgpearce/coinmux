@@ -1,26 +1,37 @@
+require 'fileutils'
+
 class Cli::Bootstrap
-  include Singleton
+  DEFAULT_PORT = 14141
+
+  attr_accessor :port
 
   import 'java.io.IOException'
+  import 'java.util.Random'
   import 'net.tomp2p.p2p.Peer'
   import 'net.tomp2p.p2p.PeerMaker'
   import 'net.tomp2p.peers.Number160'
-  import 'java.util.Random'
+  import 'net.tomp2p.storage.StorageDisk'
+  import 'net.tomp2p.storage.StorageGeneric'
   
-  def startup
-    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(14141).makeAndListen()
-    @peer.getConfiguration().setBehindFirewall(true)
+  def initialize(options = {})
+    options.assert_keys!(optional: :port)
 
-    begin
-      loop do
-        sleep(1)
-      end
-    ensure
-      shutdown
-    end
+    self.port = options[:port].try(:to_i) || DEFAULT_PORT
   end
 
-  def shutdown
-    @peer.shutdown if @peer
+  def startup
+    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(port).makeAndListen()
+    @peer.getPeerBean().setStorage(StorageDisk.new(storage_path));
+    @peer.getConfiguration().setBehindFirewall(true)
+
+    # blocks current thread
+  end
+
+  private
+
+  def storage_path
+    File.join(Coinmux.root, 'tmp', 'bootstrap_storage').tap do |path|
+      FileUtils.mkdir_p(path)
+    end
   end
 end

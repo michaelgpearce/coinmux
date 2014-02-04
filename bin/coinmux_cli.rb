@@ -23,7 +23,7 @@ TEXT
   on :c, :"change-address=", 'Change address (in BTC); optional'
   on :k, :"private-key=", 'Input private key in hex format *NOT SECURE*'
   on :d, :"data-store=", 'Data store to use: (p2p <default> | filesystem)'
-  on :b, :bootstrap, 'Run as P2P bootstrap server'
+  on :b, :bootstrap, 'Run as P2P bootstrap server (optional <port>)', argument: :optional
 end
 
 if opts.version?
@@ -31,7 +31,7 @@ if opts.version?
 elsif opts.bootstrap?
   require 'cli/bootstrap'
 
-  Cli::Bootstrap.instance.startup
+  Cli::Bootstrap.new(port: opts[:bootstrap]).startup
 else
   require 'cli/event'
   require 'cli/event_queue'

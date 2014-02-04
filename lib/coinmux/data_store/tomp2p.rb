@@ -174,9 +174,40 @@ class Coinmux::DataStore::Tomp2p
       value: value
     }.to_json
 
-    exec(peer.add(create_hash(key)).setData(Data.new(json).set_ttl_seconds(11)).setRefreshSeconds(5).setDirectReplication(), callback) do |future|
+    exec(peer.add(create_hash(key)).setData(Data.new(json)), callback) do |future|
+    # exec(peer.add(create_hash(key)).setData(Data.new(json).set_ttl_seconds(11)).setRefreshSeconds(5).setDirectReplication(), callback) do |future|
       if future.isSuccess()
         Coinmux::Event.new(data: nil)
+      else
+        Coinmux::Event.new(error: future.getFailedReason())
+      end
+    end
+  end
+
+  def put(key, value, &callback)
+    key = current_key(key)
+
+    json = {
+      timestamp: Time.now.to_i, # TODO: need to come up with something better than timestamps here
+      value: value
+    }.to_json
+
+    exec(peer.put(create_hash(key)).setData(Data.new(json)), callback) do |future|
+      if future.isSuccess()
+        Coinmux::Event.new(data: nil)
+      else
+        Coinmux::Event.new(error: future.getFailedReason())
+      end
+    end
+  end
+
+  def get(key, &callback)
+    key = current_key(key)
+
+    exec(peer.get(create_hash(key)), callback) do |future|
+      if future.isSuccess()
+        value = JSON.parse(future.getData().getObject().to_s)['value'] rescue nil
+        Coinmux::Event.new(data: value)
       else
         Coinmux::Event.new(error: future.getFailedReason())
       end
