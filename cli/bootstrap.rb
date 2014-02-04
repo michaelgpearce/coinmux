@@ -30,8 +30,12 @@ class Cli::Bootstrap
   private
 
   def storage_path
-    File.join(Coinmux.root, 'tmp', 'bootstrap_storage').tap do |path|
-      FileUtils.mkdir_p(path)
+    begin
+      FileUtils.mkdir_p(path = File.join(Coinmux.root, 'tmp', 'bootstrap_storage'))
+    rescue
+      FileUtils.mkdir_p(path = File.join('.', 'tmp', 'bootstrap_storage'))
     end
+
+    path
   end
 end
