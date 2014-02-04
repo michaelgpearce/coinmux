@@ -20,11 +20,18 @@ class Cli::Bootstrap
   end
 
   def startup
+    puts "Starting bootstrap on port #{port}"
     @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(port).makeAndListen()
     @peer.getPeerBean().setStorage(StorageDisk.new(storage_path));
     @peer.getConfiguration().setBehindFirewall(true)
 
-    # blocks current thread
+    begin
+      loop do
+        sleep(0.05)
+      end
+    ensure
+      shutdown
+    end
   end
 
   private
