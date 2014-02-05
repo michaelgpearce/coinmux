@@ -5,9 +5,17 @@ task :default => :spec
 require 'warbler'
 Warbler::Task.new
 
+require './lib/coinmux/version'
+
 namespace 'release' do
+  task 'release' => [:jar, :tag]
+
+  task 'tag' do
+    system("git checkout origin master && git pull origin master && git tag -a v#{Coinmux::VERSION} -m '#{Coinmux::VERSION}' && git push --tags origin master") || fail("Unable to tag release")
+  end
+
   task 'jar' do
-    raise "You must set COINMUX_JAR_VERSION in the environment" if ENV['COINMUX_JAR_VERSION'].nil?
-    Rake::Task['jar'].invoke
+    # Must set the environment variable before rake task is loaded
+    system({'COINMUX_JAR_VERSION' => Coinmux::VERSION}, "bundle exec rake jar") || fail("Unable to build jar")
   end
 end
