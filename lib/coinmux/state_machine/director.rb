@@ -149,7 +149,12 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
 
     transaction_signatures.each_with_index do |transaction_signature, input_index|
       script_sig = Base64.decode64(transaction_signature.script_sig)
-      bitcoin_network_facade.sign_transaction_input(transaction, input_index, script_sig)
+      begin
+        bitcoin_network_facade.sign_transaction_input(transaction, input_index, script_sig)
+      rescue Coinmux::Error => e
+        yield Coinmux::Event.new(error: "Unable to sign transaction input: #{e}")
+        return
+      end
     end
 
     bitcoin_network_facade.post_transaction(transaction) do |event|
