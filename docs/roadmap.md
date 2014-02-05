@@ -1,16 +1,19 @@
 ### v0.1 - Functional Prototype
 
+* Command line available
 * Creates transactions with no bad actors present
-* Works for testnet usage
-* May have single point of failure (i.e. blockchain HTTP API)
-* May have external application dependencies (i.e. Freenet)
+* Works on Testnet
+* Support WIF private keys
+* Can specify/create custom CoinJoin URI
+* May have single point of failure (i.e. webbtc HTTP API) and not be fully decentralized
+* May not be fully anonymous (i.e. IP address leaked during P2P connections)
 
 ### v0.2 - Functional Beta
 
+* Graphical user interface available
 * Creates transactions with no bad actors present
 * Works for Mainnet usage for advanced users
 * Remove single points of failure
-* Support WIF private keys
 * Transaction fee calculation use transaction size info.
 * Support multiple input addresses during CoinJoin (proper fee calculation required)
 * Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
@@ -22,7 +25,6 @@
 * Require minimum confirmations for input address (?)
 * Blacklist of "bad addresses" (probably not workable)
 * Encrypt all messages after publish of message_verification so only participants and director can decrypt
-* Can specify/create custom CoinJoin URI
 * Dependent Gems are part of project
 
 ### v1.0 - Stable enough and feature rich enough for novice users
