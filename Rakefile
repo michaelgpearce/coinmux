@@ -11,7 +11,7 @@ namespace 'release' do
   task 'release' => [:jar, :tag]
 
   task 'tag' do
-    system("git checkout origin master && git pull origin master && git tag -a v#{Coinmux::VERSION} -m '#{Coinmux::VERSION}' && git push --tags origin master") || fail("Unable to tag release")
+    system("git checkout master && git pull origin master && git tag -a v#{Coinmux::VERSION} -m '#{Coinmux::VERSION}' && git push --tags origin && git push origin master") || fail("Unable to tag release")
   end
 
   task 'jar' do
