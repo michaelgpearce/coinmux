@@ -178,13 +178,22 @@ class Cli::Application
       errors << "CoinJoin URI is invalid"
     end
 
+    begin
+      self.input_private_key = bitcoin_crypto_facade.private_key_to_hex!(input_private_key)
+    rescue Coinmux::Error => e
+      self.input_private_key = nil
+      errors << "Input private key is invalid"
+    end
+
     coin_join = Coinmux::Message::CoinJoin.build(data_store, amount: amount, participants: participants)
     errors += coin_join.errors.full_messages unless coin_join.valid?
 
-    input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key, change_address: change_address)
-    input.valid?
-    errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
-    errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
+    if input_private_key
+      input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key, change_address: change_address)
+      input.valid?
+      errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
+      errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
+    end
 
     output = Coinmux::Message::Output.build(coin_join, address: output_address)
     output.valid?

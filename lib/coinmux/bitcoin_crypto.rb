@@ -3,8 +3,10 @@ class Coinmux::BitcoinCrypto
 
   import 'java.math.BigInteger'
   import 'java.security.SignatureException'
+  import 'com.google.bitcoin.core.AddressFormatException'
   import 'com.google.bitcoin.core.ECKey'
   import 'com.google.bitcoin.core.Address'
+  import 'com.google.bitcoin.core.DumpedPrivateKey'
   import 'com.google.bitcoin.core.Utils'
   import 'com.google.bitcoin.core.NetworkParameters'
   import 'org.spongycastle.util.encoders.Hex'
@@ -62,6 +64,21 @@ class Coinmux::BitcoinCrypto
   end
   def_no_raise_method(:verify_address, false)
   
+  def private_key_to_hex!(data)
+    return data if data.size == 64
+
+    private_key_hex = begin
+      Utils.bytesToHexString(DumpedPrivateKey.new(network_params, data).getKey().getPrivKeyBytes())
+    rescue AddressFormatException => e
+      nil
+    end
+
+    raise Coinmux::Error, "Private Key not valid" if private_key_hex.nil?
+
+    private_key_hex.upcase
+  end
+  def_no_raise_method(:private_key_to_hex, nil)
+
   private
 
   def build_ec_key(private_key_hex)
