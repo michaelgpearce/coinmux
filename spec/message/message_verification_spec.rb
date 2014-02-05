@@ -51,6 +51,19 @@ describe Coinmux::Message::MessageVerification do
         end
       end
     end
+
+    describe "#ensure_encrypted_secret_keys_size_is_participant_count" do
+      context "with incorrect number of participants" do
+        before do
+          coin_join.participants += 1
+        end
+
+        it "is invalid" do
+          subject
+          expect(message.errors[:encrypted_secret_keys]).to include("does not match number of participants")
+        end
+      end
+    end
   end
 
   describe "#get_secret_key_for_address!" do

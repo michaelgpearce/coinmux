@@ -9,6 +9,7 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
   validates :message_identifier, :secret_key, :absence => true, :unless => :created_with_build?
   validate :ensure_has_addresses_for_all_encrypted_secret_keys, :unless => :created_with_build?
   validate :ensure_owned_input_can_decrypt_message_identifier, :unless => :created_with_build?
+  validate :ensure_encrypted_secret_keys_size_is_participant_count
 
   class << self
     def build(coin_join)
@@ -51,6 +52,12 @@ class Coinmux::Message::MessageVerification < Coinmux::Message::Base
   end
 
   private
+
+  def ensure_encrypted_secret_keys_size_is_participant_count
+    return unless errors[:encrypted_secret_keys].empty?
+
+    (errors[:encrypted_secret_keys] << "does not match number of participants" and return) unless encrypted_secret_keys.size == coin_join.participants
+  end
 
   def ensure_owned_input_can_decrypt_message_identifier
     input = coin_join.inputs.value.detect(&:message_private_key)
