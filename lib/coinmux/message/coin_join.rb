@@ -19,7 +19,6 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   validate :participants_numericality, :if => :participants
   validate :participant_transaction_fee_numericality, :if => :participant_transaction_fee
   validate :version_matches, :if => :version
-  validate :amount_is_base_2_bitcoin, :if => :amount
 
   class << self
     def build(data_store, options = {})
@@ -173,24 +172,5 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     (errors[:participant_transaction_fee] << "is not an integer" and return) unless participant_transaction_fee.to_s.to_i == participant_transaction_fee
     (errors[:participant_transaction_fee] << "may not be a negative amount" and return) if participant_transaction_fee < 0
     (errors[:participant_transaction_fee] << "may not be greater than #{DEFAULT_TRANSACTION_FEE}" and return) if participant_transaction_fee > DEFAULT_TRANSACTION_FEE
-  end
-
-  def amount_is_base_2_bitcoin
-    amount = self.amount.to_s.to_f
-
-    (errors[:amount] << "is not a valid amount" && return) if amount <= 0
-
-    quotient = if amount > SATOSHIS_PER_BITCOIN
-      amount / SATOSHIS_PER_BITCOIN.to_f
-    else
-      SATOSHIS_PER_BITCOIN.to_f / amount
-    end
-    (errors[:amount] << "is not a valid amount" and return) if quotient.to_i != quotient
-
-    quotient = quotient.to_i
-
-    is_base_2 = (quotient & (quotient - 1)) == 0
-
-    errors[:amount] << "is not a valid amount" unless is_base_2
   end
 end

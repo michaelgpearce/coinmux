@@ -17,7 +17,7 @@ TEXT
   on :v, :version, 'Display the version'
   on :h, :help, 'Display this help message'
   on :l, :"list", 'List CoinJoins waiting for inputs'
-  on :a, :amount=, 'CoinJoin transaction amount (in BTC); must be a power of 2'
+  on :a, :amount=, 'CoinJoin transaction amount (in BTC)'
   on :p, :participants=, 'Number of participants'
   on :o, :"output-address=", 'Output address (in BTC)'
   on :c, :"change-address=", 'Change address (in BTC); optional'

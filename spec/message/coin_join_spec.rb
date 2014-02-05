@@ -79,44 +79,6 @@ describe Coinmux::Message::CoinJoin do
         end
       end
     end
-
-    describe "#amount_is_base_2_bitcoin" do
-      context "with base 2 bitcoin amount less than 1" do
-        let(:amount) { SATOSHIS_PER_BITCOIN / 2 }
-
-        it "is valid" do
-          expect(subject).to be_true
-        end
-      end
-
-      context "with base 2 bitcoin amount greater than 1" do
-        let(:amount) { SATOSHIS_PER_BITCOIN * 2 }
-
-        it "is valid" do
-          expect(subject).to be_true
-        end
-      end
-
-      context "with bitcoin amount is not base 2" do
-        context "and not divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { SATOSHIS_PER_BITCOIN - 1 }
-
-          it "is invalid" do
-            expect(subject).to be_false
-            expect(message.errors[:amount]).to include("is not a valid amount")
-          end
-        end
-
-        context "and divisible by SATOSHIS_PER_BITCOIN" do
-          let(:amount) { SATOSHIS_PER_BITCOIN * 3 }
-
-          it "is invalid" do
-            expect(subject).to be_false
-            expect(message.errors[:amount]).to include("is not a valid amount")
-          end
-        end
-      end
-    end
   end
 
   describe "associations" do

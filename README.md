@@ -82,8 +82,6 @@ BTC Amount  Participants
 1.0         3 of 5
 ```
 
-Notice that the bitcoin amount must be a power of 2 number of bitcoins: 1, 2, 4, or 1/2, 1/4, 1/8, etc.
-
 Now execute Coinmux in a CoinJoin between 2 participants for 0.5 BTC. You will be prompted to enter the private key of your input Bitcoin address.
 ```bash
 java -jar coinmux-SNAPSHOT.jar --participants 2 --amount 0.5 --output-address my-output-address --change-address my-change-address
