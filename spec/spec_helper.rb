@@ -88,19 +88,45 @@ def load_fixture(name)
 end
 
 module Helper
+  class BitcoinInfo
+    include Coinmux::Facades
+
+    def initialize(index)
+      @index = index
+    end
+
+    def [](key)
+      send(key)
+    end
+
+    def private_key
+      @private_key ||= "%064x" % @index
+    end
+
+    def public_key
+      @public_key ||= bitcoin_crypto_facade.public_key_for_private_key!(private_key)
+    end
+
+    def address
+      @address ||= bitcoin_crypto_facade.address_for_public_key!(public_key)
+    end
+
+    def identifier
+      @identifier ||= "valid-identifier-#{@index}"
+    end
+
+    def signature
+      @signature ||= bitcoin_crypto_facade.sign_message!(identifier, private_key)
+    end
+  end
+
+
   @@bitcoin_infos = []
   @@bitcoin_info_index = 0
 
   def self.next_bitcoin_info
     if (bitcoin_info = @@bitcoin_infos[@@bitcoin_info_index]).nil?
-      bitcoin_info = {}
-      bitcoin_info[:private_key] = "%064x" % (@@bitcoin_info_index + 1)
-      bitcoin_info[:public_key] = bitcoin_crypto_facade.public_key_for_private_key!(bitcoin_info[:private_key])
-      bitcoin_info[:address] = bitcoin_crypto_facade.address_for_public_key!(bitcoin_info[:public_key])
-      bitcoin_info[:identifier] = "valid-identifier-#{@@bitcoin_info_index + 1}"
-      bitcoin_info[:signature] = bitcoin_crypto_facade.sign_message!(bitcoin_info[:identifier], bitcoin_info[:private_key])
-
-      @@bitcoin_infos << bitcoin_info
+      @@bitcoin_infos << (bitcoin_info = ::Helper::BitcoinInfo.new(@@bitcoin_info_index + 1))
     end
 
     @@bitcoin_info_index += 1
