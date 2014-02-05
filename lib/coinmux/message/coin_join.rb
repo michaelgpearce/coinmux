@@ -86,7 +86,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       end)
 
       result.concat(inputs.value.select(&:change_address).collect do |input|
-        unspent_input_amount = minimum_unspent_transaction_inputs(input.address).collect { |hash| hash[:amount] }.inject(&:+)
+        unspent_input_amount = minimum_unspent_value!(input.address)
         change_amount = unspent_input_amount - amount - participant_transaction_fee
         { 'address' => input.change_address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
       end)
@@ -109,6 +109,10 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
 
       bitcoin_network_facade.build_unsigned_transaction(inputs, outputs)
     )
+  end
+
+  def minimum_unspent_value!(address)
+    minimum_unspent_transaction_inputs(address).collect { |hash| hash[:amount] }.inject(&:+)
   end
 
   def input_has_enough_unspent_value?(address)

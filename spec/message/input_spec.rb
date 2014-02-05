@@ -68,6 +68,33 @@ describe Coinmux::Message::Input do
         end
       end
     end
+
+    describe "#change_amount_not_more_than_transaction_fee_with_no_change_address" do
+      context "with no change address" do
+        let(:change_address) { nil }
+
+        context "with unspent amount greater than coinjoin amount and participant transaction fee" do
+          before do
+            message.coin_join.should_receive(:minimum_unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee + 1)
+          end
+
+          it "is invalid" do
+            expect(subject).to be_false
+            expect(message.errors[:change_address]).to include("required for this input address")
+          end
+        end
+
+        context "with unspent amount equal to coinjoin amount and participant transaction fee" do
+          before do
+            message.coin_join.should_receive(:minimum_unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee)
+          end
+
+          it "is valid" do
+            expect(subject).to be_true
+          end
+        end
+      end
+    end
   end
 
   describe "#build" do
