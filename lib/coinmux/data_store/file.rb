@@ -4,8 +4,13 @@ class Coinmux::DataStore::File < Coinmux::DataStore::Base
   def initialize(coin_join_uri)
     super(coin_join_uri)
 
-    path = File.join(Coinmux.root, 'tmp', 'file_data_store')
-    FileUtils.mkdir_p(path)
+    path = if path_override = coin_join_uri.params['path']
+      path_override = File.expand_path(path_override)
+      FileUtils.mkdir_p(path_override)
+      path_override
+    else
+      Coinmux::FileUtil.root_mkdir_p('tmp', 'file_data_store')
+    end
 
     @data_store ||= Diskcached.new(path, DATA_TIME_TO_LIVE)
   end
