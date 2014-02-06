@@ -166,6 +166,10 @@ If you find this software useful and want to contribute to the continued develop
 
 16f6gUFDFafjLPkWB55nvDjE3YkA6uPvoG
 
+## Thanks
+
+```irritant``` on Bitcointalk for helping with testing and debugging some Windows issues.
+
 ## License
 
 Licenced with Apache v2.0.
