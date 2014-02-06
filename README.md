@@ -21,6 +21,8 @@ And CoinJoin is very inexpensive. The only fees involved are those used to pay B
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
+[Release Notes](docs/release_notes.md)
+
 [Protocol Specification](docs/spec.md)
 
 [Roadmap](docs/roadmap.md)
