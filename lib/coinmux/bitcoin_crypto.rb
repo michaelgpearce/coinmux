@@ -12,7 +12,10 @@ class Coinmux::BitcoinCrypto
   import 'org.spongycastle.util.encoders.Hex'
 
   # https://github.com/jruby/jruby/wiki/UnlimitedStrengthCrypto
-  java.lang.Class.for_name('javax.crypto.JceSecurity').get_declared_field('isRestricted').tap{|f| f.accessible = true; f.set nil, false}
+  begin
+    java.lang.Class.for_name('javax.crypto.JceSecurity').get_declared_field('isRestricted').tap{|f| f.accessible = true; f.set nil, false}
+  rescue Exception => e
+  end
 
   class << self
     def def_no_raise_method(method, raise_return_value)
