@@ -11,6 +11,9 @@ class Coinmux::BitcoinCrypto
   import 'com.google.bitcoin.core.NetworkParameters'
   import 'org.spongycastle.util.encoders.Hex'
 
+  # https://github.com/jruby/jruby/wiki/UnlimitedStrengthCrypto
+  java.lang.Class.for_name('javax.crypto.JceSecurity').get_declared_field('isRestricted').tap{|f| f.accessible = true; f.set nil, false}
+
   class << self
     def def_no_raise_method(method, raise_return_value)
       define_method(method) do |*args|
