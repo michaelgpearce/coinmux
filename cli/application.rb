@@ -33,7 +33,7 @@ class Cli::Application
 
   def start
     if self.input_private_key.blank?
-      puts "Enter your private key (HEX format):"
+      puts "Enter your private key:"
       self.input_private_key = input_password
     end
 
@@ -188,12 +188,10 @@ class Cli::Application
     coin_join = Coinmux::Message::CoinJoin.build(data_store, amount: amount, participants: participants)
     errors += coin_join.errors.full_messages unless coin_join.valid?
 
-    if input_private_key
-      input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key, change_address: change_address)
-      input.valid?
-      errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank?
-      errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
-    end
+    input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key || '', change_address: change_address)
+    input.valid?
+    errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank? if input_private_key
+    errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
 
     output = Coinmux::Message::Output.build(coin_join, address: output_address)
     output.valid?

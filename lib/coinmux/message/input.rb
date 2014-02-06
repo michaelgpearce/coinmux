@@ -17,9 +17,14 @@ class Coinmux::Message::Input < Coinmux::Message::Base
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
 
       message.private_key = options[:private_key]
-      message.address = bitcoin_crypto_facade.address_for_private_key!(options[:private_key])
-      message.signature = bitcoin_crypto_facade.sign_message!(coin_join.identifier, options[:private_key])
-
+      begin
+        message.address = bitcoin_crypto_facade.address_for_private_key!(options[:private_key])
+      rescue Coinmux::Error
+      end
+      begin
+        message.signature = bitcoin_crypto_facade.sign_message!(coin_join.identifier, options[:private_key])
+      rescue Coinmux::Error
+      end
       message.change_address = options[:change_address]
       message.change_transaction_output_identifier = digest_facade.random_identifier
 
