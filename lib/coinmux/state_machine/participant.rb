@@ -114,8 +114,10 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   def wait_for_state(state, &callback)
     event_queue.future_exec(MESSAGE_POLL_INTERVAL) do
       refresh_message(:status) do
-        if coin_join_message.status.value && coin_join_message.status.value.state == state
+        if coin_join_message.status.value.try(:state) == state
           yield
+        elsif coin_join_message.status.value.try(:state) == 'failed'
+          failure(:director_failed)
         else
           wait_for_state(state, &callback) # try again
         end

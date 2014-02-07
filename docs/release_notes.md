@@ -2,6 +2,7 @@
 
 ### v0.1.3
 
+* Participant checks for director changing status to 'failed'.
 * Use webbtc for posting transactions instead of connecting to the Bitcoin network.
 
 ### v0.1.2.1
