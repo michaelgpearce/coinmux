@@ -183,4 +183,48 @@ describe Coinmux::BitcoinNetwork do
       end
     end
   end
+
+  describe "#post_transaction" do
+    let(:transaction_data) { "\x01\x02\x03" }
+    let(:transaction_java_bytes) { transaction_data.bytes.to_a.to_java(:byte) }
+    let(:transaction_hex) { transaction_data.unpack('H*').first }
+    let(:transaction) { double('transaction', bitcoinSerialize: transaction_java_bytes) }
+
+    before do
+      http_facade.stub(:post).with(config_facade.webbtc_host, "/relay_tx", tx: transaction_hex).and_return(response_content)
+    end
+
+    subject do
+      bitcoin_network_facade.send(:post_transaction, transaction)
+    end
+
+    context "with valid transaction data" do
+      let(:transaction_hash) { 'valid-hash' }
+      let(:response_content) { { 'hash' => transaction_hash }.to_json }
+
+      before do
+        http_facade.stub(:post).with(config_facade.webbtc_host, "/relay_tx", tx: transaction_hex).and_return(response_content)
+      end
+
+      it "returns transaction hash" do
+        expect(subject).to eq(transaction_hash)
+      end
+    end
+
+    context "with invalid JSON" do
+      let(:response_content) { 'Not JSON' }
+
+      it "raises Coinmux::Error" do
+        expect { subject }.to raise_error(Coinmux::Error, 'Unable to post to /relay_tx: invalid JSON response')
+      end
+    end
+
+    context "with error JSON" do
+      let(:response_content) { { "error" => "an error", 'detail' => 'some detail' }.to_json }
+
+      it "raises Coinmux::Error" do
+        expect { subject }.to raise_error(Coinmux::Error, "Unable to post to /relay_tx: an error (some detail)")
+      end
+    end
+  end
 end

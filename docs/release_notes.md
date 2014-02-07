@@ -1,5 +1,9 @@
 ## Coinmux Release Notes
 
+### v0.1.3
+
+* Use webbtc for posting transactions instead of connecting to the Bitcoin network.
+
 ### v0.1.2.1
 
 * Ignore errors disabling crypto restrictions.

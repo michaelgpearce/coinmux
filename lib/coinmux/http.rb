@@ -23,7 +23,32 @@ class Coinmux::Http
     end
   end
 
+  def post(host, path, data = {})
+    begin
+      info "HTTP POST Request #{host}#{path}"
+      do_post(host, path, data)
+    rescue Coinmux::Error => e
+      raise e
+    rescue SocketError => e
+      raise Coinmux::Error, e.message
+    rescue StandardError => e
+      puts e, e.backtrace
+      raise Coinmux::Error, "Unknown error: #{e.message}"
+    end
+  end
+
   private
+
+  def do_post(host, path, data)
+    uri = URI("#{host}#{path}")
+    response = Net::HTTP.post_form(uri, data)
+
+    info "HTTP POST Response #{response.code}"
+    raise Coinmux::Error, "Invalid response code: #{response.code}" if response.code.to_s != '200'
+
+    # debug "HTTP POST Response Content #{response.body}"
+    response.body
+  end
 
   def do_get(host, path)
     uri = URI("#{host}#{path}")

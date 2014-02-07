@@ -44,4 +44,34 @@ describe Coinmux::Http do
       end
     end
   end
+
+  describe "#post" do
+    let(:http) { Coinmux::Http.instance }
+    let(:host) { 'http://valid-host.example.com' }
+    let(:path) { '/valid/path.html' }
+    let(:data) { { "random-key-#{rand}" => "some data #{rand}" } }
+    let(:code) { '200' }
+    let(:body) { 'some content' }
+    let(:response) { double(code: code, body: body) }
+
+    before do
+      Net::HTTP.stub(:post_form).with(URI("#{host}#{path}"), data).and_return(response)
+    end
+
+    subject { http.post(host, path, data) }
+
+    context "with 200 response code" do
+      it "returns body" do
+        expect(subject).to eq(body)
+      end
+    end
+
+    context "with non-200 response code" do
+      let(:code) { '404' }
+
+      it "raises error" do
+        expect { subject }.to raise_error(Coinmux::Error)
+      end
+    end
+  end
 end

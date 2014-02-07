@@ -109,14 +109,9 @@ class Coinmux::BitcoinNetwork
   # @raise [Coinmux::Error] Only raises when no callback
   def post_transaction(transaction, &callback)
     exec(callback) do
-      peer_group = PeerGroup.new(network_params)
-      peer_group.setUserAgent("Coinmux", Coinmux::VERSION)
-      peer_group.addPeerDiscovery(DnsDiscovery.new(network_params))
-      peer_group.startAndWait()
-      peer_group.broadcastTransaction(transaction).get()
-      peer_group.stopAndWait()
+      result = webbtc_post_bin("/relay_tx", tx: transaction.bitcoinSerialize().collect(&:to_i).pack('c*').unpack('H*').first)
 
-      transaction.getHash().to_s
+      result['hash']
     end
   end
 
@@ -228,6 +223,20 @@ class Coinmux::BitcoinNetwork
 
       nil
     end
+  end
+
+  def webbtc_post_bin(path, data)
+    result = http_facade.post(config_facade.webbtc_host, path, data)
+
+    hash = JSON.parse(result) rescue nil
+
+    if hash.nil?
+      raise Coinmux::Error, "Unable to post to #{path}: invalid JSON response"
+    elsif hash['error']
+      raise Coinmux::Error, "Unable to post to #{path}: #{hash['error']} (#{hash['detail']})"
+    end
+
+    hash
   end
 
   def webbtc_get_bin(path)
