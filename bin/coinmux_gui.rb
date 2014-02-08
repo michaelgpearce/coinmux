@@ -5,7 +5,12 @@ require File.expand_path("../../lib/coinmux", __FILE__)
 
 if Coinmux.os == :macosx
   # Need to set app name before loading any AWT/Swing components
-  Java::JavaLang::System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Coinmux")
+  {
+    "com.apple.mrj.application.apple.menu.about.name" => "Coinmux",
+    "apple.laf.useScreenMenuBar" => "true",
+  }.each do |key, value|
+    Java::JavaLang::System.setProperty(key, value)
+  end
   image = Java::JavaAwt.Toolkit.getDefaultToolkit().getImage(File.join(Coinmux.root, "gui", "assets", "icon.png"))
   Java::ComAppleEawt::Application.getApplication().setDockIconImage(image)
 end
@@ -21,6 +26,10 @@ require 'gui/model/input'
 require 'gui/model/output'
 require 'gui/model/coin_join'
 
+require 'gui/view/base'
+require 'gui/view/available_mixes'
+require 'gui/view/mix_settings'
+require 'gui/view/mixing'
 require 'gui/view/application'
 
 # Coinmux::Application.instance = Gui::View::Application.instance
