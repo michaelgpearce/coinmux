@@ -2,12 +2,6 @@
 
 ### Decentralized<sup>1</sup>, Trustless, Anonymous<sup>2</sup> and Open Bitcoin Mixer
 
-### DO NOT USE WITH THE MAIN BITCOIN NETWORK!<br>THIS SOFTWARE IS FOR TESTING PURPOSES ONLY!
-
-<sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full copy of the blockchain.
-
-<sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transaction's output is difficult to trace once added to the Bitcoin blockchain.
-
 ## Synopsis
 
 Coinmux is an implementation of [CoinJoin](https://bitcointalk.org/index.php?topic=279249).
@@ -17,7 +11,7 @@ CoinJoin increases your Bitcoin privacy and helps bitcoins remain [fungible](htt
 
 CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
 
-And CoinJoin is very inexpensive. The only fees involved are those used to pay Bitcoin miners their normal transaction fee. And that low fee is split between all participants!
+CoinJoin is very inexpensive. The only fees involved are those used to pay Bitcoin miners their normal transaction fee. And that low fee is split between all participants!
 
 You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1jBsizt9MKtNDxpn3qdd73CRyhQ) made during testing.
 
@@ -27,6 +21,11 @@ You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1j
 
 [Roadmap](docs/roadmap.md)
 
+## Notes
+
+<sup>1</sup> Its not totally decentralized yet. It makes some connections to [webbtc.com](http://webbtc.com) to get transaction data since this cannot be retrieved over the Bitcoin network without a full copy of the blockchain.
+
+<sup>2</sup> Its not totally anonymous yet. Your IP address will be leaked when connecting over the P2P network. But your CoinJoin transaction's output is difficult to trace once added to the Bitcoin blockchain.
 
 ## Installation
 
