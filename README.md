@@ -32,6 +32,8 @@ You can view some of the [transactions](http://test.webbtc.com/address/mjfCi3t1j
 
 You can either run Coinmux from the pre-built Java Jar file or run directly from source. You should already have Java installed on your computer. 
 
+The latest version is: 0.1.3
+
 ### Runnable Java Jar File Installation
 
 Download the Java Jar file:
