@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 
 group :gui do
-  gem 'swt', '0.18'
-  gem 'glimmer', '0.1.3'
 end
 
 group :cli do

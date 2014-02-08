@@ -1,31 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'rbconfig'
-
-def os
-  @os ||= (
-    host_os = RbConfig::CONFIG['host_os']
-    case host_os
-    when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-      :windows
-    when /darwin|mac os/
-      :macosx
-    when /linux/
-      :linux
-    when /solaris|bsd/
-      :unix
-    else
-      raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-    end
-  )
-end
-
 args = []
-
-if os == :macosx
-  args << '-J-XstartOnFirstThread'
-  args << '-J-Xdock:name=Coinmux'
-end
 
 env = {
   'COINMUX_ENV' => ENV['COINMUX_ENV'] || 'development' # TODO: This should be production by default
@@ -33,17 +8,9 @@ env = {
 
 script = ARGV.length == 0 ? 'bin/coinmux_gui.rb' : 'bin/coinmux_cli.rb'
 
-if File.exists?("./config/coinmux.yml")
-  # assume running from project directory
-  Dir.chdir File.join(File.dirname(__FILE__), '..') do
-    args = %w(exec ruby) + args + [script] + ARGV
-    system(env, "bundle", *args)
-  end
-else
-  # assume running from jar file
-  $:.unshift(File.expand_path("../..", __FILE__))
-  ENV['COINMUX_ENV'] = env['COINMUX_ENV']
-  ENV['COINMUX_JAR'] = 'true'
-  load script
-end
+# assume running from jar file
+$:.unshift(File.expand_path("../..", __FILE__))
+ENV['COINMUX_ENV'] = env['COINMUX_ENV']
+ENV['COINMUX_JAR'] = 'true'
+load script
 

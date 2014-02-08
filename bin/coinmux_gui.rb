@@ -3,8 +3,12 @@ Bundler.require(:default, ENV['COINMUX_ENV'], :gui) unless ENV['COINMUX_JAR'] ==
 
 require File.expand_path("../../lib/coinmux", __FILE__)
 
-require 'swt'
-require 'glimmer'
+if Coinmux.os == :macosx
+  # Need to set app name before loading any AWT/Swing components
+  Java::JavaLang::System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Coinmux")
+  image = Java::JavaAwt.Toolkit.getDefaultToolkit().getImage(File.join(Coinmux.root, "gui", "assets", "icon.png"))
+  Java::ComAppleEawt::Application.getApplication().setDockIconImage(image)
+end
 
 module Gui
   module Model; end
@@ -19,7 +23,5 @@ require 'gui/model/coin_join'
 
 require 'gui/view/application'
 
-Swt::Widgets::Display.set_app_name "Coinmux"
-
-Coinmux::Application.instance = Gui::View::Application.instance
-Coinmux::Application.instance.start
+# Coinmux::Application.instance = Gui::View::Application.instance
+Gui::View::Application.new.start

@@ -8,6 +8,8 @@ require 'set'
 Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require filename }
 
 module Coinmux
+  require 'rbconfig'
+  
   module Message; end
   module StateMachine; end
   module DataStore; end
@@ -18,6 +20,24 @@ module Coinmux
 
   def self.env
     ENV['COINMUX_ENV'] || 'development'
+  end
+
+  def self.os
+    @os ||= (
+      host_os = RbConfig::CONFIG['host_os']
+      case host_os
+      when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+        :windows
+      when /darwin|mac os/
+        :macosx
+      when /linux/
+        :linux
+      when /solaris|bsd/
+        :unix
+      else
+        raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+      end
+    )
   end
 end
 

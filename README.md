@@ -9,7 +9,7 @@ It is currently in early development and only suitable for use on Bitcoin's Test
 
 CoinJoin increases your Bitcoin privacy and helps bitcoins remain [fungible](http://en.wikipedia.org/wiki/Fungibility). Your bitcoins along with others are joined into a single transaction with some of the output addresses at the same Bitcoin amount. These same amount output addresses are indistinguishable from one another and there is no way to match them to a specific input addresses.
 
-CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the internet, Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
+CoinJoin is also safe. Even though you are combining your bitcoins with strangers on the Internet, Coinmux only signs transactions that have the inputs and outputs you specify. There is no chance of anyone stealing your coins - if your outputs are not 100% correct, Coinmux will not sign the transaction and your coins don't go anywhere!
 
 CoinJoin is very inexpensive. The only fees involved are those used to pay Bitcoin miners their normal transaction fee. And that low fee is split between all participants!
 
