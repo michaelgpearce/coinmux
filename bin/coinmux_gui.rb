@@ -30,7 +30,7 @@ require 'gui/view/base'
 require 'gui/view/available_mixes'
 require 'gui/view/mix_settings'
 require 'gui/view/mixing'
-require 'gui/view/application'
+require 'gui/application'
 
-# Coinmux::Application.instance = Gui::View::Application.instance
-Gui::View::Application.new.start
+# Coinmux::Application.instance = Gui::Application.new
+Gui::Application.new.start

@@ -1,4 +1,4 @@
-class Gui::View::Application < Java::JavaxSwing::JFrame
+class Gui::Application < Java::JavaxSwing::JFrame
   WIDTH = 600
   HEIGHT = 500
 
