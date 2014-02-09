@@ -34,7 +34,7 @@ class Gui::View::Base
     yield(body)
   end
 
-  def add_button_row(primary_button, secondary_button)
+  def add_button_row(primary_button, secondary_button = nil)
     container = JPanel.new
     container.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0))
     container.setLayout(GridLayout.new(0, 1))
@@ -46,7 +46,7 @@ class Gui::View::Base
     panel.setLayout(FlowLayout.new(FlowLayout::CENTER, 0, 0))
     container.add(panel)
 
-    buttons = [primary_button, secondary_button]
+    buttons = [primary_button, secondary_button].compact
     buttons.reverse! if Coinmux.os == :macosx
 
     buttons.each do |button|

@@ -39,6 +39,13 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
     card_panel.getLayout().show(card_panel, view.to_s)
   end
 
+  def root_panel
+    @root_panel ||= JPanel.new.tap do |panel|
+      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
+      panel.setBorder(BorderFactory.createEmptyBorder())
+    end
+  end
+
   private
 
   def views
@@ -54,13 +61,6 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
     panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
     panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20))
     view_class.new(self, panel)
-  end
-
-  def root_panel
-    @root_panel ||= JPanel.new.tap do |panel|
-      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
-      panel.setBorder(BorderFactory.createEmptyBorder())
-    end
   end
 
   def show_frame(&block)
