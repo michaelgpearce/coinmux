@@ -8,7 +8,9 @@ class Gui::Application < Java::JavaxSwing::JFrame
   import 'java.awt.Dimension'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.BoxLayout'
+  import 'javax.swing.ImageIcon'
   import 'javax.swing.JFrame'
+  import 'javax.swing.JOptionPane'
   import 'javax.swing.JPanel'
 
   def initialize
@@ -30,6 +32,13 @@ class Gui::Application < Java::JavaxSwing::JFrame
         view.add
       end
 
+      if Coinmux.os == :macosx
+        Java::ComAppleEawt::Application.new.tap do |app|
+          app.addApplicationListener(AppleAdapter.new(self))
+          app.setEnabledPreferencesMenu(true)
+        end
+      end
+
       show_view(:available_mixes)
     end
   end
@@ -47,6 +56,19 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   private
+
+  def quit
+    Java::JavaLang::System.exit(0)
+    # clean_up_coin_join
+  end
+
+  def show_preferences
+  end
+
+  def show_about
+    icon = ImageIcon.new(File.join(Coinmux.root, 'gui', 'assets', 'icon_80.png'))
+    JOptionPane.showMessageDialog(root_panel, "Coinmux\nVersion: #{Coinmux::VERSION}", "About", JOptionPane::INFORMATION_MESSAGE, icon)
+  end
 
   def views
     @views ||= {}
@@ -74,5 +96,27 @@ class Gui::Application < Java::JavaxSwing::JFrame
     pack
     setVisible(true)
     root_panel.revalidate() # OSX opening with no content about 20% of time. :(
+  end
+
+  if Coinmux.os == :macosx
+    class AppleAdapter < Java::ComAppleEawt::ApplicationAdapter
+      def initialize(application)
+        @application = application
+        super()
+      end
+
+      def handleAbout(e)
+        e.setHandled(true)
+        @application.send(:show_about)
+      end
+
+      def handlePreferences(e)
+        @application.send(:show_preferences)
+      end
+
+      def handleQuit(e)
+        @application.send(:quit)
+      end
+    end
   end
 end
