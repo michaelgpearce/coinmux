@@ -1,6 +1,6 @@
 class Gui::Application < Java::JavaxSwing::JFrame
   WIDTH = 600
-  HEIGHT = 500
+  HEIGHT = 450
 
   attr_accessor :amount, :participants
 
