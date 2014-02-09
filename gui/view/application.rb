@@ -1,6 +1,6 @@
 class Gui::View::Application < Java::JavaxSwing::JFrame
   attr_accessor :amount, :participants
-  
+
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
   import 'javax.swing.BorderFactory'
@@ -16,30 +16,40 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
     show_frame do
       root_panel.add(card_panel)
 
-      card_panel.add(build_card_panel(Gui::View::AvailableMixes), 'available_mixes')
-      card_panel.add(build_card_panel(Gui::View::MixSettings), 'mix_settings')
-      card_panel.add(build_card_panel(Gui::View::Mixing), 'mixing')
+      {
+        available_mixes: Gui::View::AvailableMixes,
+        mix_settings: Gui::View::MixSettings,
+        mixing: Gui::View::Mixing
+      }.each do |key, view_class|
+        views[key] = view = build_view(view_class)
+        card_panel.add(view.root_panel, key.to_s)
+        view.add
+      end
 
-      show_view('available_mixes')
+      show_view(:available_mixes)
     end
   end
 
   def show_view(view)
+    views[view].show
     card_panel.getLayout().show(card_panel, view.to_s)
   end
 
   private
 
+  def views
+    @views ||= {}
+  end
+
   def card_panel
     @card_panel ||= JPanel.new(CardLayout.new)
   end
 
-  def build_card_panel(view_class)
-    JPanel.new.tap do |panel|
-      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
-      panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20))
-      view_class.new(self, panel).add
-    end
+  def build_view(view_class)
+    panel = JPanel.new
+    panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
+    panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20))
+    view_class.new(self, panel)
   end
 
   def root_panel
@@ -52,7 +62,7 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
   def show_frame(&block)
     getContentPane.add(root_panel)
     setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
-    setSize(Dimension.new(600, 500))
+    setSize(Dimension.new(600, 400))
     setLocationRelativeTo(nil)
 
     yield

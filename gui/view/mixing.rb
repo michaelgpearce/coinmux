@@ -10,5 +10,9 @@ class Gui::View::Mixing < Gui::View::Base
       parent.add(progress_bar)
     end
   end
+  
+  def show
+  end
+
 end
 

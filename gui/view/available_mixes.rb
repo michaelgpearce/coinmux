@@ -30,11 +30,10 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
       parent.add(scrollpane)
     end
 
-    add_button_row do |parent|
-      parent.add(join_button)
+    add_button_row(join_button, create_button)
+  end
 
-      parent.add(create_button)
-    end
+  def show
   end
 
   private
@@ -49,7 +48,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
 
     def getColumnCount(); 2; end
     def getRowCount(); 10; end
-    def getValueAt(row, col); "foo #{row} - #{col}"; end
+    def getValueAt(row, col); col == 0 ? row * 3.3 : "#{row * 2} of 20" end
   end
 
   def join_button
