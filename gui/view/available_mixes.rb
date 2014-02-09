@@ -2,11 +2,13 @@ class Gui::View::AvailableMixes < Gui::View::Base
   include Coinmux::BitcoinUtil
   
   import 'java.awt.Dimension'
+  import 'javax.swing.BorderFactory'
   import 'javax.swing.ListSelectionModel'
   import 'javax.swing.JButton'
   import 'javax.swing.JTextArea'
   import 'javax.swing.JScrollPane'
   import 'javax.swing.JTable'
+  import 'javax.swing.border.TitledBorder'
   import 'javax.swing.table.AbstractTableModel'
   import 'javax.swing.table.TableModel'
 
@@ -22,12 +24,18 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
       label.setLineWrap(true)
       label.setWrapStyleWord(true)
       label.setBackground(parent.getBackground())
-      parent.add(label)
+      parent.add(label, build_grid_bag_constraints(gridy: 0, fill: :horizontal, anchor: :north))
     end
 
-    add_row(label: "Available Bitcoin Mixes") do |parent|
-      scrollpane = JScrollPane.new(mixes_table)
-      parent.add(scrollpane)
+    add_row do |parent|
+      JPanel.new(Java::JavaAwt::GridLayout.new(1, 1)).tap do |panel|
+        scroll_pane = JScrollPane.new(mixes_table)
+        panel.setBorder(BorderFactory.createTitledBorder(
+          BorderFactory.createEmptyBorder(), "Available Bitcoin Mixes", TitledBorder::LEFT, TitledBorder::TOP))
+
+        panel.add(scroll_pane)
+        parent.add(panel, build_grid_bag_constraints(gridy: 1, fill: :both, anchor: :center, weighty: 1000000))
+      end
     end
 
     add_button_row(join_button, create_button)

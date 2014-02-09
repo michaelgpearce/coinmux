@@ -1,4 +1,7 @@
 class Gui::View::Application < Java::JavaxSwing::JFrame
+  WIDTH = 600
+  HEIGHT = 500
+
   attr_accessor :amount, :participants
 
   import 'java.awt.CardLayout'
@@ -22,6 +25,7 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
         mixing: Gui::View::Mixing
       }.each do |key, view_class|
         views[key] = view = build_view(view_class)
+        view.root_panel.setPreferredSize(Dimension.new(WIDTH, HEIGHT))
         card_panel.add(view.root_panel, key.to_s)
         view.add
       end
@@ -62,11 +66,12 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
   def show_frame(&block)
     getContentPane.add(root_panel)
     setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
-    setSize(Dimension.new(600, 400))
+    setSize(Dimension.new(WIDTH, HEIGHT)) # even though pack() resizes, this helps start the window in the right location on screen
     setLocationRelativeTo(nil)
 
     yield
 
+    pack
     setVisible(true)
     root_panel.revalidate() # OSX opening with no content about 20% of time. :(
   end

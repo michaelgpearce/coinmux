@@ -7,77 +7,38 @@ class Gui::View::Base
   import 'java.awt.GridBagLayout'
   import 'java.awt.GridBagConstraints'
   import 'java.awt.GridLayout'
+  import 'java.awt.Insets'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.BoxLayout'
   import 'javax.swing.JLabel'
   import 'javax.swing.JPanel'
   import 'javax.swing.JSeparator'
-  import 'javax.swing.border.TitledBorder'
 
   def initialize(application, root_panel)
     @application = application
     @root_panel = root_panel
+
+    root_panel.add(container)
   end
 
   protected
 
   def add_header(text)
-   add_row(layout: FlowLayout.new(FlowLayout::CENTER, 0, 0)) do |parent|
-      label = JLabel.new(text)
-      font = label.getFont()
-      label.setFont(font.java_send(:deriveFont, [Java::float], font.size() * 1.5))
-      parent.add(label)
-    end
+    label = JLabel.new(text, JLabel::CENTER)
+    font = label.getFont()
+    label.setFont(font.java_send(:deriveFont, [Java::float], font.size() * 1.5))
+    header.add(label, build_grid_bag_constraints(fill: :horizontal, anchor: :center))
   end
 
-  def add_row(options = {}, &block)
-    panel = JPanel.new
-    panel.setBorder(options[:border] || BorderFactory.createEmptyBorder(0, 0, 10, 0))
-    panel.setLayout(options[:layout] || GridLayout.new(0, 1))
-    if options[:label]
-      panel.setBorder(BorderFactory.createTitledBorder(
-        BorderFactory.createEmptyBorder(), options[:label], TitledBorder::LEFT, TitledBorder::TOP))
-    end
-    root_panel.add(panel)
-
-    yield(panel)
-  end
-
-  def add_form_row(label_text, component, options = {})
-    add_row do |parent|
-      container = JPanel.new
-      container.setLayout(BoxLayout.new(container, BoxLayout::LINE_AXIS))
-      parent.add(container)
-
-      label = JLabel.new(label_text, JLabel::RIGHT)
-      label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20))
-      label.setToolTipText(options[:tool_tip]) if options[:tool_tip]
-      label.setPreferredSize(Dimension.new(200, 0))
-      container.add(label)
-
-      component.setToolTipText(options[:tool_tip]) if options[:tool_tip]
-      if options[:width]
-        component_container = JPanel.new(GridBagLayout.new)
-        component_container.add(component, GridBagConstraints.new.tap do |c|
-          c.gridx = c.gridy = 0
-          c.gridwidth = c.gridheight = 1
-          c.weightx = c.weighty = 1.0
-          c.fill = GridBagConstraints::VERTICAL
-          c.anchor = GridBagConstraints::WEST
-        end)
-        component.setPreferredSize(Dimension.new(options[:width], component.getPreferredSize().height))
-        container.add(component_container)
-      else
-        container.add(component)
-      end
-    end
+  def add_row(&block)
+    yield(body)
   end
 
   def add_button_row(primary_button, secondary_button)
     container = JPanel.new
     container.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0))
     container.setLayout(GridLayout.new(0, 1))
-    root_panel.add(container)
+    footer.add(container, build_grid_bag_constraints(fill: :horizontal))
 
     container.add(JSeparator.new)
 
@@ -92,6 +53,61 @@ class Gui::View::Base
       panel.add(button)
     end
   end
-  
+
+  def build_grid_bag_constraints(attributes)
+    attributes = {
+      gridx: 0,
+      gridy: 0,
+      gridwidth: 1,
+      gridheight: 1,
+      ipadx: 0,
+      ipady: 0,
+      weightx: 1.0,
+      weighty: 1.0,
+      fill: :both,
+      anchor: :center
+    }.merge(attributes)
+
+    GridBagConstraints.new.tap do |c|
+      attributes.each do |key, value|
+        c.send("#{key}=", value.is_a?(Symbol) ? GridBagConstraints.const_get(value.to_s.upcase) : value)
+      end
+    end
+  end
+
+  private
+
+  def container
+    @container ||= JPanel.new(GridBagLayout.new)
+  end
+
+  def header
+    @header ||= JPanel.new(GridBagLayout.new).tap do |header|
+      container.add(header, build_grid_bag_constraints(
+        gridy: 0,
+        fill: :horizontal,
+        insets: Insets.new(0, 0, 10, 0),
+        anchor: :north))
+    end
+  end
+
+  def body
+    @body ||= JPanel.new(GridBagLayout.new).tap do |body|
+      container.add(body, build_grid_bag_constraints(
+        gridy: 1,
+        weighty: 1000000, # take up all space with body
+        fill: :both,
+        anchor: :center))
+    end
+  end
+
+  def footer
+    @footer ||= JPanel.new(GridBagLayout.new).tap do |footer|
+      container.add(footer, build_grid_bag_constraints(
+        gridy: 2,
+        fill: :horizontal,
+        anchor: :south))
+    end
+  end
 end
 
