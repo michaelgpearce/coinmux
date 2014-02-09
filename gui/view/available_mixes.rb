@@ -1,26 +1,22 @@
 class Gui::View::AvailableMixes < Gui::View::Base
+  include Coinmux::BitcoinUtil
+  
   import 'java.awt.Dimension'
-  import 'java.awt.Font'
+  import 'javax.swing.ListSelectionModel'
   import 'javax.swing.JButton'
-  import 'javax.swing.JLabel'
   import 'javax.swing.JTextArea'
   import 'javax.swing.JScrollPane'
   import 'javax.swing.JTable'
-  import 'javax.swing.table.TableModel'
   import 'javax.swing.table.AbstractTableModel'
+  import 'javax.swing.table.TableModel'
 
   def add
-    add_row do |parent|
-      label = JLabel.new("Mix Your Bitcoins")
-      font = label.getFont()
-      label.setFont(font.java_send(:deriveFont, [Java::float], font.size() * 1.5))
-      parent.add(label)
-    end
+    add_header("Mix Your Bitcoins")
 
     add_row do |parent|
       label = JTextArea.new(<<-STRING)
 Coinmux is the safe way to mix your bitcoins.
-Your coins are mixed with others on the Internet, but you never send any private information. You are always 100% in control of your coins and you never need to place your trust in a 3rd party - just like Bitcoin.
+Your bitcoins are mixed with other Coinmux users on the Internet, but your private Bitcoin information never leaves your computer. You are always 100% in control of your bitcoins and you never need to trust a 3rd party - just like Bitcoin.
       STRING
       label.setEditable(false)
       label.setLineWrap(true)
@@ -30,26 +26,18 @@ Your coins are mixed with others on the Internet, but you never send any private
     end
 
     add_row(label: "Available Bitcoin Mixes") do |parent|
-      table = JTable.new(TModel.new)
-      scrollpane = JScrollPane.new(table)
-      scrollpane.setMaximumSize(Dimension.new(0, 150))
+      scrollpane = JScrollPane.new(mixes_table)
       parent.add(scrollpane)
     end
 
     add_button_row do |parent|
-      join_button = JButton.new("Join Available Mix")
-      join_button.add_action_listener do |e|
-        application.show_view(:mix_settings)
-      end
       parent.add(join_button)
 
-      create_button = JButton.new("Create New Mix")
-      create_button.add_action_listener do |e|
-        application.show_view(:mixing)
-      end
       parent.add(create_button)
     end
   end
+
+  private
 
   class TModel < Java::JavaxSwingTable::AbstractTableModel
     def getColumnName(index)
@@ -62,6 +50,54 @@ Your coins are mixed with others on the Internet, but you never send any private
     def getColumnCount(); 2; end
     def getRowCount(); 10; end
     def getValueAt(row, col); "foo #{row} - #{col}"; end
+  end
+
+  def join_button
+    @join_button ||= JButton.new("Join Available Mix").tap do |join_button|
+      join_button.add_action_listener do |e|
+        application.show_view(:mix_settings)
+      end
+    end
+  end
+
+  def create_button
+    @create_button ||= JButton.new("Create New Mix").tap do |create_button|
+      create_button.add_action_listener do |e|
+        application.amount = nil
+        application.participants = nil
+        application.show_view(:mix_settings)
+      end
+    end
+  end
+
+  def join_button
+    @join_button ||= JButton.new("Join Available Mix").tap do |join_button|
+      join_button.setEnabled(false)
+      join_button.add_action_listener do |e|
+        selected_index = mixes_table.getSelectionModel().getMinSelectionIndex()
+        application.amount = (mixes_table.getModel().getValueAt(selected_index, 0).to_f * SATOSHIS_PER_BITCOIN).to_i
+        application.participants = mixes_table.getModel().getValueAt(selected_index, 1).to_i
+        application.show_view(:mix_settings)
+      end
+    end
+  end
+
+  def mixes_table
+    @mixes_table ||= JTable.new(TModel.new).tap do |mixes_table|
+      mixes_table.setSelectionMode(ListSelectionModel::SINGLE_SELECTION)
+      mixes_table.getSelectionModel().addListSelectionListener do |e|
+        update_join_enabled
+      end
+
+      mixes_table.getModel().addTableModelListener do |e|
+        update_join_enabled
+      end
+    end
+  end
+
+  def update_join_enabled
+    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && mixes_table.getModel().getRowCount() > 0
+    join_button.setEnabled(enabled)
   end
 end
 

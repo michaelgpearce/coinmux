@@ -1,4 +1,5 @@
 class Gui::View::Application < Java::JavaxSwing::JFrame
+  attr_accessor :amount, :participants
   
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
@@ -36,7 +37,7 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
   def build_card_panel(view_class)
     JPanel.new.tap do |panel|
       panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
-      panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20))
+      panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20))
       view_class.new(self, panel).add
     end
   end
@@ -51,12 +52,12 @@ class Gui::View::Application < Java::JavaxSwing::JFrame
   def show_frame(&block)
     getContentPane.add(root_panel)
     setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
-    setSize(Dimension.new(600, 400))
-    setResizable(false)
+    setSize(Dimension.new(600, 500))
     setLocationRelativeTo(nil)
 
     yield
 
     setVisible(true)
+    root_panel.revalidate() # OSX opening with no content about 20% of time. :(
   end
 end
