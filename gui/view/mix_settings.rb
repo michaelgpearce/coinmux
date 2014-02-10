@@ -1,6 +1,8 @@
 class Gui::View::MixSettings < Gui::View::Base
+  include Coinmux::BitcoinUtil
+
   DEFAULT_PARTICIPANTS = 5
-  DEFAULT_AMOUNT = 1.0
+  DEFAULT_AMOUNT = 1.0 * SATOSHIS_PER_BITCOIN
   MAX_PARTICIPANTS = 100
 
   import 'java.awt.Component'
@@ -32,7 +34,8 @@ class Gui::View::MixSettings < Gui::View::Base
   end
 
   def show
-    amount.setText((application.amount || DEFAULT_AMOUNT).to_s)
+    bitcoin_amount = (application.amount || DEFAULT_AMOUNT).to_f / SATOSHIS_PER_BITCOIN
+    amount.setText(bitcoin_amount.to_s)
     amount.setEnabled(application.amount.nil?)
     participants.setValue(application.participants || DEFAULT_PARTICIPANTS)
     participants.setEnabled(application.participants.nil?)
