@@ -48,7 +48,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
       show_view(:available_mixes)
     end
 
-    Gui::EventQueue.instance.future_exec do
+    Gui::EventQueue.instance.future_exec(2) do # show "loading" for a couple of seconds minimum
       refresh_mixes_table
     end
   end
