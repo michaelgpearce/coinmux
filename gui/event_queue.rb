@@ -2,6 +2,7 @@ class Gui::EventQueue
   include Singleton
 
   import 'javax.swing.SwingUtilities'
+  import 'javax.swing.Timer'
 
   def sync_exec(&callback)
     SwingUtilities.invokeAndWait(&callback)
@@ -11,10 +12,9 @@ class Gui::EventQueue
     if seconds <= 0
       SwingUtilities.invokeLater(&callback)
     else
-      Thread.new do
-        sleep(seconds)
-        SwingUtilities.invokeLater(&callback)
-      end
+      Timer.new(seconds * 1000, lambda { |e|
+        yield
+      }).start()
     end
   end
 end
