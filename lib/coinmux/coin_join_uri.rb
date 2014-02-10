@@ -26,6 +26,12 @@ class Coinmux::CoinJoinUri
   end
 
   def initialize(attrs = {})
+    attrs = {
+      application: "coinmux",
+      network: "test",
+      params: {}
+    }.merge(attrs)
+
     attrs.each do |key, value|
       send("#{key}=", value)
     end

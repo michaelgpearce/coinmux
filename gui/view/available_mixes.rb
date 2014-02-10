@@ -2,6 +2,7 @@ class Gui::View::AvailableMixes < Gui::View::Base
   include Coinmux::BitcoinUtil
   
   import 'java.awt.Dimension'
+  import 'java.awt.GridLayout'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.ListSelectionModel'
   import 'javax.swing.JButton'
@@ -28,7 +29,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     end
 
     add_row do |parent|
-      JPanel.new(Java::JavaAwt::GridLayout.new(1, 1)).tap do |panel|
+      JPanel.new(GridLayout.new(1, 1)).tap do |panel|
         scroll_pane = JScrollPane.new(mixes_table)
         panel.setBorder(BorderFactory.createTitledBorder(
           BorderFactory.createEmptyBorder(), "Available Bitcoin Mixes", TitledBorder::LEFT, TitledBorder::TOP))
@@ -46,16 +47,14 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
 
   private
 
-  class TModel < Java::JavaxSwingTable::AbstractTableModel
-    def getColumnName(index)
-      case index
-      when 0; "Bitcoin Amount (BTC)"
-      when 1; "Participants"
-      end
-    end
-
+  class TModel < AbstractTableModel
     def getColumnCount(); 2; end
     def getRowCount(); 10; end
+
+    def getColumnName(index)
+      ["Bitcoin Amount (BTC)", "Participants"][index]
+    end
+
     def getValueAt(row, col); col == 0 ? row * 3.3 : "#{row * 2} of 20" end
   end
 

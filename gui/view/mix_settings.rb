@@ -41,35 +41,6 @@ class Gui::View::MixSettings < Gui::View::Base
 
   private
 
-  def add_form_row(label_text, component, index, options = {})
-    add_row do |parent|
-        # parent.add(panel, build_grid_bag_constraints(gridy: 1, fill: :both, anchor: :center, weighty: 1000000))
-      container = JPanel.new
-      container.setLayout(BoxLayout.new(container, BoxLayout::LINE_AXIS))
-      parent.add(container, build_grid_bag_constraints(
-        fill: options[:last] ? :horizontal : :horizontal,
-        weighty: options[:last] ? 1000000 : 0,
-        anchor: :north,
-        insets: Insets.new(0, 0, 10, 0),
-        gridy: index))
-
-      label = JLabel.new(label_text, JLabel::RIGHT)
-      label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20))
-      label.setToolTipText(options[:tool_tip]) if options[:tool_tip]
-      label.setPreferredSize(Dimension.new(200, 0))
-      container.add(label)
-
-      if options[:width]
-        component_container = JPanel.new(GridBagLayout.new)
-        component_container.add(component, build_grid_bag_constraints(fill: :vertical, anchor: :west))
-        component.setPreferredSize(Dimension.new(options[:width], component.getPreferredSize().height))
-        container.add(component_container)
-      else
-        container.add(component)
-      end
-    end
-  end
-
   def change_address
     @change_address ||= JTextField.new
   end

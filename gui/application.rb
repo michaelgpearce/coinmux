@@ -2,19 +2,23 @@ class Gui::Application < Java::JavaxSwing::JFrame
   WIDTH = 600
   HEIGHT = 450
 
-  attr_accessor :amount, :participants
+  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri
 
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.BoxLayout'
   import 'javax.swing.ImageIcon'
+  import 'javax.swing.JDialog'
   import 'javax.swing.JFrame'
   import 'javax.swing.JOptionPane'
   import 'javax.swing.JPanel'
 
   def initialize
     super Coinmux::BANNER
+
+    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'p2p')
+    self.bitcoin_network = :testnet
   end
 
   def start
@@ -55,6 +59,19 @@ class Gui::Application < Java::JavaxSwing::JFrame
     end
   end
 
+  def preferences_panel
+    @preferences_panel ||= JPanel.new.tap do |panel|
+      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
+      panel.setBorder(BorderFactory.createEmptyBorder())
+    end
+  end
+
+  def preferences_view
+    @preferences_view ||= Gui::View::Preferences.new(self, preferences_panel).tap do |preferences_view|
+      preferences_view.add
+    end
+  end
+
   private
 
   def quit
@@ -63,6 +80,19 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def show_preferences
+    preferences_view.show
+
+    JDialog.new(self, "Coinmux", true).tap do |dialog|
+      panel = JPanel.new
+      panel.setBorder(create_frame_border)
+      panel.add(preferences_panel)
+      dialog.add(panel)
+      dialog.pack
+      dialog.setLocationRelativeTo(self)
+      dialog.show
+
+      puts "PREF SUCCESS #{preferences_view.success}"
+    end
   end
 
   def show_about
@@ -81,8 +111,12 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def build_view(view_class)
     panel = JPanel.new
     panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
-    panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20))
+    panel.setBorder(create_frame_border)
     view_class.new(self, panel)
+  end
+
+  def create_frame_border
+    BorderFactory.createEmptyBorder(10, 20, 20, 20)
   end
 
   def show_frame(&block)

@@ -34,6 +34,8 @@ class Gui::View::Mixing < Gui::View::Base
   def show
   end
 
+  private
+
   def action_button
     @action_button ||= JButton.new("Terminate").tap do |action_button|
       action_button.add_action_listener do |e|
