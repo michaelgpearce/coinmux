@@ -130,6 +130,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
         update_join_enabled
       end
 
+      mixes_table.getModel().data = [["Loading...", ""]]
       mixes_table.getModel().addTableModelListener do |e|
         update_join_enabled
       end
