@@ -20,14 +20,18 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
   private
 
   def start_status_update
-    event_queue.interval_exec(STATUS_UPDATE_INTERVAL) do |interval_id|
+    next_status_update
+  end
+
+  def next_status_update
+    event_queue.future_exec(STATUS_UPDATE_INTERVAL) do
       info("director doing status update")
 
-      if %w(failed completed).include?(state)
-        event_queue.clear_interval(interval_id)
-      else
+      if !%w(failed completed).include?(state)
         status_message = coin_join_message.status.value
-        insert_current_status_message(status_message.transaction_id)
+        insert_current_status_message(status_message.transaction_id) do
+          next_status_update # do it again
+        end
       end
     end
   end
