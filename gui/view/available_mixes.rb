@@ -117,7 +117,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
       join_button.add_action_listener do |e|
         selected_index = mixes_table.getSelectionModel().getMinSelectionIndex()
         application.amount = (mixes_table.getModel().getValueAt(selected_index, 0).to_f * SATOSHIS_PER_BITCOIN).to_i
-        application.participants = mixes_table.getModel().getValueAt(selected_index, 1).to_i
+        application.participants = mixes_table.getModel().getValueAt(selected_index, 1).gsub(/.* /, '').to_i
         application.show_view(:mix_settings)
       end
     end
