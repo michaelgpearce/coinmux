@@ -8,7 +8,7 @@ module Coinmux
 end
 
 require 'rspec'
-require 'spec/fake/application'
+# require 'spec/fake/application'
 require 'spec/fake/bitcoin_network'
 require 'factory_girl'
 require 'pry'
@@ -22,20 +22,11 @@ require 'rspec/mocks'
 RSpec::Mocks::setup(Object.new)
 
 def fake_all
-  fake_application
   fake_bitcoin_network
 end
 
 def fake_all_network_connections
   fake_bitcoin_network
-end
-
-def fake_application
-  @fake_application ||= (
-    Coinmux::Fake::Application.new.tap do |application|
-      Coinmux::Application.stub(:instance).and_return(application)
-    end
-  )
 end
 
 def fake_bitcoin_network

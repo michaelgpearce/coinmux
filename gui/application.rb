@@ -1,4 +1,6 @@
 class Gui::Application < Java::JavaxSwing::JFrame
+  include Coinmux::Facades
+
   WIDTH = 600
   HEIGHT = 450
 
@@ -17,7 +19,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def initialize
     super Coinmux::BANNER
 
-    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'p2p')
+    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'filesystem')
     self.bitcoin_network = :testnet
   end
 
@@ -44,6 +46,10 @@ class Gui::Application < Java::JavaxSwing::JFrame
       end
 
       show_view(:available_mixes)
+    end
+
+    Gui::EventQueue.instance.future_exec do
+      refresh_mixes_table
     end
   end
 
@@ -73,6 +79,33 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   private
+
+  def data_store
+    @data_store ||= Coinmux::DataStore::Factory.build(coin_join_uri)
+  end
+
+  def update_mixes_table(coin_join_data)
+    Gui::EventQueue.instance.future_exec do
+      views[:available_mixes].update_mixes_table(coin_join_data)
+
+      Gui::EventQueue.instance.future_exec(10) do
+        refresh_mixes_table # refresh again
+      end
+    end
+  end
+
+  def refresh_mixes_table
+    Coinmux::StateMachine::Concerns::AvailableCoinJoins.new(data_store).find do |event|
+      Gui::EventQueue.instance.future_exec do
+        if event.error
+          warn("Error refreshing mixes table: #{event.error}")
+          update_mixes_table([])
+        else
+          update_mixes_table(event.data)
+        end
+      end
+    end
+  end
 
   def quit
     Java::JavaLang::System.exit(0)

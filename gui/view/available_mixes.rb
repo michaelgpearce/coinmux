@@ -9,6 +9,7 @@ class Gui::View::AvailableMixes < Gui::View::Base
   import 'javax.swing.JTextArea'
   import 'javax.swing.JScrollPane'
   import 'javax.swing.JTable'
+  import 'javax.swing.event.TableModelEvent'
   import 'javax.swing.border.TitledBorder'
   import 'javax.swing.table.AbstractTableModel'
   import 'javax.swing.table.TableModel'
@@ -45,17 +46,51 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   def show
   end
 
+  def update_mixes_table(mixes_data)
+    mixes_table.getModel().data = mixes_data.collect do |mix_data|
+      [mix_data[:amount], "#{mix_data[:waiting_participants]} of #{mix_data[:total_participants]}"]
+    end
+  end
+
   private
 
+  class MyTable < JTable
+    def tableChanged(event)
+      selected = getSelectionModel().getMinSelectionIndex()
+      super(event)
+      setRowSelectionInterval(selected, selected) if selected >= 0 && selected < getModel().getRowCount()
+    end
+  end
+
   class TModel < AbstractTableModel
+    def data
+      @data ||= []
+    end
+
+    def data=(data)
+      @data = data
+      fireTableChanged(TableModelEvent.new(self))
+    end
+
     def getColumnCount(); 2; end
-    def getRowCount(); 10; end
+    def getRowCount(); data.size; end
 
     def getColumnName(index)
       ["Bitcoin Amount (BTC)", "Participants"][index]
     end
 
-    def getValueAt(row, col); col == 0 ? row * 3.3 : "#{row * 2} of 20" end
+    def getValueAt(row, col)
+      data[row][col]
+    end
+
+    def setValueAt(value, row, col)
+      if value.nil? && row >= data.size
+        self.data = data[0...row]
+      else
+        data[row] ||= []
+        data[row][col] = value
+      end
+    end
   end
 
   def join_button
@@ -89,7 +124,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   end
 
   def mixes_table
-    @mixes_table ||= JTable.new(TModel.new).tap do |mixes_table|
+    @mixes_table ||= MyTable.new(TModel.new).tap do |mixes_table|
       mixes_table.setSelectionMode(ListSelectionModel::SINGLE_SELECTION)
       mixes_table.getSelectionModel().addListSelectionListener do |e|
         update_join_enabled

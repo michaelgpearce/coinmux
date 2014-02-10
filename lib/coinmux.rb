@@ -11,7 +11,9 @@ module Coinmux
   require 'rbconfig'
   
   module Message; end
-  module StateMachine; end
+  module StateMachine
+    module Concerns; end
+  end
   module DataStore; end
 
   def self.root
@@ -83,5 +85,4 @@ require 'lib/coinmux/state_machine/event'
 require 'lib/coinmux/state_machine/base'
 require 'lib/coinmux/state_machine/director'
 require 'lib/coinmux/state_machine/participant'
-
-require 'lib/coinmux/application'
+require 'lib/coinmux/state_machine/concerns/available_coin_joins'

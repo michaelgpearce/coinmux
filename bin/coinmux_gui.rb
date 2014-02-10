@@ -26,6 +26,7 @@ require 'gui/model/input'
 require 'gui/model/output'
 require 'gui/model/coin_join'
 
+require 'gui/event_queue'
 require 'gui/view/base'
 require 'gui/view/available_mixes'
 require 'gui/view/mix_settings'
@@ -33,5 +34,4 @@ require 'gui/view/mixing'
 require 'gui/view/preferences'
 require 'gui/application'
 
-# Coinmux::Application.instance = Gui::Application.new
 Gui::Application.new.start
