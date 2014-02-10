@@ -2,7 +2,7 @@ class Coinmux::Fake::Application
   class Invocation
     include Coinmux::Proper
 
-    property :block, :time, :seconds, :interval_identifier
+    property :block, :time, :seconds
 
     def <=>(other)
       self.time <=> other.time
@@ -21,10 +21,6 @@ class Coinmux::Fake::Application
 
     while next_invocation
       invocation.block.call
-
-      if invocation.interval_identifier
-        add_invocation(invocation.seconds, invocation.block, invocation.interval_identifier)
-      end
     end
   end
 
@@ -36,19 +32,6 @@ class Coinmux::Fake::Application
     add_invocation(seconds, block)
   end
   
-  def interval_exec(seconds, &block)
-    interval_identifier = rand.to_s
-    add_invocation(seconds, block, interval_identifier)
-
-    interval_identifier
-  end
-  
-  def clear_interval(interval_id)
-    invocations.delete_if do |invocation|
-      invocation.interval_identifier == interval_id
-    end
-  end
-
   private
 
   def next_invocation
@@ -58,8 +41,8 @@ class Coinmux::Fake::Application
     invocation
   end
 
-  def add_invocation(seconds, block, interval_identifier = nil)
-    invocation = Invocation.new(:seconds => seconds, :time => @current_time + seconds, :block => block, :interval_identifier => interval_identifier)
+  def add_invocation(seconds, block)
+    invocation = Invocation.new(:seconds => seconds, :time => @current_time + seconds, :block => block)
     invocations << invocation
     invocations.sort!
 

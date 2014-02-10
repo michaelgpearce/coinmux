@@ -4,11 +4,10 @@ require 'set'
 class Cli::EventQueue
   include Singleton, Coinmux::BitcoinUtil
 
-  attr_reader :queue, :cleared_interval_identifiers, :event_thread
+  attr_reader :queue, :event_thread
 
   def initialize
     @queue = Queue.new
-    @cleared_interval_identifiers = Set.new
   end
 
   def start
@@ -51,21 +50,6 @@ class Cli::EventQueue
     nil
   end
   
-  def interval_exec(seconds, &callback)
-    interval_identifier = rand.to_s
-    queue << Cli::Event.new(
-      invoke_at: Time.now + seconds,
-      callback: callback,
-      interval_period: seconds,
-      interval_identifier: interval_identifier)
-
-    interval_identifier
-  end
-  
-  def clear_interval(interval_identifier)
-    cleared_interval_identifiers << interval_identifier
-  end
-
   private
 
   def start_event_thread
@@ -76,9 +60,6 @@ class Cli::EventQueue
         all_events.each do |event|
           if event.nil? # nil in the event thread indicates to quit
             break
-          elsif cleared_interval_identifiers.include?(event.interval_identifier)
-            # remove interval so do not re-enqueue
-            cleared_interval_identifiers.delete(event.interval_identifier)
           elsif event.invoke_at && Time.now < event.invoke_at
             # interval has not passed, so re-enqueue
             events_to_enqueue << event
@@ -103,11 +84,6 @@ class Cli::EventQueue
               end
             else
               invocation.call
-            end
-
-            if event.interval_identifier # invoke again in the future
-              event.invoke_at = Time.now + event.interval_period
-              events_to_enqueue << event
             end
           end
         end
