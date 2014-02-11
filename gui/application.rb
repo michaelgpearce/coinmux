@@ -3,6 +3,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
 
   WIDTH = 600
   HEIGHT = 450
+  MIXES_TABLE_REFRESH_SECONDS = 5
 
   attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri
 
@@ -87,7 +88,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def update_mixes_table(coin_join_data)
     views[:available_mixes].update_mixes_table(coin_join_data)
 
-    Gui::EventQueue.instance.future_exec(10) do
+    Gui::EventQueue.instance.future_exec(MIXES_TABLE_REFRESH_SECONDS) do
       refresh_mixes_table # refresh again
     end
   end
