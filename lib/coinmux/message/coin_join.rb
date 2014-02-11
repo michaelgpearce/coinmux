@@ -30,7 +30,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       message.version = VERSION
       message.identifier = digest_facade.random_identifier
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
-      message.amount = options[:amount].try(:to_f) || DEFAULT_AMOUNT
+      message.amount = options[:amount].try(:to_i) || DEFAULT_AMOUNT
       message.participants = options[:participants].try(:to_i) || DEFAULT_PARTICIPANTS
       message.participant_transaction_fee = message.participants == 0 ? 0 : options[:participant_transaction_fee] || (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / message.participants).to_i
 
