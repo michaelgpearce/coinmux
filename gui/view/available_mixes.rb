@@ -1,6 +1,4 @@
 class Gui::View::AvailableMixes < Gui::View::Base
-  include Coinmux::BitcoinUtil
-  
   import 'java.awt.Dimension'
   import 'java.awt.GridLayout'
   import 'javax.swing.BorderFactory'
@@ -47,33 +45,98 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   end
 
   def update_mixes_table(mixes_data)
-    mixes_table.getModel().data = if mixes_data.blank?
-      [["Nothing available", ""]]
-    else
-      mixes_data.collect do |mix_data|
-        [mix_data[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{mix_data[:waiting_participants]} of #{mix_data[:total_participants]}"]
-      end
-    end
+    mixes_table.setMixesData(mixes_data)
   end
 
   private
 
-  class MyTable < JTable
+  class MixesTable < JTable
+    include Coinmux::BitcoinUtil
+
+    def initialize
+      super(TModel.new)
+      getModel().setData([["Loading...", ""]])
+    end
+
+    def setMixesData(mixes_data)
+      data = if mixes_data.blank?
+        [["Nothing available", ""]]
+      else
+        mixes_data.collect do |mix_data|
+          [mix_data[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{mix_data[:waiting_participants]} of #{mix_data[:total_participants]}"]
+        end
+      end
+
+      getModel().setData(data)
+    end
+
+    def hasMixes()
+      # we sometimes put some text in [0][0], not the bitcoin amount
+      getModel().getData()[0][0].to_f != 0
+    end
+
     def tableChanged(event)
-      selected = getSelectionModel().getMinSelectionIndex()
+      return super(event) unless hasMixes() && (selected_index = getSelectedIndex()) >= 0
+
+      previous_amount = getAmountFromData(selected_index, event.getPreviousData())
+      previous_participants = getParticipantsFromData(selected_index, event.getPreviousData())
+
       super(event)
-      setRowSelectionInterval(selected, selected) if selected >= 0 && selected < getModel().getRowCount()
+
+      selectAmountAndParticipants(previous_amount, previous_participants)
+    end
+
+    def getSelectedIndex()
+      getSelectionModel().getMinSelectionIndex()
+    end
+
+    def getAmount(row_index)
+      getAmountFromData(row_index)
+    end
+
+    def getParticipants(row_index)
+      getParticipantsFromData(row_index)
+    end
+
+    private
+
+    def getAmountFromData(row_index, data = getModel().getData())
+      (data[row_index][0].to_f * SATOSHIS_PER_BITCOIN).to_i
+    end
+
+    def getParticipantsFromData(row_index, data = getModel().getData())
+      data[row_index][1].gsub(/.* /, '').to_i
+    end
+
+    def selectAmountAndParticipants(amount, participants)
+      getModel().getRowCount().times do |row_index|
+        if amount == getAmount(row_index) && participants == getParticipants(row_index)
+          setRowSelectionInterval(row_index, row_index)
+          break
+        end
+      end
     end
   end
 
-  class TModel < AbstractTableModel
-    def data
-      @data ||= []
+  class TModelEvent < TableModelEvent
+    def initialize(source, previous_data, current_data)
+      super(source)
+
+      @previous_data = previous_data
+      @current_data = current_data
     end
 
-    def data=(data)
-      @data = data
-      fireTableChanged(TableModelEvent.new(self))
+    def getPreviousData(); @previous_data; end
+    def getCurrentData(); @current_data; end
+  end
+
+  class TModel < AbstractTableModel
+    def getData()
+      data
+    end
+
+    def setData(data)
+      self.data = data
     end
 
     def getColumnCount(); 2; end
@@ -84,7 +147,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     end
 
     def getValueAt(row, col)
-      data[row][col]
+      data[row].try(:[], col)
     end
 
     def setValueAt(value, row, col)
@@ -93,6 +156,21 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
       else
         data[row] ||= []
         data[row][col] = value
+      end
+    end
+
+    private
+
+    def data
+      @data ||= []
+    end
+
+    def data=(data)
+      previous_data = @data
+      @data = data
+
+      if previous_data != data
+        fireTableChanged(TModelEvent.new(self, previous_data, data))
       end
     end
   end
@@ -119,22 +197,21 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     @join_button ||= JButton.new("Join Available Mix").tap do |join_button|
       join_button.setEnabled(false)
       join_button.add_action_listener do |e|
-        selected_index = mixes_table.getSelectionModel().getMinSelectionIndex()
-        application.amount = (mixes_table.getModel().getValueAt(selected_index, 0).to_f * SATOSHIS_PER_BITCOIN).to_i
-        application.participants = mixes_table.getModel().getValueAt(selected_index, 1).gsub(/.* /, '').to_i
+        selected_index = mixes_table.getSelectedIndex()
+        application.amount = mixes_table.getAmount(selected_index)
+        application.participants = mixes_table.getParticipants(selected_index)
         application.show_view(:mix_settings)
       end
     end
   end
 
   def mixes_table
-    @mixes_table ||= MyTable.new(TModel.new).tap do |mixes_table|
+    @mixes_table ||= MixesTable.new.tap do |mixes_table|
       mixes_table.setSelectionMode(ListSelectionModel::SINGLE_SELECTION)
       mixes_table.getSelectionModel().addListSelectionListener do |e|
         update_join_enabled
       end
 
-      mixes_table.getModel().data = [["Loading...", ""]]
       mixes_table.getModel().addTableModelListener do |e|
         update_join_enabled
       end
@@ -142,9 +219,7 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   end
 
   def update_join_enabled
-    has_table_data = mixes_table.getModel().data[0][0].to_f != 0 # we sometimes put some text in [0][0], not the bitcoin amount
-
-    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && has_table_data
+    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && mixes_table.hasMixes()
     join_button.setEnabled(enabled)
   end
 end
