@@ -34,6 +34,8 @@ class Coinmux::Message::Output < Coinmux::Message::Base
   end
 
   def address_valid
+    return if errors[:address].present?
+    
     unless bitcoin_crypto_facade.verify_address(address)
       errors[:address] << "is not a valid address"
     end
