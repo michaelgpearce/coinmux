@@ -33,12 +33,23 @@ class Cli::Application
       self.input_private_key = input_password
     end
 
-    if (input_errors = validate_inputs).present?
+    input_validator = Coinmux::Application::InputValidator.new(
+      data_store: data_store,
+      coin_join_uri: coin_join_uri,
+      input_private_key: input_private_key,
+      amount: amount,
+      participants: participants,
+      change_address: change_address,
+      output_address: output_address)
+    if (input_errors = input_validator.validate).present?
       message "Unable to perform CoinJoin due to the following:"
       message input_errors.collect { |message| " * #{message}" }
       message "Quitting..."
       return
     end
+
+    # ensure we have the key in hex
+    self.input_private_key = bitcoin_crypto_facade.private_key_to_hex!(input_private_key)
 
     Kernel.trap('SIGINT') { clean_up_coin_join }
     Kernel.trap('SIGTERM') { clean_up_coin_join }
@@ -122,37 +133,6 @@ class Cli::Application
       puts message
       info message
     end
-  end
-
-  def validate_inputs
-    errors = []
-
-    begin
-      Coinmux::CoinJoinUri.parse(coin_join_uri)
-    rescue Coinmux::Error => e
-      errors << "CoinJoin URI is invalid"
-    end
-
-    begin
-      self.input_private_key = bitcoin_crypto_facade.private_key_to_hex!(input_private_key)
-    rescue Coinmux::Error => e
-      self.input_private_key = nil
-      errors << "Input private key is invalid"
-    end
-
-    coin_join = Coinmux::Message::CoinJoin.build(data_store, amount: amount, participants: participants)
-    errors += coin_join.errors.full_messages unless coin_join.valid?
-
-    input = Coinmux::Message::Input.build(coin_join, private_key: input_private_key || '', change_address: change_address)
-    input.valid?
-    errors += input.errors[:address].collect { |e| "Input address #{e}" } unless input.errors[:address].blank? if input_private_key
-    errors += input.errors[:change_address].collect { |e| "Change address #{e}" } unless input.errors[:change_address].blank?
-
-    output = Coinmux::Message::Output.build(coin_join, address: output_address)
-    output.valid?
-    errors += output.errors[:address].collect { |e| "Output address #{e}" } unless output.errors[:address].blank?
-
-    errors
   end
 
   def data_store
