@@ -10,12 +10,14 @@ class Gui::View::MixSettings < Gui::View::Base
   import 'java.awt.Insets'
   import 'javax.swing.JButton'
   import 'javax.swing.JLabel'
+  import 'javax.swing.JOptionPane'
   import 'javax.swing.JPanel'
   import 'javax.swing.JPasswordField'
   import 'javax.swing.JSpinner'
+  import 'javax.swing.JTextField'
   import 'javax.swing.SpinnerModel'
   import 'javax.swing.SpinnerNumberModel'
-  import 'javax.swing.JTextField'
+  import 'javax.swing.SwingWorker'
 
   def add
     add_header("Mix Settings")
@@ -44,6 +46,43 @@ class Gui::View::MixSettings < Gui::View::Base
 
   private
 
+  class ValidationWorker < SwingWorker
+    attr_accessor :mix_settings, :input_errors
+
+    def initialize(mix_settings)
+      super()
+
+      self.mix_settings = mix_settings
+    end
+
+    def doInBackground
+      input_validator = Coinmux::Application::InputValidator.new(
+        data_store: mix_settings.application.data_store,
+        input_private_key: mix_settings.send(:input_private_key).getText(),
+        amount: mix_settings.send(:amount).getText(),
+        participants: mix_settings.send(:participants).getValue(),
+        change_address: mix_settings.send(:change_address).getText(),
+        output_address: mix_settings.send(:output_address).getText())
+
+      self.input_errors = input_validator.validate
+    end
+
+    def done
+      mix_settings.send(:start_button).setEnabled(true)
+      mix_settings.send(:start_button).setLabel("Start Mixing")
+
+      if input_errors.present?
+        JOptionPane.showMessageDialog(
+          mix_settings.application,
+          input_errors.collect(&:to_s).to_java(:string),
+          "Input Errors",
+          JOptionPane::ERROR_MESSAGE)
+      else
+        mix_settings.application.show_view(:mixing)
+      end
+    end
+  end
+
   def change_address
     @change_address ||= JTextField.new
   end
@@ -59,7 +98,9 @@ class Gui::View::MixSettings < Gui::View::Base
   def start_button
     @start_button ||= JButton.new("Start Mixing").tap do |start_button|
       start_button.add_action_listener do |e|
-        application.show_view(:mixing)
+        start_button.setEnabled(false)
+        start_button.setLabel("Validating...")
+        ValidationWorker.new(self).execute()
       end
     end
   end

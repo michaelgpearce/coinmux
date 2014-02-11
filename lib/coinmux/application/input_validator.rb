@@ -1,11 +1,13 @@
 class Coinmux::Application::InputValidator
   include Coinmux::Facades
 
-  ATTRS = [:data_store, :coin_join_uri, :input_private_key, :amount, :participants, :change_address, :output_address]
+  REQUIRED_ATTRS = [:data_store, :input_private_key, :amount, :participants, :change_address, :output_address]
+  OPTIONAL_ATTRS = [:coin_join_uri]
+  ATTRS = REQUIRED_ATTRS + OPTIONAL_ATTRS
   attr_accessor *ATTRS
 
   def initialize(params)
-    params.assert_keys!(required: ATTRS)
+    params.assert_keys!(required: REQUIRED_ATTRS, optional: OPTIONAL_ATTRS)
 
     params.each do |key, value|
       send("#{key}=", value)
@@ -16,7 +18,7 @@ class Coinmux::Application::InputValidator
     errors = []
 
     begin
-      Coinmux::CoinJoinUri.parse(coin_join_uri)
+      Coinmux::CoinJoinUri.parse(coin_join_uri) if coin_join_uri
     rescue Coinmux::Error => e
       errors << ErrorMessage.new(:coin_join_uri, "is invalid", "CoinJoin URI is invalid")
     end
@@ -48,7 +50,7 @@ class Coinmux::Application::InputValidator
   class ErrorMessage
     attr_accessor :key, :message, :full_message
 
-    def initialize(key, message, full_message = "#{key.to_s.capitalize} #{message}")
+    def initialize(key, message, full_message = "#{key.to_s.gsub(/_/, ' ').capitalize} #{message}")
       self.key, self.message, self.full_message = key, message.to_s, full_message
     end
 

@@ -79,11 +79,11 @@ class Gui::Application < Java::JavaxSwing::JFrame
     end
   end
 
-  private
-
   def data_store
     @data_store ||= Coinmux::DataStore::Factory.build(coin_join_uri)
   end
+
+  private
 
   def update_mixes_table(coin_join_data)
     views[:available_mixes].update_mixes_table(coin_join_data)
