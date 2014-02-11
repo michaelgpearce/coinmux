@@ -1,4 +1,4 @@
-class Coinmux::StateMachine::Concerns::AvailableCoinJoins
+class Coinmux::Application::AvailableCoinJoins
   include Coinmux::Facades
 
   attr_accessor :data_store

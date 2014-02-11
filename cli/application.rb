@@ -94,7 +94,7 @@ class Cli::Application
   end
 
   def run_list_coin_joins
-    Coinmux::StateMachine::Concerns::AvailableCoinJoins.new(data_store).find do |event|
+    Coinmux::Application::AvailableCoinJoins.new(data_store).find do |event|
       Cli::EventQueue.instance.stop
 
       if event.error

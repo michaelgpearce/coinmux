@@ -10,10 +10,9 @@ Dir[File.join(File.dirname(__FILE__), 'jar', '*.jar')].each { |filename| require
 module Coinmux
   require 'rbconfig'
   
+  module Application; end
   module Message; end
-  module StateMachine
-    module Concerns; end
-  end
+  module StateMachine; end
   module DataStore; end
 
   def self.root
@@ -85,4 +84,5 @@ require 'lib/coinmux/state_machine/event'
 require 'lib/coinmux/state_machine/base'
 require 'lib/coinmux/state_machine/director'
 require 'lib/coinmux/state_machine/participant'
-require 'lib/coinmux/state_machine/concerns/available_coin_joins'
+
+require 'lib/coinmux/application/available_coin_joins'

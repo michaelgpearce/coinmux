@@ -93,7 +93,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def refresh_mixes_table
-    Coinmux::StateMachine::Concerns::AvailableCoinJoins.new(data_store).find do |event|
+    Coinmux::Application::AvailableCoinJoins.new(data_store).find do |event|
       Gui::EventQueue.instance.future_exec do
         if event.error
           warn("Error refreshing mixes table: #{event.error}")
