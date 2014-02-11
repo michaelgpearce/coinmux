@@ -105,24 +105,20 @@ class Cli::Application
   end
 
   def run_list_coin_joins
-    Coinmux::Application::AvailableCoinJoins.new(data_store).find do |event|
-      Cli::EventQueue.instance.stop
+    begin
+      available_coin_joins = Coinmux::Application::AvailableCoinJoins.new(data_store).find
 
-      if event.error
-        puts "Error: #{message}"
-        raise message # this will terminate the thread called from
+      if available_coin_joins.empty?
+        puts "No available CoinJoins"
       else
-        available_coin_joins = event.data
-        if available_coin_joins.empty?
-          puts "No available CoinJoins"
-        else
-          puts "%10s  %12s" % ["BTC Amount", "Participants"]
-          puts "#{'=' * 10}  #{'=' * 12}"
-          available_coin_joins.each do |hash|
-            puts "%-10s  %-12s" % [hash[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{hash[:waiting_participants]} of #{hash[:total_participants]}"]
-          end
+        puts "%10s  %12s" % ["BTC Amount", "Participants"]
+        puts "#{'=' * 10}  #{'=' * 12}"
+        available_coin_joins.each do |hash|
+          puts "%-10s  %-12s" % [hash[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{hash[:waiting_participants]} of #{hash[:total_participants]}"]
         end
       end
+    rescue Coinmux::Error => e
+      puts "Error: #{e}"
     end
   end
 
