@@ -47,8 +47,12 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   end
 
   def update_mixes_table(mixes_data)
-    mixes_table.getModel().data = mixes_data.collect do |mix_data|
-      [mix_data[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{mix_data[:waiting_participants]} of #{mix_data[:total_participants]}"]
+    mixes_table.getModel().data = if mixes_data.blank?
+      [["Nothing available", ""]]
+    else
+      mixes_data.collect do |mix_data|
+        [mix_data[:amount].to_f / SATOSHIS_PER_BITCOIN, "#{mix_data[:waiting_participants]} of #{mix_data[:total_participants]}"]
+      end
     end
   end
 
