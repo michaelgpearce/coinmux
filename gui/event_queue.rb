@@ -14,7 +14,10 @@ class Gui::EventQueue
     else
       Timer.new(seconds * 1000, lambda { |e|
         yield
-      }).start()
+      }).tap do |timer|
+        timer.setRepeats(false)
+        timer.start()
+      end
     end
   end
 end
