@@ -85,12 +85,10 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def update_mixes_table(coin_join_data)
-    Gui::EventQueue.instance.future_exec do
-      views[:available_mixes].update_mixes_table(coin_join_data)
+    views[:available_mixes].update_mixes_table(coin_join_data)
 
-      Gui::EventQueue.instance.future_exec(10) do
-        refresh_mixes_table # refresh again
-      end
+    Gui::EventQueue.instance.future_exec(10) do
+      refresh_mixes_table # refresh again
     end
   end
 
