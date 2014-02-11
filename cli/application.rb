@@ -22,11 +22,7 @@ class Cli::Application
   def list_coin_joins
     data_store.startup
 
-    Cli::EventQueue.instance.start
-
     run_list_coin_joins
-
-    Cli::EventQueue.instance.wait
 
     data_store.shutdown
   end
