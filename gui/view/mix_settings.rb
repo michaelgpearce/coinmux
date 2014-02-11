@@ -99,6 +99,7 @@ class Gui::View::MixSettings < Gui::View::Base
 
   def start_button
     @start_button ||= JButton.new("Start Mixing").tap do |start_button|
+      start_button.setPreferredSize(Dimension.new(120, start_button.getPreferredSize().height)) # size that accomodates both labels
       start_button.add_action_listener do |e|
         start_button.setEnabled(false)
         start_button.setLabel("Validating...")
