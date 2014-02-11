@@ -17,6 +17,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   
   validates :version, :identifier, :message_public_key, :amount, :participants, :participant_transaction_fee, :presence => true
   validate :participants_numericality, :if => :participants
+  validate :amount_numericality, :if => :amount
   validate :participant_transaction_fee_numericality, :if => :participant_transaction_fee
   validate :version_matches, :if => :version
 
@@ -29,9 +30,9 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       message.version = VERSION
       message.identifier = digest_facade.random_identifier
       message.message_private_key, message.message_public_key = pki_facade.generate_keypair
-      message.amount = options[:amount] || DEFAULT_AMOUNT
-      message.participants = options[:participants] || DEFAULT_PARTICIPANTS
-      message.participant_transaction_fee = options[:participant_transaction_fee] || (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / message.participants).to_i
+      message.amount = options[:amount].try(:to_f) || DEFAULT_AMOUNT
+      message.participants = options[:participants].try(:to_i) || DEFAULT_PARTICIPANTS
+      message.participant_transaction_fee = message.participants == 0 ? 0 : options[:participant_transaction_fee] || (Coinmux::BitcoinUtil::DEFAULT_TRANSACTION_FEE / message.participants).to_i
 
       message
     end
@@ -170,6 +171,11 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   def participants_numericality
     (errors[:participants] << "is not an integer" and return) unless participants.to_s.to_i == participants
     (errors[:participants] << "must be at least 2" and return) unless participants > 1
+  end
+
+  def amount_numericality
+    (errors[:amount] << "is not a decimal number" and return) unless amount.to_s.to_f == amount
+    (errors[:amount] << "must be greater than 0" and return) unless amount > 0
   end
 
   def participant_transaction_fee_numericality

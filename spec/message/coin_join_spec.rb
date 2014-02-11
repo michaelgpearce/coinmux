@@ -40,6 +40,26 @@ describe Coinmux::Message::CoinJoin do
       end
     end
 
+    describe "#amount_numericality" do
+      context "with non numeric value" do
+        let(:amount) { "non-numeric" }
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:amount]).to include("is not a decimal number")
+        end
+      end
+
+      context "with less than or equal 0" do
+        let(:amount) { [0, -1].sample }
+
+        it "is invalid" do
+          expect(subject).to be_false
+          expect(message.errors[:amount]).to include("must be greater than 0")
+        end
+      end
+    end
+
     describe "#participant_transaction_fee_numericality" do
       context "with non numeric value" do
         let(:participant_transaction_fee) { "non-numeric" }
