@@ -47,6 +47,8 @@ class Gui::View::MixSettings < Gui::View::Base
   private
 
   class ValidationWorker < SwingWorker
+    include Coinmux::BitcoinUtil
+
     attr_accessor :mix_settings, :input_errors
 
     def initialize(mix_settings)
@@ -59,7 +61,7 @@ class Gui::View::MixSettings < Gui::View::Base
       input_validator = Coinmux::Application::InputValidator.new(
         data_store: mix_settings.application.data_store,
         input_private_key: mix_settings.send(:input_private_key).getText(),
-        amount: mix_settings.send(:amount).getText(),
+        amount: (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i,
         participants: mix_settings.send(:participants).getValue(),
         change_address: mix_settings.send(:change_address).getText(),
         output_address: mix_settings.send(:output_address).getText())
