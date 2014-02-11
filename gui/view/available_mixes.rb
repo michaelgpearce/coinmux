@@ -142,7 +142,9 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
   end
 
   def update_join_enabled
-    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && mixes_table.getModel().getRowCount() > 0
+    has_table_data = mixes_table.getModel().data[0][0].to_f != 0 # we sometimes put some text in [0][0], not the bitcoin amount
+
+    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && has_table_data
     join_button.setEnabled(enabled)
   end
 end
