@@ -18,7 +18,7 @@ class Gui::View::AvailableMixes < Gui::View::Base
     add_row do |parent|
       label = JTextArea.new(<<-STRING)
 Coinmux is the safe way to mix your bitcoins.
-Your bitcoins are mixed with other Coinmux users on the Internet, but your private Bitcoin information never leaves your computer. You are always 100% in control of your bitcoins and you never need to trust a 3rd party - just like Bitcoin.
+Your bitcoins are mixed with other Coinmux users on the Internet, but your private Bitcoin information never leaves your computer. You are always 100% in control of your bitcoins and you never need to trust a 3rd party.
       STRING
       label.setEditable(false)
       label.setLineWrap(true)
