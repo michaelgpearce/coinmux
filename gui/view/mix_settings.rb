@@ -1,6 +1,4 @@
 class Gui::View::MixSettings < Gui::View::Base
-  include Coinmux::BitcoinUtil
-
   DEFAULT_PARTICIPANTS = 5
   DEFAULT_AMOUNT = 1.0 * SATOSHIS_PER_BITCOIN
   MAX_PARTICIPANTS = 100
@@ -62,12 +60,12 @@ class Gui::View::MixSettings < Gui::View::Base
     def doInBackground
       begin
         input_validator = Coinmux::Application::InputValidator.new(
-          data_store: mix_settings.application.data_store,
-          input_private_key: mix_settings.send(:input_private_key).getText(),
-          amount: (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i,
-          participants: mix_settings.send(:participants).getValue(),
-          change_address: mix_settings.send(:change_address).getText(),
-          output_address: mix_settings.send(:output_address).getText())
+          data_store: data_store,
+          amount: amount,
+          participants: participants,
+          input_private_key: input_private_key,
+          change_address: change_address,
+          output_address: output_address)
 
         self.input_errors = input_validator.validate
       rescue Exception => e
@@ -88,9 +86,44 @@ class Gui::View::MixSettings < Gui::View::Base
           "Input Errors",
           JOptionPane::ERROR_MESSAGE)
       else
-        mix_settings.application.show_view(:mixing)
+        mix_settings.application.tap do |app|
+          app.amount = amount
+          app.participants = participants
+          app.input_private_key = bitcoin_crypto_facade.private_key_to_hex!(input_private_key)
+          app.output_address = output_address
+          app.change_address = change_address
+
+          app.show_view(:mixing)
+        end
       end
     end
+
+    private
+
+    def data_store
+      mix_settings.application.data_store
+    end
+
+    def amount
+      (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i
+    end
+
+    def participants
+      mix_settings.send(:participants).getValue()
+    end
+
+    def input_private_key
+      mix_settings.send(:input_private_key).getText()
+    end
+
+    def change_address
+      mix_settings.send(:change_address).getText()
+    end
+
+    def output_address
+      mix_settings.send(:output_address).getText()
+    end
+
   end
 
   def change_address

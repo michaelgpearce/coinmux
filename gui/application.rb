@@ -5,7 +5,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   HEIGHT = 450
   MIXES_TABLE_REFRESH_SECONDS = 5
 
-  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri
+  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri, :input_private_key, :output_address, :change_address
 
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
@@ -132,7 +132,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
 
       # show once part of dialog
       preferences_view.show
-      
+
       dialog.show
     end
   end

@@ -1,7 +1,7 @@
 class Cli::Application
   include Coinmux::BitcoinUtil, Coinmux::Facades
 
-  attr_accessor :participant, :director, :notification_callback
+  attr_accessor :participant, :director
   attr_accessor :amount, :participants, :input_private_key, :output_address, :change_address, :coin_join_uri
 
   def initialize(options = {})
@@ -54,7 +54,24 @@ class Cli::Application
     Kernel.trap('SIGINT') { clean_up_coin_join }
     Kernel.trap('SIGTERM') { clean_up_coin_join }
 
-    self.notification_callback = Proc.new do |event|
+    message "Starting..."
+
+    data_store.startup
+
+    Cli::EventQueue.instance.start
+
+    self.participant = build_participant
+    participant.start(&notification_callback)
+
+    Cli::EventQueue.instance.wait
+
+    data_store.shutdown
+  end
+
+  private
+
+  def notification_callback
+    @notification_callback ||= Proc.new do |event|
       debug "event queue event received: #{event.inspect}"
       if event.type == :failed
         message "Error - #{event.message}", event.source
@@ -77,21 +94,7 @@ class Cli::Application
       end
     end
 
-    message "Starting..."
-
-    data_store.startup
-
-    Cli::EventQueue.instance.start
-
-    self.participant = build_participant
-    participant.start(&notification_callback)
-
-    Cli::EventQueue.instance.wait
-
-    data_store.shutdown
   end
-
-  private
 
   def clean_up_coin_join
     puts "Quitting..."

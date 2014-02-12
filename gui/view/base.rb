@@ -1,4 +1,6 @@
 class Gui::View::Base
+  include Coinmux::BitcoinUtil, Coinmux::Facades
+
   attr_accessor :application, :root_panel, :primary_button
 
   import 'java.awt.Dimension'
