@@ -5,7 +5,11 @@ class Gui::EventQueue
   import 'javax.swing.Timer'
 
   def sync_exec(&callback)
-    SwingUtilities.invokeAndWait(&callback)
+    if SwingUtilities.isEventDispatchThread()
+      yield
+    else
+      SwingUtilities.invokeAndWait(&callback)
+    end
   end
   
   def future_exec(seconds = 0, &callback)
