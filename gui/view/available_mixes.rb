@@ -41,9 +41,6 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     add_button_row(join_button, create_button)
   end
 
-  def show
-  end
-
   def update_mixes_table(mixes_data)
     mixes_table.setMixesData(mixes_data)
   end

@@ -67,16 +67,13 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def preferences_panel
-    @preferences_panel ||= JPanel.new.tap do |panel|
-      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
-      panel.setBorder(BorderFactory.createEmptyBorder())
-    end
+    load_preferences_panel_and_view
+    @preferences_panel
   end
 
   def preferences_view
-    @preferences_view ||= Gui::View::Preferences.new(self, preferences_panel).tap do |preferences_view|
-      preferences_view.add
-    end
+    load_preferences_panel_and_view
+    @preferences_view
   end
 
   def data_store
@@ -84,6 +81,19 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   private
+
+  def load_preferences_panel_and_view
+    return if @preferences_panel.present? && @preferences_view.nil?
+
+    @preferences_panel ||= JPanel.new.tap do |panel|
+      panel.setLayout(BoxLayout.new(panel, BoxLayout::PAGE_AXIS))
+      panel.setBorder(BorderFactory.createEmptyBorder())
+    end
+
+    @preferences_view ||= Gui::View::Preferences.new(self, @preferences_panel).tap do |preferences_view|
+      preferences_view.add
+    end
+  end
 
   def update_mixes_table(coin_join_data)
     views[:available_mixes].update_mixes_table(coin_join_data)
@@ -112,8 +122,6 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def show_preferences
-    preferences_view.show
-
     JDialog.new(self, "Coinmux", true).tap do |dialog|
       panel = JPanel.new
       panel.setBorder(create_frame_border)
@@ -121,9 +129,11 @@ class Gui::Application < Java::JavaxSwing::JFrame
       dialog.add(panel)
       dialog.pack
       dialog.setLocationRelativeTo(self)
-      dialog.show
 
-      puts "PREF SUCCESS #{preferences_view.success}"
+      # show once part of dialog
+      preferences_view.show
+      
+      dialog.show
     end
   end
 

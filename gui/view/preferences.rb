@@ -38,7 +38,9 @@ class Gui::View::Preferences < Gui::View::Base
     add_button_row(save_button, cancel_button)
   end
 
-  def show
+  protected
+
+  def do_show
     self.success = false
   end
 

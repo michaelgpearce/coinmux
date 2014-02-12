@@ -31,9 +31,6 @@ class Gui::View::Mixing < Gui::View::Base
     add_button_row(action_button)
   end
 
-  def show
-  end
-
   private
 
   def action_button

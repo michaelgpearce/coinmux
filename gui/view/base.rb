@@ -1,5 +1,5 @@
 class Gui::View::Base
-  attr_accessor :application, :root_panel
+  attr_accessor :application, :root_panel, :primary_button
 
   import 'java.awt.Dimension'
   import 'java.awt.Font'
@@ -21,7 +21,18 @@ class Gui::View::Base
     root_panel.add(container)
   end
 
+  # subclasses should not override, override do_show instead
+  def show
+    root_panel.getRootPane().setDefaultButton(primary_button)
+
+    do_show
+  end
+
   protected
+
+  def do_show
+    # override in subclass
+  end
 
   def add_header(text)
     label = JLabel.new(text, JLabel::CENTER)
@@ -47,6 +58,7 @@ class Gui::View::Base
     container.add(panel)
 
     buttons = [primary_button, secondary_button].compact
+    self.primary_button = buttons.first
     buttons.reverse! if Coinmux.os == :macosx
 
     buttons.each do |button|
