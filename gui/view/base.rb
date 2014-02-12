@@ -70,7 +70,7 @@ class Gui::View::Base
     options = {
       last: false,
       width: nil,
-      label_width: 200
+      label_width: 160
     }.merge(options)
 
     add_row do |parent|
