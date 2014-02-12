@@ -47,7 +47,7 @@ class Gui::View::MixSettings < Gui::View::Base
   private
 
   class ValidationWorker < SwingWorker
-    include Coinmux::BitcoinUtil
+    include Coinmux::BitcoinUtil, Coinmux::Facades
 
     attr_accessor :mix_settings, :input_errors
 
@@ -58,15 +58,21 @@ class Gui::View::MixSettings < Gui::View::Base
     end
 
     def doInBackground
-      input_validator = Coinmux::Application::InputValidator.new(
-        data_store: mix_settings.application.data_store,
-        input_private_key: mix_settings.send(:input_private_key).getText(),
-        amount: (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i,
-        participants: mix_settings.send(:participants).getValue(),
-        change_address: mix_settings.send(:change_address).getText(),
-        output_address: mix_settings.send(:output_address).getText())
+      begin
+        input_validator = Coinmux::Application::InputValidator.new(
+          data_store: mix_settings.application.data_store,
+          input_private_key: mix_settings.send(:input_private_key).getText(),
+          amount: (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i,
+          participants: mix_settings.send(:participants).getValue(),
+          change_address: mix_settings.send(:change_address).getText(),
+          output_address: mix_settings.send(:output_address).getText())
 
-      self.input_errors = input_validator.validate
+        self.input_errors = input_validator.validate
+      rescue Exception => e
+        error "Error in ValidationWorker: #{e}"
+        puts "Error in ValidationWorker: #{e}", e.backtrace
+        raise e
+      end
     end
 
     def done
