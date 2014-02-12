@@ -37,7 +37,7 @@ class Gui::View::MixSettings < Gui::View::Base
 
   protected
 
-  def do_show
+  def handle_show
     bitcoin_amount = (application.amount || DEFAULT_AMOUNT).to_f / SATOSHIS_PER_BITCOIN
     amount.setText(bitcoin_amount.to_s)
     amount.setEnabled(application.amount.nil?)

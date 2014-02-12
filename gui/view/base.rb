@@ -21,16 +21,16 @@ class Gui::View::Base
     root_panel.add(container)
   end
 
-  # subclasses should not override, override do_show instead
+  # subclasses should not override, override handle_show instead
   def show
     root_panel.getRootPane().setDefaultButton(primary_button)
 
-    do_show
+    handle_show
   end
 
   protected
 
-  def do_show
+  def handle_show
     # override in subclass
   end
 

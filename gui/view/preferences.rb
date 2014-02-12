@@ -40,7 +40,7 @@ class Gui::View::Preferences < Gui::View::Base
 
   protected
 
-  def do_show
+  def handle_show
     self.success = false
   end
 
