@@ -8,7 +8,7 @@ group :cli do
 end
 
 group :development do
-  gem 'rake', '10.1.0'
+  gem 'rake', '10.1.1'
   gem 'wirble', '0.1.3'
   gem 'rspec', '2.14.1'
   gem 'warbler', '1.4.0'
