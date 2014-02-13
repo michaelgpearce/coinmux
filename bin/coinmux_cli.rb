@@ -1,52 +1,51 @@
 raise "COINMUX_ENV not set" if ENV['COINMUX_ENV'].nil?
-Bundler.require(:default, ENV['COINMUX_ENV'], :cli) unless ENV['COINMUX_JAR'] == 'true'
 
 require File.expand_path("../../lib/coinmux", __FILE__)
-
-require 'slop'
 
 module Cli
 end
 
-opts = Slop.parse(help: true) do
-  banner <<-TEXT
-#{Coinmux::BANNER}
+require 'optparse'
+require 'ostruct'
 
-Usage: coinmux [options]
-TEXT
-  on :v, :version, 'Display the version'
-  on :h, :help, 'Display this help message'
-  on :l, :"list", 'List CoinJoins waiting for inputs'
-  on :a, :amount=, 'CoinJoin transaction amount (in BTC)'
-  on :p, :participants=, 'Number of participants'
-  on :o, :"output-address=", 'Output address (in BTC)'
-  on :c, :"change-address=", 'Change address (in BTC); optional'
-  on :k, :"private-key=", 'Input private key in hex or wallet import format *NOT SECURE*'
-  on :d, :"data-store=", 'Data store to use: (p2p <default> | filesystem)'
-  on :b, :bootstrap, 'Run as P2P bootstrap server (optional <port>)', argument: :optional
-end
+options = OpenStruct.new
+OptionParser.new do |o|
+  o.banner = "#{Coinmux::BANNER}\n\nUsage: coinmux [options]\n"
+  o.separator ""
 
-if opts.version?
+  o.on('-v', '--version', 'Display the version') { |v| options.version = v }
+  o.on('-h', '--help', 'Display this help message') { |v| options.help = v }
+  o.on('-l', '--list', 'List CoinJoins waiting for inputs') { |v| options.list = v }
+  o.on('-a', '--amount AMOUNT', 'CoinJoin transaction amount (in BTC)') { |v| options.amount = v }
+  o.on('-p', '--participants PARTICIPANTS', 'Number of participants') { |v| options.participants = v }
+  o.on('-o', '--output-address OUTPUTADDRESS', 'Output address (in BTC)') { |v| options.output_address = v }
+  o.on('-c', '--change-address [CHANGEADDRESS]', 'Change address (in BTC)') { |v| options.change_address = v }
+  o.on('-k', '--private-key [PRIVATEKEY]', 'Input private key in hex or wallet import format *NOT SECURE*') { |v| options.private_key = v }
+  o.on('-d', '--data-store DATASTORE', 'Data store to use: p2p <default> or filesystem') { |v| options.data_store = v }
+  o.on('-b', '--bootstrap [PORT]', 'Run as P2P bootstrap server') { |v| options.bootstrap = v }
+end.parse!
+
+if options.version
   puts Coinmux::VERSION
-elsif opts.bootstrap?
+elsif options.bootstrap
   require 'cli/bootstrap'
 
-  Cli::Bootstrap.new(port: opts[:bootstrap]).startup
+  Cli::Bootstrap.new(port: options.bootstrap).startup
 else
   require 'cli/event'
   require 'cli/event_queue'
   require 'cli/application'
 
   app = Cli::Application.new(
-    amount: opts[:amount],
-    participants: opts[:participants],
-    input_private_key: opts[:"private-key"],
-    output_address: opts[:"output-address"],
-    change_address: opts[:"change-address"],
-    data_store: opts[:"data-store"],
-    list: opts[:list]
+    amount: options.amount,
+    participants: options.participants,
+    input_private_key: options.private_key,
+    output_address: options.output_address,
+    change_address: options.change_address,
+    data_store: options.data_store,
+    list: options.list
   )
-  if opts[:list]
+  if options.list
     app.list_coin_joins
   else
     app.start

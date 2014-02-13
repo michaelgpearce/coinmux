@@ -11,6 +11,5 @@ script = ARGV.length == 0 ? 'bin/coinmux_gui.rb' : 'bin/coinmux_cli.rb'
 # assume running from jar file
 $:.unshift(File.expand_path("../..", __FILE__))
 ENV['COINMUX_ENV'] = env['COINMUX_ENV']
-ENV['COINMUX_JAR'] = 'true'
 load script
 
