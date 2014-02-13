@@ -35,3 +35,12 @@ require 'gui/view/preferences'
 require 'gui/application'
 
 Gui::Application.new.start
+
+import 'javax.swing.SwingUtilities'
+if !Java::JavaxSwing::SwingUtilities.isEventDispatchThread()
+  thread = nil
+  Java::JavaxSwing::SwingUtilities.invokeAndWait do
+    thread = Thread.current
+  end
+  thread.join
+end
