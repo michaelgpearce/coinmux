@@ -1,12 +1,5 @@
 source 'https://rubygems.org'
 
-group :gui do
-end
-
-group :cli do
-  gem 'slop', '3.4.7'
-end
-
 group :development do
   gem 'rake', '10.1.1'
   gem 'wirble', '0.1.3'
