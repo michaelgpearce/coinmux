@@ -38,8 +38,7 @@ class Gui::View::Base
 
   def add_header(text)
     label = JLabel.new(text, JLabel::CENTER)
-    font = label.getFont()
-    label.setFont(font.java_send(:deriveFont, [Java::float], font.size() * 1.5))
+    label.setFont(Font.new(label.getFont().getName(), Font::BOLD, (label.getFont().getSize() * 1.5).to_i))
     header.add(label, build_grid_bag_constraints(fill: :horizontal, anchor: :center))
   end
 

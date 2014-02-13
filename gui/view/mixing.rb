@@ -145,7 +145,7 @@ class Gui::View::Mixing < Gui::View::Base
   def status_label
     @status_label ||= JLabel.new("", JLabel::CENTER).tap do |label|
       font = label.getFont()
-      label.setFont(font.java_send(:deriveFont, [Java::float], font.size() * 1.6))
+      label.setFont(Font.new(font.getName(), Font::PLAIN, (font.getSize() * 1.6).to_i))
     end
   end
 
