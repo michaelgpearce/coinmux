@@ -1,5 +1,5 @@
 class Coinmux::Application::AvailableCoinJoins
-  include Coinmux::Facades
+  include Coinmux::Facades, Coinmux::Threading
 
   attr_accessor :data_store
 
@@ -14,13 +14,10 @@ class Coinmux::Application::AvailableCoinJoins
         do_find(&callback)
       end
     else
-      event = nil
-      do_find do |e|
-        event = e
-      end
+      event = wait_for_callback(:do_find, &callback)[0]
 
       raise Coinmux::Error.new(event.error) if event.error
-      
+
       event.data
     end
   end
