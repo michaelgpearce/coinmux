@@ -1,6 +1,7 @@
 raise "COINMUX_ENV not set" if ENV['COINMUX_ENV'].nil?
 
-require File.expand_path("../../lib/coinmux", __FILE__)
+$: << File.join(File.dirname(__FILE__), '..')
+require 'lib/coinmux'
 
 if Coinmux.os == :macosx
   # Need to set app name before loading any AWT/Swing components
