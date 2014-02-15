@@ -183,6 +183,8 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def show_frame(&block)
+    icon = ImageIcon.new(Coinmux::FileUtil.read_content_as_java_bytes("gui", "assets", "icon_320.png"))
+    setIconImage(icon.getImage())
     getContentPane.add(root_panel)
     setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
     setSize(Dimension.new(WIDTH, HEIGHT)) # even though pack() resizes, this helps start the window in the right location on screen

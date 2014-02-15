@@ -11,8 +11,8 @@ if Coinmux.os == :macosx
   }.each do |key, value|
     Java::JavaLang::System.setProperty(key, value)
   end
-  image = Java::JavaAwt.Toolkit.getDefaultToolkit().getImage(File.join(Coinmux.root, "gui", "assets", "icon_320.png"))
-  Java::ComAppleEawt::Application.getApplication().setDockIconImage(image)
+  icon = Java::JavaxSwing::ImageIcon.new(Coinmux::FileUtil.read_content_as_java_bytes("gui", "assets", "icon_320.png"))
+  Java::ComAppleEawt::Application.getApplication().setDockIconImage(icon.getImage())
 end
 
 module Gui
