@@ -59,7 +59,11 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
         end
       end
     rescue
-      yield(Coinmux::Event.new(error: $!.to_s))
+      if block_given?
+        yield(Coinmux::Event.new(error: $!.to_s))
+      else
+        raise Coinmux::Error.new($!.to_s)
+      end
     end
   end
 
