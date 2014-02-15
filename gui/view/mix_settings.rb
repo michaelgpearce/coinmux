@@ -80,11 +80,7 @@ class Gui::View::MixSettings < Gui::View::Base
       mix_settings.send(:start_button).setLabel("Start Mixing")
 
       if input_errors.present?
-        JOptionPane.showMessageDialog(
-          mix_settings.application,
-          input_errors.collect(&:to_s).to_java(:string),
-          "Input Errors",
-          JOptionPane::ERROR_MESSAGE)
+        application.show_error_dialog(*input_errors)
       else
         mix_settings.application.tap do |app|
           app.amount = amount

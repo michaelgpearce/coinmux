@@ -20,7 +20,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def initialize
     super Coinmux::BANNER
 
-    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'filesystem')
+    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'p2p')
     self.bitcoin_network = :testnet
   end
 
@@ -58,6 +58,14 @@ class Gui::Application < Java::JavaxSwing::JFrame
         end
       end
     end
+  end
+
+  def show_error_dialog(*error_messages)
+    JOptionPane.showMessageDialog(
+      self,
+      error_messages.collect(&:to_s).to_java(:string),
+      "Error",
+      JOptionPane::ERROR_MESSAGE)
   end
 
   def show_view(view)
