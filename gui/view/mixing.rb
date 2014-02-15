@@ -2,9 +2,11 @@ class Gui::View::Mixing < Gui::View::Base
   STATES = [:initializing, :waiting_for_other_inputs, :waiting_for_other_outputs, :waiting_for_completed, :completed]
   TERMINATE_TEXT = "Terminate"
 
-  attr_accessor :director, :participant
+  attr_accessor :director, :participant, :transaction_url
 
+  import 'java.awt.Color'
   import 'java.awt.Component'
+  import 'java.awt.Cursor'
   import 'java.awt.Dimension'
   import 'java.awt.GridLayout'
   import 'javax.swing.BorderFactory'
@@ -26,7 +28,10 @@ class Gui::View::Mixing < Gui::View::Base
 
         container.add(progress_bar)
 
-        container.add(message_text_field)
+        JPanel.new.tap do |panel|
+          panel.add(show_transaction_button)
+          container.add(panel)
+        end
       end
 
       parent.add(container, build_grid_bag_constraints(fill: :horizontal, anchor: :center))
@@ -38,6 +43,8 @@ class Gui::View::Mixing < Gui::View::Base
   protected
 
   def handle_show
+    transaction_url = nil
+    show_transaction_button.setVisible(false)
     reset_status
     action_button.setLabel(TERMINATE_TEXT)
 
@@ -60,11 +67,6 @@ class Gui::View::Mixing < Gui::View::Base
         else
           raise "Unknown event source: #{event.source}"
         end
-      end
-
-      if participant.nil? && director.nil?
-        # we are done, so shut down the data store
-        application.data_store.disconnect
       end
     end
   end
@@ -89,7 +91,13 @@ class Gui::View::Mixing < Gui::View::Base
   end
 
   def handle_participant_event(event)
-    update_status(event.type, event.message) if STATES.include?(event.type)
+    Gui::EventQueue.instance.sync_exec do
+      do_handle_participant_event(event)
+    end
+  end
+
+  def do_handle_participant_event(event)
+    update_status(event.type, event.options) if STATES.include?(event.type)
 
     if [:no_available_coin_join].include?(event.type)
       if director.nil?
@@ -100,17 +108,19 @@ class Gui::View::Mixing < Gui::View::Base
     elsif [:input_not_selected, :transaction_not_found].include?(event.type)
       # TODO: try again
     elsif event.type == :completed
+      handle_success(event.options[:transaction_id])
       self.participant = nil # done
-      handle_success
     elsif event.type == :failed
-      self.participant = nil # done
       handle_failure
+      self.participant = nil # done
     end
   end
 
-  def handle_success
+  def handle_success(transaction_id)
     progress_bar.setValue(progress_bar.getMaximum())
     action_button.setLabel("Done")
+    self.transaction_url = Coinmux::Config.instance.show_transaction_url % transaction_id
+    show_transaction_button.setVisible(true)
   end
 
   def handle_failure
@@ -119,6 +129,12 @@ class Gui::View::Mixing < Gui::View::Base
   end
 
   def handle_director_event(event)
+    Gui::EventQueue.instance.sync_exec do
+      do_handle_director_event(event)
+    end
+  end
+
+  def do_handle_director_event(event)
     if event.type == :waiting_for_inputs
       # our Director is now ready, so let's get started with a new participant
       self.participant = build_participant
@@ -132,12 +148,11 @@ class Gui::View::Mixing < Gui::View::Base
     update_status(:initializing)
   end
 
-  def update_status(state, message = nil)
+  def update_status(state, options = {})
     index = STATES.index(state)
 
     progress_bar.setValue(index)
     status_label.setText(state.to_s.capitalize.gsub(/_/, ' '))
-    message_text_field.setText(message.to_s)
   end
 
   def status_label
@@ -147,14 +162,16 @@ class Gui::View::Mixing < Gui::View::Base
     end
   end
 
-  def message_text_field
-    @message_text_field ||= JTextField.new.tap do |text_field|
-      text_field.setHorizontalAlignment(JTextField::CENTER)
-      text_field.setEditable(false)
-      text_field.setBorder(nil)
-      text_field.setBackground(UIManager.getColor("Label.background"))
-      text_field.setForeground(UIManager.getColor("Label.foreground"))
-      text_field.setFont(UIManager.getFont("Label.font"))
+  def show_transaction_button
+    @show_transaction_button ||= JButton.new.tap do |button|
+      button.setBorderPainted(false)
+      button.setText("View transaction")
+      button.setCursor(Cursor.getPredefinedCursor(Cursor::HAND_CURSOR))
+      button.setBackground(UIManager.getColor("Label.background"))
+      button.setForeground(Color.blue)
+      button.addActionListener do |e|
+        application.open_webpage(transaction_url)
+      end
     end
   end
 
@@ -167,12 +184,15 @@ class Gui::View::Mixing < Gui::View::Base
 
   def action_button
     @action_button ||= JButton.new(TERMINATE_TEXT).tap do |action_button|
-      action_button.add_action_listener do |e|
+      action_button.addActionListener() do |e|
         if action_button.getLabel() == TERMINATE_TEXT
           result = JOptionPane.showConfirmDialog(application.root_panel, "Are you sure you want to terminate this mix?", "Coinmux", JOptionPane::YES_NO_OPTION, JOptionPane::WARNING_MESSAGE)
           if result == JOptionPane::YES_OPTION
             application.show_view(:available_mixes)
+            # TODO: clean_up_coin_join
           end
+        else
+          application.show_view(:available_mixes)
         end
       end
     end

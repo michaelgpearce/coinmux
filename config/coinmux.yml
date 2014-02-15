@@ -5,13 +5,16 @@ development:
   # coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=coinjoin.coinmux.com:14141&port=14141'
   coin_join_uri: 'coinjoin://coinmux/p2p'
   webbtc_host: 'http://test.webbtc.com'
+  show_transaction_url: 'http://test.webbtc.com/tx/%s'
 
 test:
   bitcoin_network: 'testnet3'
   coin_join_uri: 'coinjoin://coinmux/test'
   webbtc_host: 'http://webbtc.example.com'
+  show_transaction_url: 'http://example.com/%s'
 
 production:
   bitcoin_network: 'mainnet'
   coin_join_uri: 'coinjoin://coinmux/p2p'
   webbtc_host: 'http://webbtc.com'
+  show_transaction_url: 'https://blockchain.info/tx/%s'

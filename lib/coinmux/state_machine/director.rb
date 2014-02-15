@@ -51,7 +51,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
 
   def failure(error_identifier, error_message = nil)
     if state != 'failed' # already failed so don't cause infinite loop
-      update_state('failed', nil, "#{error_identifier}: #{error_message}")
+      update_state('failed', message: "#{error_identifier}: #{error_message}")
     end
   end
   
@@ -104,7 +104,7 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
         if coin_join_message.transaction_signatures.value.size == coin_join_message.transaction.value.inputs.size
           notify(:publishing_transaction)
           publish_transaction do |transaction_id|
-            update_state('completed', transaction_id)
+            update_state('completed', transaction_id: transaction_id)
           end
         else
           continue_poll.call
@@ -113,18 +113,18 @@ class Coinmux::StateMachine::Director < Coinmux::StateMachine::Base
     end
   end
 
-  def update_state(state, transaction_id = nil, message = nil, &block)
+  def update_state(state, options = {}, &block)
     info("director updating state to #{state}")
 
     self.state = state
-    insert_current_status_message(transaction_id) do
-      notify(state.to_sym, message)
+    insert_current_status_message(options[:transaction_id]) do
+      notify(state.to_sym, options)
       yield if block_given?
     end
   end
 
   def update_state_and_poll(state, transaction_id = nil, &block)
-    update_state(state, transaction_id) do
+    update_state(state, transaction_id: transaction_id) do
       poll_for_state(state, &block)
     end
   end

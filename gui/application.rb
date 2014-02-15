@@ -9,6 +9,9 @@ class Gui::Application < Java::JavaxSwing::JFrame
 
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
+  import 'java.awt.Desktop'
+  import 'java.net.URL'
+  import 'java.net.URI'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.BoxLayout'
   import 'javax.swing.ImageIcon'
@@ -58,6 +61,10 @@ class Gui::Application < Java::JavaxSwing::JFrame
         end
       end
     end
+  end
+
+  def open_webpage(url_string)
+    Desktop.getDesktop().browse(URL.new(url_string).toURI()) rescue puts $!
   end
 
   def show_error_dialog(*error_messages)

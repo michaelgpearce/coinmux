@@ -73,12 +73,13 @@ class Cli::Application
   def notification_callback
     @notification_callback ||= Proc.new do |event|
       debug "event queue event received: #{event.inspect}"
+      message = event.options[:message]
       if event.type == :failed
-        message "Error - #{event.message}", event.source
+        message "Error - #{message}", event.source
         message "Quitting..."
         self.director = self.participant = nil # end execution
       else
-        message "#{event.type.to_s.humanize.capitalize}#{" - #{event.message}" if event.message}", event.source
+        message "#{event.type.to_s.humanize.capitalize}#{" - #{message}" if message}", event.source
         if event.source == :participant
           handle_participant_event(event)
         elsif event.source == :director

@@ -31,9 +31,9 @@ class Coinmux::StateMachine::Base
     self.class.name.gsub(/.*::/, '').downcase.to_sym
   end
 
-  def notify(type, message = nil)
-    info "notify: #{source} #{type} #{message}"
-    event = Coinmux::StateMachine::Event.new(source: source, type: type, message: message)
+  def notify(type, options = {})
+    info "notify: #{source} #{type} #{options}"
+    event = Coinmux::StateMachine::Event.new(source: source, type: type, options: options)
     event_queue.sync_exec do
       notification_callback.call(event)
     end
