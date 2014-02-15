@@ -26,6 +26,9 @@ require 'gui/view/available_mixes'
 require 'gui/view/mix_settings'
 require 'gui/view/mixing'
 require 'gui/view/preferences'
+
+require 'gui/component/link_button'
+
 require 'gui/application'
 
 Gui::Application.new.start

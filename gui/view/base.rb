@@ -3,7 +3,6 @@ class Gui::View::Base
 
   attr_accessor :application, :root_panel, :primary_button
 
-  import 'java.awt.Cursor'
   import 'java.awt.Dimension'
   import 'java.awt.Font'
   import 'java.awt.FlowLayout'
@@ -18,13 +17,21 @@ class Gui::View::Base
   import 'javax.swing.JLabel'
   import 'javax.swing.JPanel'
   import 'javax.swing.JSeparator'
-  import 'javax.swing.UIManager'
 
   def initialize(application, root_panel)
     @application = application
     @root_panel = root_panel
 
     root_panel.add(container)
+  end
+
+  def add
+    handle_add
+
+    JPanel.new(GridBagLayout.new).tap do |container|
+      container.add(about_button, build_grid_bag_constraints(fill: :none, anchor: :east))
+      footer.add(container, build_grid_bag_constraints(fill: :horizontal))
+    end
   end
 
   # subclasses should not override, override handle_show instead
@@ -37,6 +44,10 @@ class Gui::View::Base
   protected
 
   def handle_show
+    # override in subclass
+  end
+
+  def handle_add
     # override in subclass
   end
 
@@ -62,7 +73,7 @@ class Gui::View::Base
     container = JPanel.new
     container.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0))
     container.setLayout(GridLayout.new(0, 1))
-    footer.add(container, build_grid_bag_constraints(fill: :horizontal))
+    buttons.add(container, build_grid_bag_constraints(fill: :horizontal))
 
     container.add(JSeparator.new)
 
@@ -161,10 +172,20 @@ class Gui::View::Base
     end
   end
 
+  def buttons
+    @buttons ||= JPanel.new(GridBagLayout.new).tap do |buttons|
+      container.add(buttons, build_grid_bag_constraints(
+        gridy: 2,
+        fill: :horizontal,
+        anchor: :south))
+    end
+  end
+
   def footer
     @footer ||= JPanel.new(GridBagLayout.new).tap do |footer|
       container.add(footer, build_grid_bag_constraints(
-        gridy: 2,
+        gridy: 3,
+        insets: Insets.new(10, 0, 0, 0),
         fill: :horizontal,
         anchor: :south))
     end
@@ -175,13 +196,18 @@ class Gui::View::Base
   end
 
   def settings_button
-    @settings_button ||= JButton.new(settings_button_icon).tap do |settings_button|
-      settings_button.setBorderPainted(false)
-      settings_button.setMargin(Insets.new(0, 0, 0, 0))
-      settings_button.setCursor(Cursor.getPredefinedCursor(Cursor::HAND_CURSOR))
-      settings_button.setBackground(UIManager.getColor("Label.background"))
+    @settings_button ||= Gui::Component::LinkButton.new.tap do |settings_button|
+      settings_button.setIcon(settings_button_icon)
       settings_button.addActionListener() do |e|
         application.show_preferences
+      end
+    end
+  end
+
+  def about_button
+    @about_button ||= Gui::Component::LinkButton.new("About Coinmux").tap do |button|
+      button.addActionListener() do |e|
+        application.show_about
       end
     end
   end

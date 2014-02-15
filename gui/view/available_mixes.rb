@@ -12,7 +12,13 @@ class Gui::View::AvailableMixes < Gui::View::Base
   import 'javax.swing.table.AbstractTableModel'
   import 'javax.swing.table.TableModel'
 
-  def add
+  def update_mixes_table(mixes_data)
+    mixes_table.setMixesData(mixes_data)
+  end
+
+  protected
+
+  def handle_add
     add_header("Mix Your Bitcoins", show_settings: true)
 
     add_row do |parent|
@@ -39,10 +45,6 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     end
 
     add_button_row(join_button, create_button)
-  end
-
-  def update_mixes_table(mixes_data)
-    mixes_table.setMixesData(mixes_data)
   end
 
   private

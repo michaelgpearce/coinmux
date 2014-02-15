@@ -17,7 +17,9 @@ class Gui::View::MixSettings < Gui::View::Base
   import 'javax.swing.SpinnerNumberModel'
   import 'javax.swing.SwingWorker'
 
-  def add
+  protected
+
+  def handle_add
     add_header("Mix Settings")
 
     add_form_row("Bitcoin Amount (BTC)", amount, 0, width: 100, tool_tip: "Bitcoin amount mixed with other participants and sent to the output address")
@@ -32,8 +34,6 @@ class Gui::View::MixSettings < Gui::View::Base
 
     add_button_row(start_button, cancel_button)
   end
-
-  protected
 
   def handle_show
     bitcoin_amount = (application.amount || DEFAULT_AMOUNT).to_f / SATOSHIS_PER_BITCOIN

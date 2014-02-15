@@ -117,6 +117,11 @@ class Gui::Application < Java::JavaxSwing::JFrame
     end
   end
 
+  def show_about
+    icon = ImageIcon.new(Coinmux::FileUtil.read_content_as_java_bytes('gui', 'assets', 'icon_80.png'))
+    JOptionPane.showMessageDialog(root_panel, "Coinmux\nVersion: #{Coinmux::VERSION}", "About", JOptionPane::INFORMATION_MESSAGE, icon)
+  end
+
   private
 
   def load_preferences_panel_and_view
@@ -156,11 +161,6 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def quit
     Java::JavaLang::System.exit(0)
     # clean_up_coin_join
-  end
-
-  def show_about
-    icon = ImageIcon.new(File.join(Coinmux.root, 'gui', 'assets', 'icon_80.png'))
-    JOptionPane.showMessageDialog(root_panel, "Coinmux\nVersion: #{Coinmux::VERSION}", "About", JOptionPane::INFORMATION_MESSAGE, icon)
   end
 
   def views

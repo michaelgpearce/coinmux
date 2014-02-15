@@ -4,9 +4,7 @@ class Gui::View::Mixing < Gui::View::Base
 
   attr_accessor :director, :participant, :transaction_url
 
-  import 'java.awt.Color'
   import 'java.awt.Component'
-  import 'java.awt.Cursor'
   import 'java.awt.Dimension'
   import 'java.awt.GridLayout'
   import 'javax.swing.BorderFactory'
@@ -14,10 +12,10 @@ class Gui::View::Mixing < Gui::View::Base
   import 'javax.swing.JOptionPane'
   import 'javax.swing.JPanel'
   import 'javax.swing.JProgressBar'
-  import 'javax.swing.JTextField'
-  import 'javax.swing.UIManager'
 
-  def add
+  protected
+
+  def handle_add
     add_header("Mixing")
 
     add_row do |parent|
@@ -39,8 +37,6 @@ class Gui::View::Mixing < Gui::View::Base
 
     add_button_row(action_button)
   end
-
-  protected
 
   def handle_show
     transaction_url = nil
@@ -163,12 +159,7 @@ class Gui::View::Mixing < Gui::View::Base
   end
 
   def show_transaction_button
-    @show_transaction_button ||= JButton.new.tap do |button|
-      button.setBorderPainted(false)
-      button.setText("View transaction")
-      button.setCursor(Cursor.getPredefinedCursor(Cursor::HAND_CURSOR))
-      button.setBackground(UIManager.getColor("Label.background"))
-      button.setForeground(Color.blue)
+    @show_transaction_button ||= Gui::Component::LinkButton.new("View transaction").tap do |button|
       button.addActionListener do |e|
         application.open_webpage(transaction_url)
       end
