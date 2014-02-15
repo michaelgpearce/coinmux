@@ -1,3 +1,5 @@
+require 'thread'
+
 class Coinmux::Application::AvailableCoinJoins
   include Coinmux::Facades, Coinmux::Threading
 
@@ -10,9 +12,7 @@ class Coinmux::Application::AvailableCoinJoins
   # Yields with a Coinmux::Event with Hash data: amount, total_participants, waiting_participants.
   def find(&callback)
     if block_given?
-      Thread.new do
-        do_find(&callback)
-      end
+      do_find(&callback)
     else
       event = wait_for_callback(:do_find, &callback)[0]
 
@@ -34,28 +34,42 @@ class Coinmux::Application::AvailableCoinJoins
         available_coin_joins = []
         if !coin_join_messages.empty?
           waiting_for = coin_join_messages.size
+          waiting_for_mutex = Mutex.new
+
           coin_join_messages.each do |coin_join_message|
             coin_join_message.status.refresh do |event|
               if event.error
                 yield(event)
               else
-                if coin_join_message.status.try(:value).try(:state) == 'waiting_for_inputs'
+                if coin_join_message.status.try(:value).try(:state) != 'waiting_for_inputs'
+                  waiting_for_mutex.synchronize do
+                    waiting_for -= 1
+                  end
+                else
                   coin_join_message.inputs.refresh do |event|
                     if event.error
                       yield(event)
                     else
-                      if coin_join_message.inputs.value.size < coin_join_message.participants
-                        available_coin_joins << {
-                          amount: coin_join_message.amount,
-                          total_participants: coin_join_message.participants,
-                          waiting_participants: coin_join_message.inputs.value.size
-                        }
+                      waiting_for_mutex.synchronize do
+                        waiting_for -= 1
+                        if coin_join_message.inputs.value.size < coin_join_message.participants
+                          available_coin_joins << {
+                            amount: coin_join_message.amount,
+                            total_participants: coin_join_message.participants,
+                            waiting_participants: coin_join_message.inputs.value.size
+                          }
+                        end
                       end
                     end
                   end
                 end
               end
             end
+          end
+
+          # we'll block until we get status/inputs for each message. not sure elegant async way to do this
+          while waiting_for_mutex.synchronize { waiting_for > 0 }
+            sleep(0.1)
           end
         end
 
