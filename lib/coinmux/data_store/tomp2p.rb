@@ -5,6 +5,7 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
 
   DEFAULT_BOOTSTRAP_HOST = "coinjoin.coinmux.com"
   DEFAULT_P2P_PORT = 14141
+  PEER_DISCOVERY_TIMEOUT_SECONDS = 30
   
   import 'java.io.IOException'
   import 'java.net.InetAddress'
@@ -47,7 +48,7 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
       @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(local_port).makeAndListen()
       peer_address = PeerAddress.new(Number160::ZERO, address, bootstrap_port, bootstrap_port)
       @peer.getConfiguration().setBehindFirewall(true)
-      exec(@peer.discover().setPeerAddress(peer_address), callback) do |future|
+      exec(@peer.discover().setDiscoverTimeoutSec(PEER_DISCOVERY_TIMEOUT_SECONDS).setPeerAddress(peer_address), callback) do |future|
         if future.isSuccess()
           @peer.bootstrap().start()
           info "My external address is #{future.getPeerAddress()}"
