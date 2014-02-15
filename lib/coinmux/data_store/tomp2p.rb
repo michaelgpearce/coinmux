@@ -1,9 +1,7 @@
 require 'java'
 
-class Coinmux::DataStore::Tomp2p
+class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
   include Coinmux::Facades
-
-  attr_accessor :coin_join_uri
 
   DEFAULT_BOOTSTRAP_HOST = "coinjoin.coinmux.com"
   DEFAULT_P2P_PORT = 14141
@@ -22,10 +20,6 @@ class Coinmux::DataStore::Tomp2p
   import 'net.tomp2p.peers.Number160'
   import 'net.tomp2p.peers.PeerAddress'
   import 'net.tomp2p.storage.Data'
-
-  def initialize(coin_join_uri)
-    self.coin_join_uri = coin_join_uri
-  end
 
   def coin_join_identifier
     @coin_join_identifier ||= (coin_join_uri.params["identifier"] || "coinjoins-#{Coinmux.env}")
@@ -47,24 +41,30 @@ class Coinmux::DataStore::Tomp2p
     @local_port ||= (coin_join_uri.params["port"] || DEFAULT_P2P_PORT).to_i
   end
 
-  def startup(&callback)
-    address = Inet4Address.getByName(bootstrap_host)
-    @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(local_port).makeAndListen()
-    peer_address = PeerAddress.new(Number160::ZERO, address, bootstrap_port, bootstrap_port)
-    @peer.getConfiguration().setBehindFirewall(true)
-    exec(@peer.discover().setPeerAddress(peer_address), callback) do |future|
-      if future.isSuccess()
-        @peer.bootstrap().start()
-        info "My external address is #{future.getPeerAddress()}"
-        Coinmux::Event.new(data: future.getPeerAddress())
-      else
-        info "Failed #{future.getFailedReason()}"
-        Coinmux::Event.new(error: future.getFailedReason())
+  def connect(&callback)
+    begin
+      address = Inet4Address.getByName(bootstrap_host)
+      @peer = PeerMaker.new(Number160.new(Random.new)).setPorts(local_port).makeAndListen()
+      peer_address = PeerAddress.new(Number160::ZERO, address, bootstrap_port, bootstrap_port)
+      @peer.getConfiguration().setBehindFirewall(true)
+      exec(@peer.discover().setPeerAddress(peer_address), callback) do |future|
+        if future.isSuccess()
+          @peer.bootstrap().start()
+          info "My external address is #{future.getPeerAddress()}"
+          self.connected = true
+          Coinmux::Event.new(data: future.getPeerAddress())
+        else
+          info "Failed #{future.getFailedReason()}"
+          Coinmux::Event.new(error: future.getFailedReason())
+        end
       end
+    rescue
+      yield(Coinmux::Event.new(error: $!.to_s))
     end
   end
 
-  def shutdown(&callback)
+  def disconnect(&callback)
+    self.connected = false
     @peer.shutdown
   end
 
@@ -231,6 +231,9 @@ class Coinmux::DataStore::Tomp2p
   end
 
   def do_get_list(key, &callback)
+    # peer.get(create_hash(key)).setAll()
+    Thread.new do
+    peer.get(create_hash(key))
     exec(peer.get(create_hash(key)).setAll(), callback) do |future|
       if future.isSuccess()
         hashes = future.getDataMap().values().each_with_object([]) do |value, hashes|
@@ -258,6 +261,7 @@ class Coinmux::DataStore::Tomp2p
       else
         Coinmux::Event.new(error: future.getFailedReason())
       end
+    end
     end
     nil
   end

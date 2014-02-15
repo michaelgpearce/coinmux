@@ -2,9 +2,10 @@ class Coinmux::DataStore::Base
   include Coinmux::Facades
   DATA_TIME_TO_LIVE = 1 * 60 * 60
 
-  attr_accessor :coin_join_uri
+  attr_accessor :coin_join_uri, :connected
 
   def initialize(coin_join_uri)
+    self.connected = false
     self.coin_join_uri = coin_join_uri
   end
 
@@ -12,11 +13,13 @@ class Coinmux::DataStore::Base
     "#{coin_join_uri.params["identifier"] || "default"}-rw"
   end
 
-  def startup(&callback)
-    yield(Coinmux::Event.new) if block_given?
+  def connect(&callback)
+    self.connected = true
+    yield(Coinmux::Event.new)
   end
 
-  def shutdown(&callback)
+  def disconnect(&callback)
+    self.connected = false
     yield(Coinmux::Event.new) if block_given?
   end
 
@@ -38,6 +41,7 @@ class Coinmux::DataStore::Base
 
   def insert(identifier, data, &callback)
     raise "Cannot insert" unless identifier_can_insert?(identifier)
+    raise "Data store not connected" unless connected
 
     key = key_from_identifier(identifier)
 
@@ -74,6 +78,8 @@ class Coinmux::DataStore::Base
   end
 
   def fetch(identifier)
+    raise "Data store not connected" unless connected
+
     key = key_from_identifier(identifier)
 
     data = (read(key) || []).clone

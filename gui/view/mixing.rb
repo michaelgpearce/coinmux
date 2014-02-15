@@ -41,8 +41,6 @@ class Gui::View::Mixing < Gui::View::Base
     reset_status
     action_button.setLabel(TERMINATE_TEXT)
 
-    application.data_store.startup
-
     self.participant = build_participant
     participant.start(&notification_callback)
   end
@@ -66,7 +64,7 @@ class Gui::View::Mixing < Gui::View::Base
 
       if participant.nil? && director.nil?
         # we are done, so shut down the data store
-        application.data_store.shutdown
+        application.data_store.disconnect
       end
     end
   end

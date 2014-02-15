@@ -20,11 +20,11 @@ class Cli::Application
   end
 
   def list_coin_joins
-    data_store.startup
+    data_store.connect
 
     run_list_coin_joins
 
-    data_store.shutdown
+    data_store.disconnect
   end
 
   def start
@@ -56,7 +56,7 @@ class Cli::Application
 
     message "Starting..."
 
-    data_store.startup
+    data_store.connect
 
     Cli::EventQueue.instance.start
 
@@ -65,7 +65,7 @@ class Cli::Application
 
     Cli::EventQueue.instance.wait
 
-    data_store.shutdown
+    data_store.disconnect
   end
 
   private

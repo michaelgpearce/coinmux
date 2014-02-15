@@ -50,7 +50,13 @@ class Gui::Application < Java::JavaxSwing::JFrame
     end
 
     Gui::EventQueue.instance.future_exec(2) do # show "loading" for a couple of seconds minimum
-      refresh_mixes_table
+      data_store.connect do |event|
+        if event.error
+          show_error_dialog("Unable to connect to data store: #{event.error}")
+        else
+          refresh_mixes_table
+        end
+      end
     end
   end
 
