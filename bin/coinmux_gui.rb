@@ -16,15 +16,9 @@ if Coinmux.os == :macosx
 end
 
 module Gui
-  module Model; end
   module View; end
+  module Component; end
 end
-
-require 'gui/model/base'
-require 'gui/model/transaction'
-require 'gui/model/input'
-require 'gui/model/output'
-require 'gui/model/coin_join'
 
 require 'gui/event_queue'
 require 'gui/view/base'
