@@ -13,7 +13,7 @@ class Gui::View::AvailableMixes < Gui::View::Base
   import 'javax.swing.table.TableModel'
 
   def add
-    add_header("Mix Your Bitcoins")
+    add_header("Mix Your Bitcoins", show_settings: true)
 
     add_row do |parent|
       label = JTextArea.new(<<-STRING)

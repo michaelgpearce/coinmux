@@ -101,6 +101,22 @@ class Gui::Application < Java::JavaxSwing::JFrame
     @data_store ||= Coinmux::DataStore::Factory.build(coin_join_uri)
   end
 
+  def show_preferences
+    JDialog.new(self, "Coinmux", true).tap do |dialog|
+      panel = JPanel.new
+      panel.setBorder(create_frame_border)
+      panel.add(preferences_panel)
+      dialog.add(panel)
+      dialog.pack
+      dialog.setLocationRelativeTo(self)
+
+      # show once part of dialog
+      preferences_view.show
+
+      dialog.show
+    end
+  end
+
   private
 
   def load_preferences_panel_and_view
@@ -140,22 +156,6 @@ class Gui::Application < Java::JavaxSwing::JFrame
   def quit
     Java::JavaLang::System.exit(0)
     # clean_up_coin_join
-  end
-
-  def show_preferences
-    JDialog.new(self, "Coinmux", true).tap do |dialog|
-      panel = JPanel.new
-      panel.setBorder(create_frame_border)
-      panel.add(preferences_panel)
-      dialog.add(panel)
-      dialog.pack
-      dialog.setLocationRelativeTo(self)
-
-      # show once part of dialog
-      preferences_view.show
-
-      dialog.show
-    end
   end
 
   def show_about

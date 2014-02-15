@@ -3,6 +3,7 @@ class Gui::View::Base
 
   attr_accessor :application, :root_panel, :primary_button
 
+  import 'java.awt.Cursor'
   import 'java.awt.Dimension'
   import 'java.awt.Font'
   import 'java.awt.FlowLayout'
@@ -12,9 +13,12 @@ class Gui::View::Base
   import 'java.awt.Insets'
   import 'javax.swing.BorderFactory'
   import 'javax.swing.BoxLayout'
+  import 'javax.swing.ImageIcon'
+  import 'javax.swing.JButton'
   import 'javax.swing.JLabel'
   import 'javax.swing.JPanel'
   import 'javax.swing.JSeparator'
+  import 'javax.swing.UIManager'
 
   def initialize(application, root_panel)
     @application = application
@@ -36,10 +40,18 @@ class Gui::View::Base
     # override in subclass
   end
 
-  def add_header(text)
+  def add_header(text, options = {})
     label = JLabel.new(text, JLabel::CENTER)
-    label.setFont(Font.new(label.getFont().getName(), Font::BOLD, (label.getFont().getSize() * 1.5).to_i))
+    label.setFont(Font.new(label.getFont().getName(), Font::BOLD, 24))
     header.add(label, build_grid_bag_constraints(fill: :horizontal, anchor: :center))
+
+    if options[:show_settings]
+      header.add(settings_button, build_grid_bag_constraints(
+        gridx: 1,
+        fill: :none,
+        weightx: 0.00000001,
+        anchor: :east))
+    end
   end
 
   def add_row(&block)
@@ -155,6 +167,22 @@ class Gui::View::Base
         gridy: 2,
         fill: :horizontal,
         anchor: :south))
+    end
+  end
+
+  def settings_button_icon
+    @settings_button_icon ||= ImageIcon.new(Coinmux::FileUtil.read_content_as_java_bytes('gui', 'assets', 'settings_24.png'))
+  end
+
+  def settings_button
+    @settings_button ||= JButton.new(settings_button_icon).tap do |settings_button|
+      settings_button.setBorderPainted(false)
+      settings_button.setMargin(Insets.new(0, 0, 0, 0))
+      settings_button.setCursor(Cursor.getPredefinedCursor(Cursor::HAND_CURSOR))
+      settings_button.setBackground(UIManager.getColor("Label.background"))
+      settings_button.addActionListener() do |e|
+        application.show_preferences
+      end
     end
   end
 end
