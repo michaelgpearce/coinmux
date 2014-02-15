@@ -42,6 +42,8 @@ class Gui::View::MixSettings < Gui::View::Base
     participants.setValue(application.participants || DEFAULT_PARTICIPANTS)
     participants.setEnabled(application.participants.nil?)
     input_private_key.setText("")
+    output_address.setText("")
+    change_address.setText("")
   end
 
   private
