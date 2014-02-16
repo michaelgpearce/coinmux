@@ -8,9 +8,12 @@
 * May have single point of failure (i.e. webbtc HTTP API) and not be fully decentralized
 * May not be fully anonymous (i.e. IP address leaked during P2P connections)
 
-### v0.2 - Functional Beta
+### v0.2 - Graphical User Interface
 
 * Graphical user interface available
+
+### v0.3 - Functional Beta
+
 * Creates transactions with no bad actors present
 * Works for Mainnet usage for advanced users
 * Remove single points of failure
@@ -18,7 +21,7 @@
 * Support multiple input addresses during CoinJoin (proper fee calculation required)
 * Allow single transaction input with value equal to CoinJoin amount to pay 0 transaction fee for rejoining
 
-### v0.3 - Improve deterrence of bad actors
+### v0.4 - Improve deterrence of bad actors
 
 * Ensure that all participants are active (signature of current Director status?)
 * Add proof of work for posting inputs / creating new CoinJoin (?)
