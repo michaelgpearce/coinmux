@@ -36,4 +36,15 @@ class Coinmux::CoinJoinUri
       send("#{key}=", value)
     end
   end
+
+  def to_s
+    params_s = params.collect { |key, value| "#{key}=#{value}" }.join("&")
+    "coinjoin://#{application}/#{network}#{params_s.blank? ? '' : "?#{params_s}"}"
+  end
+
+  def ==(other)
+    return false unless other.is_a?(Coinmux::CoinJoinUri)
+
+    return application == other.application && network == other.network && params == other.params
+  end
 end
