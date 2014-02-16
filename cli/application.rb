@@ -51,29 +51,27 @@ class Cli::Application
     # ensure we have the key in hex
     self.input_private_key = bitcoin_crypto_facade.private_key_to_hex!(input_private_key)
 
-    Kernel.trap('SIGINT') { clean_up_coin_join }
-    Kernel.trap('SIGTERM') { clean_up_coin_join }
-
     message "Starting..."
 
     data_store.connect
 
     Cli::EventQueue.instance.start
 
-    build_mixer.tap do |mixer|
-      mixer.start do |event|
-        if event.source == :mixer && event.type == :done
-          Cli::EventQueue.instance.stop
+    Kernel.trap('SIGINT') { clean_up_coin_join }
+    Kernel.trap('SIGTERM') { clean_up_coin_join }
+
+    mixer.start do |event|
+      if event.source == :mixer && event.type == :done
+        Cli::EventQueue.instance.stop
+      else
+        message = event.options[:message]
+        if event.type == :failed
+          message "Error - #{message}", event.source
+          message "Quitting..."
         else
-          message = event.options[:message]
-          if event.type == :failed
-            message "Error - #{message}", event.source
-            message "Quitting..."
-          else
-            message "#{event.type.to_s.humanize.capitalize}#{" - #{message}" if message}", event.source
-            if event.source == :participant && event.type == :completed
-              message "CoinJoin successfully created!"
-            end
+          message "#{event.type.to_s.humanize.capitalize}#{" - #{message}" if message}", event.source
+          if event.source == :participant && event.type == :completed
+            message "CoinJoin successfully created!"
           end
         end
       end
@@ -85,6 +83,10 @@ class Cli::Application
   end
 
   private
+
+  def mixer
+    @mixer ||= build_mixer
+  end
 
   def build_mixer
     Coinmux::Application::Mixer.new(
@@ -98,15 +100,12 @@ class Cli::Application
   end
 
   def clean_up_coin_join
-    # TODO
-    # warning "Cleaning up coin_join"
-    # if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
-    #   director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
-    #     Cli::EventQueue.instance.stop
-    #   end
-    # else
-    #   Cli::EventQueue.instance.stop
-    # end
+    if mixer
+      message "Canceling..."
+      mixer.cancel do
+        Cli::EventQueue.instance.stop
+      end
+    end
   end
 
   def run_list_coin_joins

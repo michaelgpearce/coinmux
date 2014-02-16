@@ -204,11 +204,23 @@ class Gui::Application < Java::JavaxSwing::JFrame
     setLocationRelativeTo(nil)
     self.coin_join_uri = preferences_view.coin_join_uri
 
+    Java::JavaLang::Runtime.getRuntime().addShutdownHook(Java::JavaLang::Thread.new do
+      clean_up_mixing
+    end)
+
     yield
 
     pack
     setVisible(true)
     root_panel.revalidate() # OSX opening with no content about 20% of time. :(
+  end
+
+  def clean_up_mixing
+    if current_view == :mixing && (mixer = views[:mixing].mixer)
+      Coinmux::Threading.wait_for_callback(mixer, :cancel) do
+        # do nothing
+      end
+    end
   end
 
   if Coinmux.os == :macosx

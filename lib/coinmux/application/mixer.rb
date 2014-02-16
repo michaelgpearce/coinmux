@@ -20,6 +20,17 @@ class Coinmux::Application::Mixer
     participant.start(&mixer_callback)
   end
 
+  def cancel(&callback)
+    if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
+      director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
+        yield if block_given?
+      end
+    else
+      yield if block_given?
+    end
+  end
+
+
   private
 
   def notify_event(event)

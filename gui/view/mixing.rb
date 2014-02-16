@@ -2,7 +2,7 @@ class Gui::View::Mixing < Gui::View::Base
   STATES = [:initializing, :waiting_for_other_inputs, :waiting_for_other_outputs, :waiting_for_completed, :completed]
   TERMINATE_TEXT = "Terminate"
 
-  attr_accessor :director, :participant, :transaction_url
+  attr_accessor :director, :participant, :transaction_url, :mixer
 
   import 'java.awt.Component'
   import 'java.awt.Dimension'
@@ -44,7 +44,7 @@ class Gui::View::Mixing < Gui::View::Base
     reset_status
     action_button.setLabel(TERMINATE_TEXT)
 
-    build_mixer.start do |event|
+    (self.mixer = build_mixer).start do |event|
       if event.source == :participant && STATES.include?(event.type)
         Gui::EventQueue.instance.sync_exec do
           update_status(event.type, event.options)
