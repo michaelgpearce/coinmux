@@ -23,7 +23,7 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
   import 'net.tomp2p.storage.Data'
 
   def coin_join_identifier
-    @coin_join_identifier ||= (coin_join_uri.params["identifier"] || "coinjoins-#{Coinmux.env}")
+    @coin_join_identifier ||= (coin_join_uri.params["identifier"] || "coinjoins#{Coinmux.env == 'production' ? "" : "-#{Coinmux.env}"}")
   end
 
   def bootstrap_host

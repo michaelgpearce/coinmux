@@ -12,7 +12,7 @@ mainnet:
   name: 'Mainnet'
   bitcoin_network: 'mainnet'
   coin_join_uris:
-    p2p: 'coinjoin://coinmux/p2p?identifier=coinjoins-production&bootstrap=mix.coinmux.com:14141&port=14141'
+    p2p: 'coinjoin://coinmux/p2p?identifier=coinjoins&bootstrap=mix.coinmux.com:14141&port=14141'
     filesystem: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
   webbtc_host: 'http://webbtc.com'
   show_transaction_url: 'https://blockchain.info/tx/%s'
