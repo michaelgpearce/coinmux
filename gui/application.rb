@@ -106,7 +106,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
       dialog.pack
       dialog.setLocationRelativeTo(self)
 
-      # show once part of dialog
+      # show after added to dialog
       preferences_view.show
 
       dialog.show
