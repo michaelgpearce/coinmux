@@ -55,6 +55,7 @@ class Gui::View::Preferences < Gui::View::Base
 
   def handle_show
     self.success = false
+    save_button.setEnabled(application.current_view == :available_mixes)
   end
 
   private

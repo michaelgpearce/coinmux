@@ -5,7 +5,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   HEIGHT = 450
   MIXES_TABLE_REFRESH_SECONDS = 5
 
-  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri, :input_private_key, :output_address, :change_address
+  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri, :input_private_key, :output_address, :change_address, :current_view
 
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
@@ -76,6 +76,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   def show_view(view)
+    self.current_view = view
     views[view].show
     card_panel.getLayout().show(card_panel, view.to_s)
   end
