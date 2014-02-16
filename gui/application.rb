@@ -22,9 +22,6 @@ class Gui::Application < Java::JavaxSwing::JFrame
 
   def initialize
     super Coinmux::BANNER
-
-    self.coin_join_uri = Coinmux::CoinJoinUri.new(network: 'p2p')
-    self.bitcoin_network = :testnet
   end
 
   def start
@@ -110,6 +107,15 @@ class Gui::Application < Java::JavaxSwing::JFrame
       preferences_view.show
 
       dialog.show
+      if preferences_view.success && coin_join_uri != preferences_view.coin_join_uri
+        if data_store.connected
+          data_store.disconnect
+        end
+        self.coin_join_uri = preferences_view.coin_join_uri
+        @data_store = nil # lazy load again
+        views[:available_mixes].update
+        connect_data_store
+      end
     end
   end
 
@@ -196,6 +202,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
     setDefaultCloseOperation JFrame::EXIT_ON_CLOSE
     setSize(Dimension.new(WIDTH, HEIGHT)) # even though pack() resizes, this helps start the window in the right location on screen
     setLocationRelativeTo(nil)
+    self.coin_join_uri = preferences_view.coin_join_uri
 
     yield
 
