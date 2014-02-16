@@ -2,13 +2,45 @@ require 'yaml'
 require 'erb'
 
 class Coinmux::Config
-  include Coinmux::Proper, Singleton
+  include Coinmux::Proper
 
-  property :bitcoin_network, :coin_join_uri, :webbtc_host, :show_transaction_url
+  CONFIG = YAML.load(ERB.new(Coinmux::FileUtil.read_content('config', 'coinmux.yml')).result)
+
+  property :name, :bitcoin_network, :coin_join_uris, :webbtc_host, :show_transaction_url
   
-  def initialize
-    YAML.load(ERB.new(Coinmux::FileUtil.read_content('config', 'coinmux.yml')).result)[Coinmux.env].each do |key, value|
+  class << self
+    def configs
+      @configs ||= %w(mainnet testnet test).each_with_object({}) do |config_key, configs|
+        configs[config_key] = self.new(config_key)
+      end
+    end
+
+    %w(mainnet testnet test).each do |config_key|
+      define_method(config_key) do
+        self[config_key]
+      end
+    end
+
+    def [](config_key)
+      configs[config_key]
+    end
+
+    def instance
+      case Coinmux.env
+      when 'production'; mainnet
+      when 'development'; testnet
+      when 'test'; test
+      end
+    end
+  end
+
+  def initialize(config_key)
+    CONFIG[config_key].each do |key, value|
       self[key] = value
     end
+  end
+
+  def coin_join_uri
+    coin_join_uris.first
   end
 end

@@ -1,20 +1,28 @@
 ---
-development:
+testnet:
+  name: 'Testnet'
   bitcoin_network: 'testnet3'
-  # coin_join_uri: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
-  # coin_join_uri: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=coinjoin.coinmux.com:14141&port=14141'
-  coin_join_uri: 'coinjoin://coinmux/p2p'
+  coin_join_uris:
+    p2p: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=mix.coinmux.com:14141&port=14141'
+    filesystem: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
   webbtc_host: 'http://test.webbtc.com'
   show_transaction_url: 'http://test.webbtc.com/tx/%s'
 
+mainnet:
+  name: 'Mainnet'
+  bitcoin_network: 'mainnet'
+  coin_join_uris:
+    p2p: 'coinjoin://coinmux/p2p?identifier=coinjoins-production&bootstrap=mix.coinmux.com:14141&port=14141'
+    filesystem: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
+  webbtc_host: 'http://webbtc.com'
+  show_transaction_url: 'https://blockchain.info/tx/%s'
+
 test:
+  name: 'Test'
   bitcoin_network: 'testnet3'
-  coin_join_uri: 'coinjoin://coinmux/test'
+  coin_join_uris:
+    p2p: 'coinjoin://coinmux/test'
+    filesystem: 'coinjoin://coinmux/test'
   webbtc_host: 'http://webbtc.example.com'
   show_transaction_url: 'http://example.com/%s'
 
-production:
-  bitcoin_network: 'mainnet'
-  coin_join_uri: 'coinjoin://coinmux/p2p'
-  webbtc_host: 'http://webbtc.com'
-  show_transaction_url: 'https://blockchain.info/tx/%s'
