@@ -47,6 +47,11 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     add_button_row(join_button, create_button)
   end
 
+  def handle_show
+    update_join_button_enabled
+    update_create_button_enabled
+  end
+
   private
 
   class MixesTable < JTable
@@ -208,18 +213,22 @@ Your bitcoins are mixed with other Coinmux users on the Internet, but your priva
     @mixes_table ||= MixesTable.new.tap do |mixes_table|
       mixes_table.setSelectionMode(ListSelectionModel::SINGLE_SELECTION)
       mixes_table.getSelectionModel().addListSelectionListener do |e|
-        update_join_enabled
+        update_join_button_enabled
       end
 
       mixes_table.getModel().addTableModelListener do |e|
-        update_join_enabled
+        update_join_button_enabled
       end
     end
   end
 
-  def update_join_enabled
-    enabled = !mixes_table.getSelectionModel().isSelectionEmpty() && mixes_table.hasMixes()
-    join_button.setEnabled(enabled)
+  def update_create_button_enabled
+    create_button.setEnabled(application.data_store.connected)
+  end
+
+  def update_join_button_enabled
+    has_selected_mix = !mixes_table.getSelectionModel().isSelectionEmpty() && mixes_table.hasMixes()
+    join_button.setEnabled(application.data_store.connected && has_selected_mix)
   end
 end
 

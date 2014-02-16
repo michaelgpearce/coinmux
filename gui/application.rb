@@ -49,17 +49,12 @@ class Gui::Application < Java::JavaxSwing::JFrame
         end
       end
 
+      views[:available_mixes].update
       show_view(:available_mixes)
     end
 
     Gui::EventQueue.instance.future_exec(2) do # show "loading" for a couple of seconds minimum
-      data_store.connect do |event|
-        if event.error
-          show_error_dialog("Unable to connect to data store: #{event.error}")
-        else
-          refresh_mixes_table
-        end
-      end
+      connect_data_store
     end
   end
 
@@ -124,6 +119,17 @@ class Gui::Application < Java::JavaxSwing::JFrame
   end
 
   private
+
+  def connect_data_store
+    data_store.connect do |event|
+      if event.error
+        show_error_dialog("Unable to connect to data store: #{event.error}")
+      else
+        views[:available_mixes].update
+        refresh_mixes_table
+      end
+    end
+  end
 
   def load_preferences_panel_and_view
     return if @preferences_panel.present? && @preferences_view.nil?

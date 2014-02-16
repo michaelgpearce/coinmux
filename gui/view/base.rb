@@ -41,6 +41,10 @@ class Gui::View::Base
     handle_show
   end
 
+  def update
+    show
+  end
+
   protected
 
   def handle_show
