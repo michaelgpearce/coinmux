@@ -44,31 +44,25 @@ class Gui::View::Mixing < Gui::View::Base
     reset_status
     action_button.setLabel(TERMINATE_TEXT)
 
-    self.participant = build_participant
-    participant.start(&notification_callback)
-  end
+    build_mixer.start do |event|
+      if event.source == :participant && STATES.include?(event.type)
+        Gui::EventQueue.instance.sync_exec do
+          update_status(event.type, event.options)
 
-  private
-
-  def notification_callback
-    @notification_callback ||= Proc.new do |event|
-      debug "event queue event received: #{event.inspect}"
-      if event.type == :failed
-        self.director = self.participant = nil # end execution
-      else
-        if event.source == :participant
-          handle_participant_event(event)
-        elsif event.source == :director
-          handle_director_event(event)
-        else
-          raise "Unknown event source: #{event.source}"
+          if event.type == :completed
+            handle_success(event.options[:transaction_id])
+          elsif event.type == :failed
+            handle_failure
+          end
         end
       end
     end
   end
 
-  def build_participant
-    Coinmux::StateMachine::Participant.new(
+  private
+
+  def build_mixer
+    Coinmux::Application::Mixer.new(
       event_queue: Gui::EventQueue.instance,
       data_store: application.data_store,
       amount: application.amount,
@@ -76,40 +70,6 @@ class Gui::View::Mixing < Gui::View::Base
       input_private_key: application.input_private_key,
       output_address: application.output_address,
       change_address: application.change_address)
-  end
-
-  def build_director
-    Coinmux::StateMachine::Director.new(
-      event_queue: Gui::EventQueue.instance,
-      data_store: application.data_store,
-      amount: application.amount,
-      participants: application.participants)
-  end
-
-  def handle_participant_event(event)
-    Gui::EventQueue.instance.sync_exec do
-      do_handle_participant_event(event)
-    end
-  end
-
-  def do_handle_participant_event(event)
-    update_status(event.type, event.options) if STATES.include?(event.type)
-
-    if [:no_available_coin_join].include?(event.type)
-      if director.nil?
-        # start our own Director since we couldn't find one
-        self.director = build_director
-        director.start(&notification_callback)
-      end
-    elsif [:input_not_selected, :transaction_not_found].include?(event.type)
-      # TODO: try again
-    elsif event.type == :completed
-      handle_success(event.options[:transaction_id])
-      self.participant = nil # done
-    elsif event.type == :failed
-      handle_failure
-      self.participant = nil # done
-    end
   end
 
   def handle_success(transaction_id)
@@ -121,23 +81,6 @@ class Gui::View::Mixing < Gui::View::Base
 
   def handle_failure
     progress_bar.setValue(progress_bar.getMaximum())
-    # TODO: clean_up_coin_join
-  end
-
-  def handle_director_event(event)
-    Gui::EventQueue.instance.sync_exec do
-      do_handle_director_event(event)
-    end
-  end
-
-  def do_handle_director_event(event)
-    if event.type == :waiting_for_inputs
-      # our Director is now ready, so let's get started with a new participant
-      self.participant = build_participant
-      participant.start(&notification_callback)
-    elsif event.type == :failed || event.type == :completed
-      self.director = nil # done
-    end
   end
 
   def reset_status

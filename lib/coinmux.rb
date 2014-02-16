@@ -88,3 +88,4 @@ require 'lib/coinmux/state_machine/participant'
 
 require 'lib/coinmux/application/available_coin_joins'
 require 'lib/coinmux/application/input_validator'
+require 'lib/coinmux/application/mixer'

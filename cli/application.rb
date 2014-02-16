@@ -60,8 +60,24 @@ class Cli::Application
 
     Cli::EventQueue.instance.start
 
-    self.participant = build_participant
-    participant.start(&notification_callback)
+    build_mixer.tap do |mixer|
+      mixer.start do |event|
+        if event.source == :mixer && event.type == :done
+          Cli::EventQueue.instance.stop
+        else
+          message = event.options[:message]
+          if event.type == :failed
+            message "Error - #{message}", event.source
+            message "Quitting..."
+          else
+            message "#{event.type.to_s.humanize.capitalize}#{" - #{message}" if message}", event.source
+            if event.source == :participant && event.type == :completed
+              message "CoinJoin successfully created!"
+            end
+          end
+        end
+      end
+    end
 
     Cli::EventQueue.instance.wait
 
@@ -70,42 +86,27 @@ class Cli::Application
 
   private
 
-  def notification_callback
-    @notification_callback ||= Proc.new do |event|
-      debug "event queue event received: #{event.inspect}"
-      message = event.options[:message]
-      if event.type == :failed
-        message "Error - #{message}", event.source
-        message "Quitting..."
-        self.director = self.participant = nil # end execution
-      else
-        message "#{event.type.to_s.humanize.capitalize}#{" - #{message}" if message}", event.source
-        if event.source == :participant
-          handle_participant_event(event)
-        elsif event.source == :director
-          handle_director_event(event)
-        else
-          raise "Unknown event source: #{event.source}"
-        end
-      end
-
-      if participant.nil? && director.nil?
-        # we are done, so notify the event queue to complete
-        Cli::EventQueue.instance.stop
-      end
-    end
-
+  def build_mixer
+    Coinmux::Application::Mixer.new(
+      event_queue: Cli::EventQueue.instance,
+      data_store: data_store,
+      amount: amount,
+      participants: participants,
+      input_private_key: input_private_key,
+      output_address: output_address,
+      change_address: change_address)
   end
 
   def clean_up_coin_join
-    puts "Quitting..."
-    if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
-      director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
-        Cli::EventQueue.instance.stop
-      end
-    else
-      Cli::EventQueue.instance.stop
-    end
+    # TODO
+    # warning "Cleaning up coin_join"
+    # if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
+    #   director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
+    #     Cli::EventQueue.instance.stop
+    #   end
+    # else
+    #   Cli::EventQueue.instance.stop
+    # end
   end
 
   def run_list_coin_joins
@@ -137,53 +138,6 @@ class Cli::Application
 
   def data_store
     @data_store ||= Coinmux::DataStore::Factory.build(Coinmux::CoinJoinUri.parse(coin_join_uri))
-  end
-
-  def build_participant
-    Coinmux::StateMachine::Participant.new(
-      event_queue: Cli::EventQueue.instance,
-      data_store: data_store,
-      amount: amount,
-      participants: participants,
-      input_private_key: input_private_key,
-      output_address: output_address,
-      change_address: change_address)
-  end
-
-  def build_director
-    Coinmux::StateMachine::Director.new(
-      event_queue: Cli::EventQueue.instance,
-      data_store: data_store,
-      amount: amount,
-      participants: participants)
-  end
-
-  def handle_participant_event(event)
-    if [:no_available_coin_join].include?(event.type)
-      if director.nil?
-        # start our own Director since we couldn't find one
-        self.director = build_director
-        director.start(&notification_callback)
-      end
-    elsif [:input_not_selected, :transaction_not_found].include?(event.type)
-      # TODO: try again
-    elsif event.type == :completed
-      self.participant = nil # done
-      message "CoinJoin successfully created!"
-    elsif event.type == :failed
-      self.participant = nil # done
-      message "CoinJoin failed!"
-    end
-  end
-
-  def handle_director_event(event)
-    if event.type == :waiting_for_inputs
-      # our Director is now ready, so let's get started with a new participant
-      self.participant = build_participant
-      participant.start(&notification_callback)
-    elsif event.type == :failed || event.type == :completed
-      self.director = nil # done
-    end
   end
 
   def input_password
