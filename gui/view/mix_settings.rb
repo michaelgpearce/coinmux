@@ -82,7 +82,7 @@ class Gui::View::MixSettings < Gui::View::Base
       mix_settings.send(:start_button).setLabel("Start Mixing")
 
       if input_errors.present?
-        application.show_error_dialog(*input_errors)
+        mix_settings.application.show_error_dialog(*input_errors)
       else
         mix_settings.application.tap do |app|
           app.amount = amount
