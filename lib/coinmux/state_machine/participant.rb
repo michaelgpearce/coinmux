@@ -164,6 +164,6 @@ class Coinmux::StateMachine::Participant < Coinmux::StateMachine::Base
   end
 
   def failure(error_identifier, error_message = nil)
-    notify(:failed, "#{error_identifier}#{": #{error_message}" if error_message}")
+    notify(:failed, message: "#{error_identifier}#{": #{error_message}" if error_message}")
   end
 end
