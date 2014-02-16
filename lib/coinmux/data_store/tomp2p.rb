@@ -71,6 +71,10 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
   def disconnect(&callback)
     self.connected = false
     @peer.shutdown
+
+    if block_given?
+      yield(Coinmux::Event.new(data: :success))
+    end
   end
 
   def generate_identifier
