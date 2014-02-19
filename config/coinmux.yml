@@ -6,7 +6,7 @@ testnet:
     p2p: 'coinjoin://coinmux/p2p?identifier=coinjoins-development&bootstrap=mix.coinmux.com:14141&port=14141'
     filesystem: 'coinjoin://coinmux/filesystem?path=tmp/file_data_store'
   webbtc_host: 'http://test.webbtc.com'
-  show_transaction_url: 'http://test.webbtc.com/tx/%s'
+  show_transaction_url: 'http://testnet.btclook.com/txn/%s'
 
 mainnet:
   name: 'Mainnet'
