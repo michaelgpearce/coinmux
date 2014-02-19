@@ -69,7 +69,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     raise ArgumentError, "cannot be called unless director" unless director?
 
     inputs.value.inject([]) do |acc, input|
-      acc += minimum_unspent_transaction_inputs(input.address).collect do |tx_input|
+      acc += unspent_transaction_inputs(input.address).collect do |tx_input|
         { 'address' => input.address, 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
       end
 
@@ -87,7 +87,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       end)
 
       result.concat(inputs.value.select(&:change_address).collect do |input|
-        unspent_input_amount = minimum_unspent_value!(input.address)
+        unspent_input_amount = unspent_value!(input.address)
         change_amount = unspent_input_amount - amount - participant_transaction_fee
         { 'address' => input.change_address, 'amount' => change_amount, 'identifier' => input.change_transaction_output_identifier }
       end)
@@ -112,37 +112,39 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     )
   end
 
-  def minimum_unspent_value!(address)
-    minimum_unspent_transaction_inputs(address).collect { |hash| hash[:amount] }.inject(&:+)
+  def unspent_value!(address)
+    unspent_transaction_inputs(address).collect { |hash| hash[:amount] }.inject(&:+)
   end
 
   def input_has_enough_unspent_value?(address)
     begin
-      minimum_unspent_transaction_inputs(address)
+      unspent_transaction_inputs(address)
       true
     rescue Coinmux::Error => e
       false
     end
   end
 
-  # Retrieves the minimum number of inputs that can be used to satisfy the `coin_join#amount` requirement.
+  # Retrieves the inputs used to for the coinjoin.
   # @address [String] Participant address.
   # @return [Array] Array of hashes with `:id` (transaction hash identifier), `:index` (the index of the transaction output that is unspent) and `:amount` (the unspent amount) sorted from largest amount to smallest amount.
   # @raise [Coinmux::Error] Unable to retrieve inputs or input data invalid
-  def minimum_unspent_transaction_inputs(address)
-    @minimum_unspent_transaction_inputs_hash ||= {}
+  def unspent_transaction_inputs(address)
+    @unspent_transaction_inputs_hash ||= {}
     
-    if (inputs = @minimum_unspent_transaction_inputs_hash[address]).nil?
-      inputs = retrieve_minimum_unspent_transaction_inputs(bitcoin_network_facade.unspent_inputs_for_address(address), amount + participant_transaction_fee)
+    if (inputs = @unspent_transaction_inputs_hash[address]).nil?
+      inputs = retrieve_unspent_transaction_inputs(bitcoin_network_facade.unspent_inputs_for_address(address), amount + participant_transaction_fee)
 
-      @minimum_unspent_transaction_inputs_hash[address] = inputs
+      @unspent_transaction_inputs_hash[address] = inputs
     end
 
     inputs
   end
 
-  def retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount)
-    total_amount = 0
+  def retrieve_unspent_transaction_inputs(unspent_inputs, minimum_amount)
+    total_amount = unspent_inputs.values.reduce(&:+) || 0
+
+    raise Coinmux::Error, "does not have #{minimum_amount} unspent" if total_amount < minimum_amount
 
     inputs = unspent_inputs.collect do |key, amount|
       { id: key[:id], index: key[:index], amount: amount }
@@ -150,14 +152,7 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
       result = right[:amount] <=> left[:amount]
       result = right[:id] <=> left[:id] if result == 0 # ensure always sort the same way when amounts are equal
       result
-    end.select do |hash|
-      if total_amount < minimum_amount
-        total_amount += hash[:amount]
-        true
-      end
     end
-
-    raise Coinmux::Error, "does not have #{minimum_amount} unspent" if total_amount < minimum_amount
 
     inputs
   end

@@ -31,7 +31,7 @@ class Coinmux::Message::Transaction < Coinmux::Message::Base
   end
 
   def participant_input_transactions
-    @participant_input_transactions ||= coin_join.minimum_unspent_transaction_inputs(participant_input.address)
+    @participant_input_transactions ||= coin_join.unspent_transaction_inputs(participant_input.address)
   end
 
   def participant_input_amount
