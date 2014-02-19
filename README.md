@@ -149,7 +149,7 @@ There may be some interesting things to try combining a filesystem CoinJoin with
 
 ## Graphical Interface
 
-Since Coinmux is in early development, there may be bugs that can cause a loss of Bitcoin. To make Coinmux only appeal to the development community, there is currently no graphical interface and the application defaults to connecting to the Testnet Bitcoin network.
+Since Coinmux is in early development, there may be bugs that can cause a loss of Bitcoin. There is a graphical interface in early development that can be used. It may be more prone to bugs than the command line interface. Like the command line interface, it defaults to the Testnet Bitcoin network. This can be changed in the settings, but this is not recommended. USE AT YOUR OWN RISK!
 
 As the system shows its robustness, it will have a graphical interface and default to Bitcoin's Mainnet.
 
