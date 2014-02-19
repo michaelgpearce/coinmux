@@ -131,7 +131,9 @@ module Helper
   def self.data_store
     @data_store ||= (
       coin_join_uri = Coinmux::CoinJoinUri.parse(Coinmux::Config.instance.coin_join_uri)
-      Coinmux::DataStore::Factory.build(coin_join_uri)
+      Coinmux::DataStore::Factory.build(coin_join_uri).tap do |data_store|
+        data_store.connect {}
+      end
     )
   end
 end

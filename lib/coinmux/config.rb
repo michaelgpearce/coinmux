@@ -46,6 +46,6 @@ class Coinmux::Config
   end
 
   def coin_join_uri
-    coin_join_uris.first
+    coin_join_uris.first[1]
   end
 end

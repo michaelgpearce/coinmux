@@ -21,6 +21,7 @@ test:
   name: 'Test'
   bitcoin_network: 'testnet3'
   coin_join_uris:
+    test: 'coinjoin://coinmux/test'
     p2p: 'coinjoin://coinmux/test'
     filesystem: 'coinjoin://coinmux/test'
   webbtc_host: 'http://webbtc.example.com'
