@@ -26,11 +26,16 @@ class Coinmux::Config
     end
 
     def instance
-      case Coinmux.env
-      when 'production'; mainnet
-      when 'development'; testnet
-      when 'test'; test
-      end
+      @instance ||= (
+        case Coinmux.env
+        when 'production'; mainnet
+        when 'development'; testnet
+        when 'test'; test
+        end)
+    end
+
+    def instance=(config)
+      @instance = config
     end
   end
 

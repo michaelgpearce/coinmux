@@ -5,7 +5,7 @@ class Gui::Application < Java::JavaxSwing::JFrame
   HEIGHT = 450
   MIXES_TABLE_REFRESH_SECONDS = 5
 
-  attr_accessor :amount, :participants, :bitcoin_network, :coin_join_uri, :input_private_key, :output_address, :change_address, :current_view
+  attr_accessor :amount, :participants, :coin_join_uri, :input_private_key, :output_address, :change_address, :current_view
 
   import 'java.awt.CardLayout'
   import 'java.awt.Dimension'
@@ -107,14 +107,18 @@ class Gui::Application < Java::JavaxSwing::JFrame
       preferences_view.show
 
       dialog.show
-      if preferences_view.success && coin_join_uri != preferences_view.coin_join_uri
-        if data_store.connected
-          data_store.disconnect
+      if preferences_view.success
+        Coinmux::Config.instance = Coinmux::Config[preferences_view.bitcoin_network] # should get rid of singleton here
+
+        if coin_join_uri != preferences_view.coin_join_uri
+          if data_store.connected
+            data_store.disconnect
+          end
+          self.coin_join_uri = preferences_view.coin_join_uri
+          @data_store = nil # lazy load again
+          views[:available_mixes].update
+          connect_data_store
         end
-        self.coin_join_uri = preferences_view.coin_join_uri
-        @data_store = nil # lazy load again
-        views[:available_mixes].update
-        connect_data_store
       end
     end
   end

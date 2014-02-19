@@ -1,5 +1,13 @@
 ## Coinmux Release Notes
 
+### v0.2.1
+
+* Connect to mainnet when selected in preferences.
+
+### v0.2.0
+
+* Initial Grapical User Interface
+
 ### v0.1.3
 
 * Participant checks for director changing status to 'failed'.

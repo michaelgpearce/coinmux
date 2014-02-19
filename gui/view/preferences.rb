@@ -29,6 +29,10 @@ class Gui::View::Preferences < Gui::View::Base
     Coinmux::CoinJoinUri.new(network: selected_data_store_key, params: selected_table_model_params)
   end
 
+  def bitcoin_network
+    selected_network_key
+  end
+
   def add
     add_header("Preferences")
 
