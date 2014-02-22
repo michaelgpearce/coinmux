@@ -171,23 +171,19 @@ class Coinmux::BitcoinNetwork
   end
 
   def build_unspent_inputs_from_data(data, address)
-    all_inputs = data['transactions'].values.inject({}) do |acc, txn|
+    all_inputs = data['transactions'].values.each_with_object({}) do |txn, acc|
       txn['out'].each_with_index do |out, index|
-        if out['address'] == address
+        if out['address'] == address # NOTE: coinbase transactions do not have an address so will never be matched
           acc[{id: txn['hash'], index: index}] = (out['value'].to_f * SATOSHIS_PER_BITCOIN).to_i
         end
       end
-
-      acc
     end
 
-    unspent_inputs = data['transactions'].values.inject(all_inputs.dup) do |acc, txn|
+    unspent_inputs = data['transactions'].values.each_with_object(all_inputs.dup) do |txn, acc|
       txn['in'].each do |in_|
         next unless prev_out = in_['prev_out']
         acc.delete({id: prev_out['hash'], index: prev_out['n']})
       end
-
-      acc
     end
 
     unspent_inputs
