@@ -43,7 +43,7 @@ Download the Java Jar file:
 
 Install RVM and JRuby
 ```bash
-\curl -sSL https://get.rvm.io | bash -s stable --ruby=jruby-1.7.8
+\curl -sSL https://get.rvm.io | bash -s stable --ruby=jruby-1.7.10
 ```
 
 Clone the git repository to your computer.
