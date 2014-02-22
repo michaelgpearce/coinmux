@@ -122,8 +122,9 @@ class Gui::View::Mixing < Gui::View::Base
         if action_button.getLabel() == TERMINATE_TEXT
           result = JOptionPane.showConfirmDialog(application.root_panel, "Are you sure you want to terminate this mix?", "Coinmux", JOptionPane::YES_NO_OPTION, JOptionPane::WARNING_MESSAGE)
           if result == JOptionPane::YES_OPTION
-            application.clean_up_mixing
-            application.show_view(:available_mixes)
+            mixer.cancel do
+              application.show_view(:available_mixes)
+            end
           end
         else
           application.show_view(:available_mixes)
