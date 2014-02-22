@@ -177,7 +177,6 @@ class Gui::Application < Java::JavaxSwing::JFrame
 
   def quit
     Java::JavaLang::System.exit(0)
-    # clean_up_coin_join
   end
 
   def views
