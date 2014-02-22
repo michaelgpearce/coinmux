@@ -142,6 +142,29 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
   end
 
   def retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount)
+    begin
+      # first try to retrieve inputs with amount exactly equal to the minimum_amount
+      do_retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount, true)
+    rescue Coinmux::Error
+      begin
+        # next try to retrieve with an amount that has a change output > the dust amount
+        # The Bitcoin network won't propogate the transaction with change < dust
+        do_retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount + DUST_SATOSHIS)
+      rescue Coinmux::Error
+        begin
+          do_retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount)
+          # If this raises, we have less than the minimum required amount
+          # If this doesn't raise, we have more than the minimum, but with a very small (i.e. dust) change amount
+          # We simply won't handle dust change though it would be possible to instead send dust as a miner fee
+          raise Coinmux::Error, "has more than #{minimum_amount} unspent but results in dust change"
+        end
+      end
+    end
+  end
+
+  private
+
+  def do_retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount, must_be_exact = false)
     total_amount = 0
 
     inputs = unspent_inputs.collect do |key, amount|
@@ -158,11 +181,10 @@ class Coinmux::Message::CoinJoin < Coinmux::Message::Base
     end
 
     raise Coinmux::Error, "does not have #{minimum_amount} unspent" if total_amount < minimum_amount
+    raise Coinmux::Error, "must have exactly #{total_amount}" if must_be_exact && total_amount != minimum_amount
 
     inputs
   end
-
-  private
 
   def version_matches
     (errors[:version] << "must be #{VERSION}" and return) unless version.to_s == VERSION.to_s

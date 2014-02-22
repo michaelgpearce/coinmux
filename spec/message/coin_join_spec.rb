@@ -354,51 +354,67 @@ describe Coinmux::Message::CoinJoin do
     let(:message) { build(:coin_join_message) }
     let(:unspent_inputs) do
       {
-        { id: "a", index: 4 } => 10,
-        { id: "b", index: 0 } => 20,
-        { id: "c", index: 3 } => 15,
+        { id: "a", index: 4 } => 10_000,
+        { id: "b", index: 0 } => 20_000,
+        { id: "c", index: 3 } => 15_000,
       }
     end
 
     subject { message.retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount) }
 
     context "with minimum_amount less than largest transaction" do
-      let(:minimum_amount) { 15 }
+      let(:minimum_amount) { 15_000 }
 
       it "retrieves returns only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20_000 }])
       end
     end
 
     context "with minimum_amount equal largest transaction" do
-      let(:minimum_amount) { 20 }
+      let(:minimum_amount) { 20_000 }
 
       it "retrieves only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20_000 }])
       end
     end
 
     context "with minimum_amount greater than largest transaction" do
-      let(:minimum_amount) { 25 }
+      let(:minimum_amount) { 25_000 }
 
       it "retrieves largest two transactions" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }])
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20_000 }, { id: "c", index: 3, amount: 15_000 }])
       end
     end
 
     context "with minimum_amount equal all transactions" do
-      let(:minimum_amount) { 45 }
+      let(:minimum_amount) { 45_000 }
 
-      it "retrieves only largest transaction" do
-        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }, { id: "a", index: 4, amount: 10 }])
+      it "retrieves all transactions" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20_000 }, { id: "c", index: 3, amount: 15_000 }, { id: "a", index: 4, amount: 10_000 }])
+      end
+    end
+
+    context "with change amount being smaller than dust sized" do
+      let(:minimum_amount) { unspent_inputs.values.reduce(&:+) - Coinmux::BitcoinUtil::DUST_SATOSHIS + 1 }
+
+      it "raises error" do
+        expect { subject }.to raise_error(Coinmux::Error, "has more than #{minimum_amount} unspent but results in dust change")
+      end
+    end
+
+    context "with change amount being dust sized" do
+      let(:minimum_amount) { unspent_inputs.values.reduce(&:+) - Coinmux::BitcoinUtil::DUST_SATOSHIS }
+
+      it "retrieves all transactions" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20_000 }, { id: "c", index: 3, amount: 15_000 }, { id: "a", index: 4, amount: 10_000 }])
       end
     end
 
     context "with minimum_amount greater than all transactions" do
-      let(:minimum_amount) { 46 }
+      let(:minimum_amount) { unspent_inputs.values.reduce(&:+) + 1 }
 
       it "raises error" do
-        expect { subject }.to raise_error(Coinmux::Error)
+        expect { subject }.to raise_error(Coinmux::Error, "does not have #{minimum_amount} unspent")
       end
     end
   end

@@ -6,7 +6,7 @@ class Coinmux::Message::Input < Coinmux::Message::Base
   validates :message_public_key, :address, :signature, :change_transaction_output_identifier, :presence => true
   validate :signature_correct
   validate :change_address_valid, :if => :change_address
-  validate :change_amount_not_more_than_transaction_fee_with_no_change_address, :unless => :change_address
+  validate :change_address_required, :unless => :change_address
   validate :input_has_enough_value
   
   class << self
@@ -46,9 +46,9 @@ class Coinmux::Message::Input < Coinmux::Message::Base
     end
   end
 
-  def change_amount_not_more_than_transaction_fee_with_no_change_address
+  def change_address_required
     unspent_value = coin_join.minimum_unspent_value!(address) rescue 0
-    if unspent_value - coin_join.amount > coin_join.participant_transaction_fee
+    if unspent_value - coin_join.amount - coin_join.participant_transaction_fee > DUST_SATOSHIS
       errors[:change_address] << "required for this input address"
     end
   end
