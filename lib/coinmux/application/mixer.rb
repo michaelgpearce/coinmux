@@ -21,8 +21,9 @@ class Coinmux::Application::Mixer
   end
 
   def cancel(&callback)
-    if !%w(failed completed).include?(director.try(:coin_join_message).try(:state).try(:value).try(:state))
-      director.coin_join_message.status.insert(Coinmux::Message::Status.build(director.coin_join_message, state: 'failed')) do
+    coin_join_message = director.try(:coin_join_message)
+    if !%w(failed completed).include?(coin_join_message.try(:state).try(:value).try(:state))
+      coin_join_message.status.insert(Coinmux::Message::Status.build(coin_join_message, state: 'failed')) do
         yield if block_given?
       end
     else
