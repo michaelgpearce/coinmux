@@ -240,9 +240,6 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
   end
 
   def do_get_list(key, &callback)
-    # peer.get(create_hash(key)).setAll()
-    Thread.new do
-    peer.get(create_hash(key))
     exec(peer.get(create_hash(key)).setAll(), callback) do |future|
       if future.isSuccess()
         hashes = future.getDataMap().values().each_with_object([]) do |value, hashes|
@@ -270,7 +267,6 @@ class Coinmux::DataStore::Tomp2p < Coinmux::DataStore::Base
       else
         Coinmux::Event.new(error: future.getFailedReason())
       end
-    end
     end
     nil
   end
