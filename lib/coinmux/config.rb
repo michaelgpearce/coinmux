@@ -1,10 +1,9 @@
 require 'yaml'
-require 'erb'
 
 class Coinmux::Config
   include Coinmux::Proper
 
-  CONFIG = YAML.load(ERB.new(Coinmux::FileUtil.read_content('config', 'coinmux.yml')).result)
+  CONFIG = YAML.load(Coinmux::FileUtil.read_content('config', 'coinmux.yml'))
 
   property :name, :bitcoin_network, :coin_join_uris, :webbtc_host, :show_transaction_url
   
