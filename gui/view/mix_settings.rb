@@ -103,7 +103,7 @@ class Gui::View::MixSettings < Gui::View::Base
     end
 
     def amount
-      (mix_settings.send(:amount).getText().to_f * SATOSHIS_PER_BITCOIN).to_i
+      (mix_settings.send(:amount).getText().strip.to_f * SATOSHIS_PER_BITCOIN).to_i
     end
 
     def participants
@@ -111,15 +111,15 @@ class Gui::View::MixSettings < Gui::View::Base
     end
 
     def input_private_key
-      mix_settings.send(:input_private_key).getText()
+      mix_settings.send(:input_private_key).getText().strip
     end
 
     def change_address
-      mix_settings.send(:change_address).getText()
+      mix_settings.send(:change_address).getText().strip
     end
 
     def output_address
-      mix_settings.send(:output_address).getText()
+      mix_settings.send(:output_address).getText().strip
     end
 
   end
