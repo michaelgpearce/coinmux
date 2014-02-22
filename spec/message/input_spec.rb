@@ -75,7 +75,7 @@ describe Coinmux::Message::Input do
 
         context "with unspent amount greater than coinjoin amount and participant transaction fee" do
           before do
-            message.coin_join.should_receive(:unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee + 1)
+            message.coin_join.should_receive(:minimum_unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee + 1)
           end
 
           it "is invalid" do
@@ -86,7 +86,7 @@ describe Coinmux::Message::Input do
 
         context "with unspent amount equal to coinjoin amount and participant transaction fee" do
           before do
-            message.coin_join.should_receive(:unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee)
+            message.coin_join.should_receive(:minimum_unspent_value!).with(address).and_return(coin_join.amount + coin_join.participant_transaction_fee)
           end
 
           it "is valid" do

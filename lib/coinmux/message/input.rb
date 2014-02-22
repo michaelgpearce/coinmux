@@ -47,7 +47,7 @@ class Coinmux::Message::Input < Coinmux::Message::Base
   end
 
   def change_amount_not_more_than_transaction_fee_with_no_change_address
-    unspent_value = coin_join.unspent_value!(address) rescue 0
+    unspent_value = coin_join.minimum_unspent_value!(address) rescue 0
     if unspent_value - coin_join.amount > coin_join.participant_transaction_fee
       errors[:change_address] << "required for this input address"
     end

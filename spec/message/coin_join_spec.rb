@@ -296,7 +296,7 @@ describe Coinmux::Message::CoinJoin do
     context "when in valid state" do
       it "maps input transactions for address" do
         expect(subject).to eq(coin_join.inputs.value.inject([]) do |acc, input|
-          acc += coin_join.unspent_transaction_inputs(input.address).collect do |tx_input|
+          acc += coin_join.minimum_unspent_transaction_inputs(input.address).collect do |tx_input|
             { 'address' => input.address, 'transaction_id' => tx_input[:id], 'output_index' => tx_input[:index] }
           end
 
@@ -350,7 +350,7 @@ describe Coinmux::Message::CoinJoin do
     end
   end
 
-  describe "#retrieve_unspent_transaction_inputs" do
+  describe "#retrieve_minimum_unspent_transaction_inputs" do
     let(:message) { build(:coin_join_message) }
     let(:unspent_inputs) do
       {
@@ -360,21 +360,36 @@ describe Coinmux::Message::CoinJoin do
       }
     end
 
-    subject { message.retrieve_unspent_transaction_inputs(unspent_inputs, minimum_amount) }
+    subject { message.retrieve_minimum_unspent_transaction_inputs(unspent_inputs, minimum_amount) }
 
-    context "with no unspect transactions" do
-      let(:minimum_amount) { 45 }
-      let(:unspent_inputs) { {} }
+    context "with minimum_amount less than largest transaction" do
+      let(:minimum_amount) { 15 }
 
-      it "raises error" do
-        expect { subject }.to raise_error(Coinmux::Error)
+      it "retrieves returns only largest transaction" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+      end
+    end
+
+    context "with minimum_amount equal largest transaction" do
+      let(:minimum_amount) { 20 }
+
+      it "retrieves only largest transaction" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }])
+      end
+    end
+
+    context "with minimum_amount greater than largest transaction" do
+      let(:minimum_amount) { 25 }
+
+      it "retrieves largest two transactions" do
+        expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }])
       end
     end
 
     context "with minimum_amount equal all transactions" do
       let(:minimum_amount) { 45 }
 
-      it "retrieves transaction" do
+      it "retrieves only largest transaction" do
         expect(subject).to eq([{ id: "b", index: 0, amount: 20 }, { id: "c", index: 3, amount: 15 }, { id: "a", index: 4, amount: 10 }])
       end
     end
