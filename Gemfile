@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 group :development do
-  gem 'rake', '10.1.1'
+  gem 'rake', '12.3.3'
   gem 'wirble', '0.1.3'
   gem 'jruby-jars', '1.7.10'
 end
