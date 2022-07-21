@@ -1,23 +1,26 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.0.2)
-      i18n (~> 0.6, >= 0.6.4)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
-    atomic (1.1.14-java)
+    activesupport (7.0.3.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
     coderay (1.1.0)
+    concurrent-ruby (1.1.10)
     diff-lcs (1.2.5)
     factory_girl (4.3.0)
       activesupport (>= 3.0.0)
     ffi (1.9.3-java)
-    i18n (0.6.9)
+    i18n (1.12.0)
+      concurrent-ruby (~> 1.0)
     jruby-jars (1.7.10)
     method_source (0.8.2)
-    minitest (4.7.5)
-    multi_json (1.8.4)
+    minitest (5.16.2)
+    pry (0.9.12.4)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
     pry (0.9.12.4-java)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -35,13 +38,13 @@ GEM
     slop (3.4.7)
     spoon (0.0.4)
       ffi
-    thread_safe (0.1.3-java)
-      atomic
-    tzinfo (0.3.38)
+    tzinfo (2.0.5)
+      concurrent-ruby (~> 1.0)
     wirble (0.1.3)
 
 PLATFORMS
   java
+  ruby
 
 DEPENDENCIES
   factory_girl (= 4.3.0)
